@@ -1,4 +1,4 @@
-use crate::{semantics::semantics::Semantics, techniques::livelock::IsPartOfLivelock};
+use crate::{semantics::semantics_trait::Semantics, techniques::livelock::IsPartOfLivelock};
 use ebi_objects::{
     anyhow::Result, ebi_arithmetic::Fraction, ebi_objects::labelled_petri_net::TransitionIndex,
 };

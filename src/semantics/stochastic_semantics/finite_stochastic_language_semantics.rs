@@ -1,6 +1,6 @@
 use crate::semantics::{
     finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},
@@ -26,7 +26,7 @@ impl StochasticSemantics for FiniteStochasticLanguageSemantics {
 
     fn get_total_weight_of_enabled_transitions(&self, state: &usize) -> Result<Fraction> {
         let mut sum = Fraction::zero();
-        for (_, (_, probability)) in &self.nodes[*state] {
+        for (_, probability) in self.nodes[*state].values() {
             sum += probability;
         }
         if sum == Fraction::zero() {

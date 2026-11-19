@@ -136,7 +136,7 @@ impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLogTraceAttrib
                 // log::debug!("sample done\n   average distance with knowledge of attribute {} \naverage distance without knowledge of attribute {}", &sum_a / count_a, &sum_r / count_r);
                 if let Ok(a) = average_a.average() {
                     let r = average_r.average().unwrap();
-                    if &a < &r {
+                    if a < r {
                         // log::debug!("a wins -- average a {}, average r {} -- sample {:?}", a, r, sample);
                         1
                     } else {

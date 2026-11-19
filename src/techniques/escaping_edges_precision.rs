@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::displayable::Displayable, ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
-    semantics::semantics::Semantics,
+    semantics::semantics_trait::Semantics,
 };
 use ebi_objects::{
     StochasticLanguageOfAlignments,

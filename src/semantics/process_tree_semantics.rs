@@ -1,4 +1,4 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
     anyhow::Result,
     ebi_objects::{
@@ -57,7 +57,7 @@ impl Semantics for ProcessTree {
 #[cfg(test)]
 mod tests {
     use crate::semantics::{
-        semantics::Semantics, stochastic_semantics::stochastic_semantics::StochasticSemantics,
+        semantics_trait::Semantics, stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     };
     use ebi_objects::{
         ebi_arithmetic::{Fraction, One},

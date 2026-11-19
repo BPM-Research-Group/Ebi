@@ -1,4 +1,4 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{ebi_arithmetic::Fraction, ebi_objects::labelled_petri_net::TransitionIndex};
 
 pub trait StochasticPartiallyOrderedSemantics:

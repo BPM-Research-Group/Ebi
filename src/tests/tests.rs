@@ -201,7 +201,7 @@ pub mod tests {
             ebi_trait_event_log::EbiTraitEventLog, ebi_trait_semantics::EbiTraitSemantics,
         },
         multiple_reader::MultipleReader,
-        semantics::semantics::Semantics,
+        semantics::semantics_trait::Semantics,
     };
     use ebi_objects::{
         ActivityKey, DeterministicFiniteAutomaton, EventLog, FiniteLanguage, Importable, Infoable,

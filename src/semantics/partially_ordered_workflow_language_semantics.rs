@@ -1,4 +1,4 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
     anyhow::{anyhow, Result},
     ebi_objects::{
@@ -429,7 +429,7 @@ fn enabled_transitions_partial_order_execute(
 #[cfg(test)]
 
 mod tests {
-    use crate::semantics::semantics::Semantics;
+    use crate::semantics::semantics_trait::Semantics;
     use ebi_objects::{
         ebi_objects::partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
         HasActivityKey,

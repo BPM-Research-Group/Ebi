@@ -6,7 +6,7 @@ use crate::{
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
         labelled_petri_net_semantics::LPNMarking,
-        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+        stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     },
     trait_definition_finalisation,
 };

@@ -70,7 +70,7 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
 
                                     *sequence_flow
                                         .weight
-                                        .get_or_insert_with(|| Fraction::zero()) += probability;
+                                        .get_or_insert_with(Fraction::zero) += probability;
                                 }
                             }
 

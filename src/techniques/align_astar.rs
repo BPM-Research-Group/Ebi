@@ -8,7 +8,7 @@ use crate::{
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
         finite_stochastic_partially_ordered_language_semantics::FspolangMarking,
-        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
+        labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics,
     },
     techniques::align::Align,
 };
@@ -63,7 +63,7 @@ impl Align for EbiTraitSemantics {
         }
     }
 
-    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+    fn align_trace(&self, trace: &[Activity]) -> Result<(Vec<Move>, usize)> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
             EbiTraitSemantics::AutomatonState(sem) => sem.align_trace(trace),
@@ -129,9 +129,10 @@ where
             //something went wrong
             if let Ok(mutex) = Arc::try_unwrap(error)
                 && let Ok(err) = mutex.into_inner()
-                    && let Some(err) = err {
-                        return Err(err);
-                    }
+                && let Some(err) = err
+            {
+                return Err(err);
+            }
             return Err(anyhow!("Something went wrong when computing alignments."));
         }
 
@@ -193,9 +194,10 @@ where
             //something went wrong
             if let Ok(mutex) = Arc::try_unwrap(error)
                 && let Ok(err) = mutex.into_inner()
-                    && let Some(err) = err {
-                        return Err(err);
-                    }
+                && let Some(err) = err
+            {
+                return Err(err);
+            }
             return Err(anyhow!("Something went wrong when computing alignments."));
         }
 
@@ -209,7 +211,7 @@ where
     /**
      * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
      */
-    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+    fn align_trace(&self, trace: &[Activity]) -> Result<(Vec<Move>, usize)> {
         if let Some((states, cost)) = align_astar(self, trace) {
             Ok((transform_alignment(self, trace, states)?, cost))
         } else {
@@ -222,7 +224,7 @@ where
 
 pub fn align_astar<T, State>(
     semantics: &T,
-    trace: &Vec<Activity>,
+    trace: &[Activity],
 ) -> Option<(Vec<(usize, State)>, usize)>
 where
     T: Semantics<SemState = State> + AlignmentHeuristics<AliState = State> + ?Sized,
@@ -253,7 +255,7 @@ where
             //walk through the enabled transitions in the model
             for transition in semantics.get_enabled_transitions(state) {
                 let mut new_state = state.clone();
-                let _ = semantics
+                semantics
                     .execute_transition(&mut new_state, transition)
                     .unwrap();
 
@@ -463,10 +465,10 @@ pub trait AlignmentHeuristics {
      */
     fn underestimate_cost_to_final_synchronous_state(
         &self,
-        trace: &Vec<Activity>,
+        trace: &[Activity],
         trace_index: &usize,
         state: &Self::AliState,
-        cache: &Vec<Vec<usize>>,
+        cache: &[Vec<usize>],
     ) -> usize;
 }
 
@@ -479,10 +481,10 @@ impl AlignmentHeuristics for BusinessProcessModelAndNotation {
 
     fn underestimate_cost_to_final_synchronous_state(
         &self,
-        _: &Vec<Activity>,
+        _: &[Activity],
         _: &usize,
         _: &BPMNMarking,
-        _: &Vec<Vec<usize>>,
+        _: &[Vec<usize>],
     ) -> usize {
         0
     }
@@ -497,10 +499,10 @@ impl AlignmentHeuristics for StochasticBusinessProcessModelAndNotation {
 
     fn underestimate_cost_to_final_synchronous_state(
         &self,
-        _: &Vec<Activity>,
+        _: &[Activity],
         _: &usize,
         _: &BPMNMarking,
-        _: &Vec<Vec<usize>>,
+        _: &[Vec<usize>],
     ) -> usize {
         0
     }
@@ -515,10 +517,10 @@ impl AlignmentHeuristics for DeterministicFiniteAutomaton {
 
     fn underestimate_cost_to_final_synchronous_state(
         &self,
-        _: &Vec<Activity>,
+        _: &[Activity],
         _: &usize,
         _: &AutomatonState,
-        _: &Vec<Vec<usize>>,
+        _: &[Vec<usize>],
     ) -> usize {
         0
     }
@@ -533,10 +535,10 @@ impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
 
     fn underestimate_cost_to_final_synchronous_state(
         &self,
-        _: &Vec<Activity>,
+        _: &[Activity],
         _: &usize,
         _: &usize,
-        _: &Vec<Vec<usize>>,
+        _: &[Vec<usize>],
     ) -> usize {
         0
     }
@@ -551,10 +553,10 @@ impl AlignmentHeuristics for FiniteStochasticPartiallyOrderedLanguage {
 
     fn underestimate_cost_to_final_synchronous_state(
         &self,
-        _trace: &Vec<Activity>,
+        _trace: &[Activity],
         _trace_index: &usize,
         _state: &Self::AliState,
-        _cache: &Vec<Vec<usize>>,
+        _cache: &[Vec<usize>],
     ) -> usize {
         0
     }
@@ -569,10 +571,10 @@ impl AlignmentHeuristics for LabelledPetriNet {
 
     fn underestimate_cost_to_final_synchronous_state(
         &self,
-        _trace: &Vec<Activity>,
+        _trace: &[Activity],
         _trace_index: &usize,
         _state: &LPNMarking,
-        _cache: &Vec<Vec<usize>>,
+        _cache: &[Vec<usize>],
     ) -> usize {
         0
     }
@@ -587,10 +589,10 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
 
     fn underestimate_cost_to_final_synchronous_state(
         &self,
-        _trace: &Vec<Activity>,
+        _trace: &[Activity],
         _trace_index: &usize,
         _state: &LPNMarking,
-        _cache: &Vec<Vec<usize>>,
+        _cache: &[Vec<usize>],
     ) -> usize {
         0
     }
@@ -607,10 +609,10 @@ macro_rules! aut {
 
             fn underestimate_cost_to_final_synchronous_state(
                 &self,
-                _: &Vec<Activity>,
+                _: &[Activity],
                 _: &usize,
                 _: &AutomatonState,
-                _: &Vec<Vec<usize>>,
+                _: &[Vec<usize>],
             ) -> usize {
                 0
             }
@@ -629,10 +631,10 @@ macro_rules! treemarking {
 
             fn underestimate_cost_to_final_synchronous_state(
                 &self,
-                _: &Vec<Activity>,
+                _: &[Activity],
                 _: &usize,
                 _: &TreeMarking,
-                _: &Vec<Vec<usize>>,
+                _: &[Vec<usize>],
             ) -> usize {
                 0
             }

@@ -1,10 +1,10 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
-    Activity, ActivityKey, ActivityKeyTranslator, FiniteStochasticLanguage, HasActivityKey,
-    IntoRefTraceProbabilityIterator, NumberOfTraces, TranslateActivityKey,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::labelled_petri_net::TransitionIndex,
+    Activity, ActivityKey, ActivityKeyTranslator, FiniteStochasticLanguage, HasActivityKey,
+    IntoRefTraceProbabilityIterator, NumberOfTraces, TranslateActivityKey,
 };
 use std::collections::HashMap;
 
@@ -169,12 +169,11 @@ impl Semantics for FiniteStochasticLanguageSemantics {
 
     fn get_enabled_transitions(&self, state: &usize) -> Vec<TransitionIndex> {
         let mut result = vec![];
-        for (activity, _) in &self.nodes[*state] {
+        for activity in self.nodes[*state].keys() {
             result.push(self.activity_to_transition_index(activity));
         }
         result
     }
-
 }
 
 #[cfg(test)]

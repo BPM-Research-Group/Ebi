@@ -116,10 +116,7 @@ pub fn get_possible_inputs_with_java(traits: &[&EbiInputType]) -> Vec<JavaObject
         result.extend(input_type.get_java_object_handlers());
     }
 
-    result = result
-        .into_iter()
-        .filter(|java_object_handler| java_object_handler.translator_java_to_ebi.is_some())
-        .collect();
+    result.retain(|java_object_handler| java_object_handler.translator_java_to_ebi.is_some());
 
     result.into_iter().cloned().collect::<Vec<_>>()
 }

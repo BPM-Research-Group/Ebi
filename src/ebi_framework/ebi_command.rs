@@ -332,7 +332,7 @@ impl EbiCommand {
 
     pub fn get_progress_bar_message(message: String) -> ProgressBar {
         let pb = ProgressBar::new_spinner();
-        pb.set_style(ProgressStyle::with_template(("{spinner} {wide_msg}")).unwrap());
+        pb.set_style(ProgressStyle::with_template("{spinner} {wide_msg}").unwrap());
         pb.enable_steady_tick(Duration::from_millis(100));
         pb.set_message(message);
         pb.tick();
@@ -529,18 +529,16 @@ impl EbiCommand {
                                 .display()
                                 .to_string()
                                 .ends_with(&(".".to_string() + file_handler.file_extension))
-                            {
-                                return Ok(exporter);
-                            }
+                        {
+                            return Ok(exporter);
+                        }
                     }
                 }
 
                 //otherwise, take the default one
                 Ok(output_type.get_default_exporter())
             }
-            None => {
-                Ok(output_type.get_default_exporter())
-            }
+            None => Ok(output_type.get_default_exporter()),
         }
     }
 

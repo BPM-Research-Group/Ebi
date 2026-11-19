@@ -1,6 +1,6 @@
 use crate::semantics::{
     labelled_petri_net_semantics::LPNMarking,
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},

@@ -181,7 +181,7 @@ pub mod semantics {
     pub mod labelled_petri_net_semantics;
     pub mod partially_ordered_workflow_language_semantics;
     pub mod process_tree_semantics;
-    pub mod semantics;
+    pub mod semantics_trait;
     pub mod stochastic_business_process_model_and_notation_semantics;
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_process_tree_semantics;
@@ -190,7 +190,7 @@ pub mod semantics {
         pub mod stochastic_deterministic_finite_automaton_deterministic;
     }
     pub mod stochastic_partially_ordered_semantics {
-        pub mod stochastic_partially_ordered_semantics;
+        pub mod stochastic_partially_ordered_semantics_trait;
         pub mod stochastic_process_tree_stochastic_partially_ordered_semantics;
     }
     pub mod stochastic_semantics {
@@ -201,7 +201,7 @@ pub mod semantics {
         pub mod stochastic_labelled_petri_net_semantics;
         pub mod stochastic_nondeterministic_finite_automaton_semantics;
         pub mod stochastic_process_tree_semantics;
-        pub mod stochastic_semantics;
+        pub mod stochastic_semantics_trait;
     }
 }
 

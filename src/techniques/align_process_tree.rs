@@ -135,7 +135,7 @@ impl Align for ProcessTreeAligner<'_> {
         })
     }
 
-    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+    fn align_trace(&self, trace: &[Activity]) -> Result<(Vec<Move>, usize)> {
         let mut solver = DynamicProgramming {
             tree: self.tree,
             node_metadata: &self.node_metadata,

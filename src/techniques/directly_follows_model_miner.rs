@@ -190,7 +190,7 @@ fn get_edges_to_filter(
 mod tests {
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        semantics::semantics::Semantics,
+        semantics::semantics_trait::Semantics,
         techniques::directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
     };
     use ebi_objects::{

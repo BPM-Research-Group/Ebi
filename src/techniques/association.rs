@@ -3,32 +3,21 @@ use crate::{
     math::{correlation::correlation, levenshtein, root::ContainsRoot},
 };
 use ebi_objects::{
-    Attribute, DataType,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, Signed, Zero},
+    Attribute, DataType,
 };
 use rand::RngExt;
 use rayon::prelude::*;
 
 pub trait Associations {
-    fn association(
-        self: &Box<Self>,
-        number_of_samples: usize,
-        attribute: Attribute,
-    ) -> Result<ContainsRoot>;
+    fn association(&self, number_of_samples: usize, attribute: Attribute) -> Result<ContainsRoot>;
 
-    fn associations(
-        self: &Box<Self>,
-        number_of_samples: usize,
-    ) -> Vec<(String, Result<ContainsRoot>)>;
+    fn associations(&self, number_of_samples: usize) -> Vec<(String, Result<ContainsRoot>)>;
 }
 
 impl Associations for dyn EbiTraitEventLogTraceAttributes {
-    fn association(
-        self: &Box<Self>,
-        number_of_samples: usize,
-        attribute: Attribute,
-    ) -> Result<ContainsRoot> {
+    fn association(&self, number_of_samples: usize, attribute: Attribute) -> Result<ContainsRoot> {
         match self.attribute_key().attribute_to_data_type(attribute) {
             Some(d_type) => self.association_type(number_of_samples, attribute, d_type),
             None => Err(anyhow!(
@@ -37,10 +26,7 @@ impl Associations for dyn EbiTraitEventLogTraceAttributes {
         }
     }
 
-    fn associations(
-        self: &Box<Self>,
-        number_of_samples: usize,
-    ) -> Vec<(String, Result<ContainsRoot>)> {
+    fn associations(&self, number_of_samples: usize) -> Vec<(String, Result<ContainsRoot>)> {
         log::info!("found attributes {:?}", self.attribute_key());
         log::info!("number of samples {}", number_of_samples);
         self.attribute_key()
@@ -60,7 +46,7 @@ impl Associations for dyn EbiTraitEventLogTraceAttributes {
 
 impl dyn EbiTraitEventLogTraceAttributes {
     fn association_type(
-        self: &Box<Self>,
+        &self,
         number_of_samples: usize,
         attribute: Attribute,
         data_type: &DataType,
@@ -78,20 +64,14 @@ impl dyn EbiTraitEventLogTraceAttributes {
     }
 
     fn association_time(
-        self: &Box<Self>,
+        &self,
         case_attribute: Attribute,
         number_of_samples: usize,
     ) -> Result<ContainsRoot> {
         //gather pairs
         let pairs = self
             .iter_time_and_traces(case_attribute)
-            .filter_map(|(trace, value)| {
-                if let Some(value) = value {
-                    Some((value, trace))
-                } else {
-                    None
-                }
-            })
+            .filter_map(|(trace, value)| value.map(|value| (value, trace)))
             .collect::<Vec<_>>();
 
         if pairs.is_empty() {
@@ -125,7 +105,7 @@ impl dyn EbiTraitEventLogTraceAttributes {
     }
 
     pub fn association_categorical(
-        self: &Box<Self>,
+        &self,
         case_attribute: Attribute,
         number_of_samples: usize,
     ) -> Result<ContainsRoot> {
@@ -134,13 +114,7 @@ impl dyn EbiTraitEventLogTraceAttributes {
         //gather pairs
         let pairs = self
             .iter_categorical_and_traces(case_attribute)
-            .filter_map(|(trace, value)| {
-                if let Some(value) = value {
-                    Some((value, trace))
-                } else {
-                    None
-                }
-            })
+            .filter_map(|(trace, value)| value.map(|value| (value, trace)))
             .collect::<Vec<_>>();
 
         if pairs.is_empty() {
@@ -203,20 +177,14 @@ impl dyn EbiTraitEventLogTraceAttributes {
     }
 
     pub fn association_numerical(
-        self: &Box<Self>,
+        &self,
         case_attribute: Attribute,
         number_of_samples: usize,
     ) -> Result<ContainsRoot> {
         //gather pairs
         let pairs = self
             .iter_numeric_and_traces(case_attribute)
-            .filter_map(|(trace, value)| {
-                if let Some(value) = value {
-                    Some((value, trace))
-                } else {
-                    None
-                }
-            })
+            .filter_map(|(trace, value)| value.map(|value| (value, trace)))
             .collect::<Vec<_>>();
 
         if pairs.is_empty() {

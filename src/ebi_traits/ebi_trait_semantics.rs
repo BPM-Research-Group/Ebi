@@ -6,7 +6,7 @@ use crate::{
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
         finite_stochastic_partially_ordered_language_semantics::FspolangMarking,
-        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
+        labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics,
     },
 };
 use ebi_objects::{

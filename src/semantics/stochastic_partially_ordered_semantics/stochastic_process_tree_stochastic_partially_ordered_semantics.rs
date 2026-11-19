@@ -1,4 +1,4 @@
-use crate::semantics::stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics::StochasticPartiallyOrderedSemantics;
+use crate::semantics::stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics_trait::StochasticPartiallyOrderedSemantics;
 use ebi_objects::{
     StochasticBusinessProcessModelAndNotation, ebi_arithmetic::Fraction, ebi_bpmn::BPMNMarking,
     ebi_objects::labelled_petri_net::TransitionIndex,

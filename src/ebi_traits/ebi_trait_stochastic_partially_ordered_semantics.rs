@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::trait_importers::ToStochasticPartiallyOrderedSemanticsTrait,
-    semantics::stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics::StochasticPartiallyOrderedSemantics,
+    semantics::stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics_trait::StochasticPartiallyOrderedSemantics,
     trait_definition_finalisation,
 };
 use ebi_objects::{ebi_bpmn::BPMNMarking, StochasticBusinessProcessModelAndNotation};

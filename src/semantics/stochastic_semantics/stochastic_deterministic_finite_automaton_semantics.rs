@@ -1,4 +1,4 @@
-use crate::semantics::stochastic_semantics::stochastic_semantics::StochasticSemantics;
+use crate::semantics::stochastic_semantics::stochastic_semantics_trait::StochasticSemantics;
 use ebi_objects::{
     AutomatonState, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
     anyhow::{Result, anyhow},

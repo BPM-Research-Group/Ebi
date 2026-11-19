@@ -1,5 +1,5 @@
 use crate::{
-    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, semantics::semantics::Semantics,
+    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, semantics::semantics_trait::Semantics,
 };
 use ebi_objects::{
     ebi_arithmetic::ebi_number::Zero,

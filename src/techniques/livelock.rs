@@ -2,7 +2,7 @@ use crate::{
     ebi_framework::displayable::Displayable,
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
-        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
+        labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics,
     },
 };
 use ebi_objects::{
@@ -230,7 +230,7 @@ aut!(DirectlyFollowsGraph);
 mod tests {
     use std::fs;
 
-    use crate::{semantics::semantics::Semantics, techniques::livelock::IsPartOfLivelock};
+    use crate::{semantics::semantics_trait::Semantics, techniques::livelock::IsPartOfLivelock};
     use ebi_objects::{
         DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet,
         StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,

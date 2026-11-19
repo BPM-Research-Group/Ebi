@@ -2,8 +2,8 @@ use crate::{
     ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     semantics::follower_semantics::FollowerSemantics,
     semantics::{
-        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
-        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+        labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics,
+        stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     },
 };
 use ebi_objects::{

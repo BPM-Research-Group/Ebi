@@ -29,7 +29,7 @@ pub trait Align {
     /**
      * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
      */
-    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)>;
+    fn align_trace(&self, trace: &[Activity]) -> Result<(Vec<Move>, usize)>;
 }
 
 #[derive(EbiInputEnum)]

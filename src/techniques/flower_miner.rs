@@ -2,7 +2,7 @@ use crate::{
     ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics,
     },
-    semantics::semantics::Semantics,
+    semantics::semantics_trait::Semantics,
 };
 use ebi_objects::{
     DeterministicFiniteAutomaton, HasActivityKey, ProcessTree,

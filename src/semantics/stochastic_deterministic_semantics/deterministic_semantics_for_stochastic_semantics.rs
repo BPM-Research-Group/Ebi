@@ -4,7 +4,7 @@ use crate::{
     math::markov_model::MarkovModel,
     semantics::labelled_petri_net_semantics::LPNMarking,
     semantics::{
-        semantics::Semantics, stochastic_semantics::stochastic_semantics::StochasticSemantics,
+        semantics_trait::Semantics, stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     },
     techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };

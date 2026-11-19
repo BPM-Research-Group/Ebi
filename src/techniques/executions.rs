@@ -4,7 +4,7 @@ use crate::{
         ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         ebi_trait_semantics::EbiTraitSemantics,
     },
-    semantics::semantics::Semantics,
+    semantics::semantics_trait::Semantics,
     techniques::{align::Align, resource_utilisation::set_resource_utilisations},
 };
 use chrono::{DateTime, FixedOffset};

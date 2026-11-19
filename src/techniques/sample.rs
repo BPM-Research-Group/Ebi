@@ -6,8 +6,8 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     semantics::{
-        stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics::StochasticPartiallyOrderedSemantics,
-        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+        stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics_trait::StochasticPartiallyOrderedSemantics,
+        stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     },
     techniques::livelock::LiveLockCache,
 };

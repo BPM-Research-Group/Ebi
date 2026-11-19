@@ -80,7 +80,7 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
 mod tests {
     use crate::{
         ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::ebi_trait_semantics::EbiTraitSemantics, semantics::semantics::Semantics,
+        ebi_traits::ebi_trait_semantics::EbiTraitSemantics, semantics::semantics_trait::Semantics,
     };
     use ebi_objects::{DeterministicFiniteAutomaton, HasActivityKey};
     use std::fs;
