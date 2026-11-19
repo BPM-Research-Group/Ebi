@@ -84,7 +84,7 @@ where
                             ));
                         }
                         self.execute_transition(&mut state, transition)
-                            .with_context(|| format!("Cannot execute transition."))?;
+                            .with_context(|| "Cannot execute transition.".to_string())?;
 
                         //process the model move
                         let new_node_index = nodes.len();

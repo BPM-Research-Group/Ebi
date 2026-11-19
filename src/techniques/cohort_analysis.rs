@@ -34,7 +34,7 @@ fn emsc_corrected_to_string(f: &Option<Fraction>) -> String {
     if let Some(f) = f {
         f.to_string()
     } else {
-        format!("correction failed")
+        "correction failed".to_string()
     }
 }
 
@@ -42,7 +42,7 @@ fn emsc_corrected_to_approximated_string(f: &Option<Fraction>) -> String {
     if let Some(f) = f {
         f.clone().approximate().unwrap().to_string()
     } else {
-        format!("correction failed")
+        "correction failed".to_string()
     }
 }
 
@@ -79,7 +79,7 @@ impl Display for RankedCohorts {
         if let Some(emsc_corrected) = &self.emsc_corrected {
             let exact_value_max_length = emsc_corrected
                 .iter()
-                .map(|emsc| format!("{}", emsc_corrected_to_string(emsc)).len())
+                .map(|emsc| emsc_corrected_to_string(emsc).to_string().len())
                 .max()
                 .unwrap()
                 .max(26);
@@ -161,16 +161,16 @@ impl Feature {
         match self {
             Feature::Categorical { value, .. } => {
                 if let Some(s) = value {
-                    format!("{s}")
+                    s.to_string()
                 } else {
-                    format!("-missing-")
+                    "-missing-".to_string()
                 }
             }
             Feature::NumericLess { threshold, .. } => {
                 if let Some(s) = threshold {
                     format!("< {s}")
                 } else {
-                    format!("-missing-")
+                    "-missing-".to_string()
                 }
             }
         }

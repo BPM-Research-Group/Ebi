@@ -180,7 +180,7 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
         let base_conformance = Arc::new(
             self_other_distances
                 .earth_movers_stochastic_conformance()
-                .with_context(|| format!("computing base earth movers' stochastic conformance"))?,
+                .with_context(|| "computing base earth movers' stochastic conformance".to_string())?,
         );
 
         log::info!("Compute the trace distances");
