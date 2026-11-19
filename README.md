@@ -2,8 +2,15 @@
 
 Ebi is a process mining software suite, maintained by the [BPM group](https://leemans.ch/group) of the RWTH Aachen University, Germany. 
 It contains several algorithms and techniques that perform analyses on event logs and process models.
-Ebi can be used as a command-line utility, from a browser and in ProM.
-Furthermore, Ebi can be called from Rust, Python, Java and Javascript. 
+
+Ebi can be used in several manners:
+1. Directly in a [browser](#use-ebi-from-a-browser),
+1. as a [command-line utility](#use-ebi-as-a-command-line-utility),
+1. in the [ProM](#use-ebi-in-prom) framework,
+1. from [Rust](#call-ebi-from-rust),
+1. from [Python](#call-ebi-from-python),
+1. from [Java](#call-ebi-from-java) and 
+1. from [Javascript](#call-ebi-from-javascript). 
 
 Ebi provides process mining and stochastic process mining algorithms, and supports exact arithmetic for most of these algorithms.
 
@@ -15,18 +22,24 @@ More information on its use can be found in its [PDF manual](https://github.com/
 
 Most commands of Ebi can be used directly from the browser on the [commands page](https://bpm-research-group.github.io/Ebi/commands.html).
 
-This will run fully on your computer, is limited to 4GB of RAM and single-threaded, but does not upload files.
+This will run fully on your computer, is limited to 4GB of RAM and single-threaded.
+Ebi does not upload or store files; everything is ran locally on your computer or smart device.
 
 ### Use Ebi as a command line utility
 
-1. Download Ebi CLI for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-windows.exe), for [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-linux), or for [Mac](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-arm-apple).
+1. Download Ebi CLI for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-windows.exe), for [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-linux) or for [Mac](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-arm-apple).
     Older versions are available [here](https://github.com/BPM-Research-Group/Ebi/releases/).
-1. In Linux or on a Mac, give the file execution permissions. In Windows, this step is not necessary.
+1. In Linux or on a Mac, give the file execution permissions:
+
+    `sudo chmod +x [ebi executable]`
+
+    On Windows, this step is not necessary.
+
 1. Open a command prompt and run the executable.
     Installation is not necessary, and Ebi does not require internet access.
 1. For an overview of the commands, refer to the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
-Ebi runs on many other platforms by self-compilation; please see below.
+Ebi runs on many other platforms by self-compilation; please see the [development](#feedback--development) section.
 
 A good way to get started is to try `ebi info` followed by the name of a file, which will parse the file and print some information about it.
 
