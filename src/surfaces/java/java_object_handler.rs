@@ -72,7 +72,7 @@ impl JavaObjectHandlerQueryImport for EbiObjectType {
 
 impl JavaObjectHandlerQueryImport for EbiTrait {
     fn get_java_object_handlers_that_can_import(&self) -> HashSet<JavaObjectHandler> {
-        EbiInputType::Trait(self.clone()).get_java_object_handlers_that_can_import()
+        EbiInputType::Trait(*self).get_java_object_handlers_that_can_import()
     }
 }
 

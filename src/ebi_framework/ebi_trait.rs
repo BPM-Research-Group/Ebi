@@ -96,7 +96,7 @@ impl EbiTrait {
             if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
                 for input_typess in input_types.iter() {
                     for input_typesss in input_typess.iter() {
-                        if input_typesss == &&EbiInputType::Trait(self.clone()) {
+                        if input_typesss == &&EbiInputType::Trait(*self) {
                             return true;
                         }
                     }

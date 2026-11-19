@@ -643,25 +643,25 @@ impl EbiCommand {
                                     error =
                                         Some(anyhow!("Value must be between {} and {}.", min, max))
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                    return Ok(EbiInput::Usize(*value, input_type));
                                 }
                             }
                             (Some(min), None) => {
                                 if value < min {
                                     error = Some(anyhow!("Value must be below {}.", min))
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                    return Ok(EbiInput::Usize(*value, input_type));
                                 }
                             }
                             (None, Some(max)) => {
                                 if value > max {
                                     error = Some(anyhow!("Value must be above {}.", max))
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                    return Ok(EbiInput::Usize(*value, input_type));
                                 }
                             }
                             (None, None) => {
-                                return Ok(EbiInput::Usize(value.clone(), input_type));
+                                return Ok(EbiInput::Usize(*value, input_type));
                             }
                         }
                     }

@@ -1557,20 +1557,20 @@ pub fn attempt_parse(
                     if let Ok(value) = string.parse::<usize>() {
                         match (min, max) {
                             (None, None) => {
-                                return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                return Ok(EbiInput::Usize(value, &input_type));
                             }
                             (None, Some(max)) => {
                                 if max < &value {
                                     error = Some(anyhow!("value should be at most {}", max));
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                    return Ok(EbiInput::Usize(value, &input_type));
                                 }
                             }
                             (Some(min), None) => {
                                 if min > &value {
                                     error = Some(anyhow!("value should be at least {}", min));
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                    return Ok(EbiInput::Usize(value, &input_type));
                                 }
                             }
                             (Some(min), Some(max)) => {
@@ -1581,7 +1581,7 @@ pub fn attempt_parse(
                                         max
                                     ));
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                    return Ok(EbiInput::Usize(value, &input_type));
                                 }
                             }
                         }

@@ -34,7 +34,7 @@ impl FixedDenominatorFractionEnum {
                     Ok(fractions
                         .into_iter()
                         .map(|f| match f.as_ref() {
-                            FractionEnum::Approx(f) => Arc::new(Self::Approximate(f.clone())),
+                            FractionEnum::Approx(f) => Arc::new(Self::Approximate(*f)),
                             _ => Arc::new(Self::CannotCombineExactAndApprox),
                         })
                         .collect::<Vec<_>>())

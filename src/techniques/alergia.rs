@@ -117,8 +117,8 @@ fn stochastic_fold(
     q: usize,
     q_prime: usize,
 ) {
-    let term_prime = fpta.node_2_termination_counts[q_prime].clone();
-    let visit_prime = fpta.node_2_visit_counts[q_prime].clone();
+    let term_prime = fpta.node_2_termination_counts[q_prime];
+    let visit_prime = fpta.node_2_visit_counts[q_prime];
     fpta.node_2_termination_counts[q] += term_prime;
     fpta.node_2_visit_counts[q] += visit_prime;
     fpta.node_2_termination_counts[q_prime] = 0;
