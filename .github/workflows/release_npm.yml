@@ -1,10 +1,7 @@
 name: Build javascript
 
 on:
-  push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
+  workflow_dispatch
 
 env:
   CARGO_TERM_COLOR: always
