@@ -1,3 +1,7 @@
+#![allow(
+  clippy::needless_range_loop
+)]
+
 #![doc = include_str!("../README.md")]
 
 //! ## Sister crates

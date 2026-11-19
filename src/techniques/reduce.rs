@@ -322,35 +322,34 @@ mod tree {
                         .get_children(node)
                         .enumerate()
                         .find(|(_, child)| has_empty_traces_node(tree, *child))
-                    {
-                        if let Some(child2) = tree
+                        && let Some(child2) = tree
                             .get_children(node)
                             .skip(i + 1)
                             .find(|child| has_empty_traces_node(tree, *child))
-                        {
-                            //remove child2
-                            let end2 = tree.traverse(child2);
-                            let tchild2 = tree.tree.drain(child2..end2).collect::<Vec<_>>();
+                    {
+                        //remove child2
+                        let end2 = tree.traverse(child2);
+                        let tchild2 = tree.tree.drain(child2..end2).collect::<Vec<_>>();
 
-                            //remove child1
-                            let end1 = tree.traverse(child1);
-                            let tchild1 = tree.tree.drain(child1..end1).collect::<Vec<_>>();
+                        //remove child1
+                        let end1 = tree.traverse(child1);
+                        let tchild1 = tree.tree.drain(child1..end1).collect::<Vec<_>>();
 
-                            //insert child2
-                            tree.tree.splice((node + 1)..(node + 1), tchild2);
+                        //insert child2
+                        tree.tree.splice((node + 1)..(node + 1), tchild2);
 
-                            //insert child1
-                            tree.tree.splice((node + 1)..(node + 1), tchild1);
+                        //insert child1
+                        tree.tree.splice((node + 1)..(node + 1), tchild1);
 
-                            //insert or
-                            tree.tree.insert(node + 1, Node::Operator(Operator::Or, 2));
+                        //insert or
+                        tree.tree.insert(node + 1, Node::Operator(Operator::Or, 2));
 
-                            //change number of children
-                            _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+                        //change number of children
+                        _ = tree.tree[node].set_number_of_children(number_of_children - 1);
 
-                            return true;
-                        }
+                        return true;
                     }
+
                     false
                 }
             }
@@ -492,10 +491,10 @@ mod labelled_petri_net {
             let transition_2 = single_unit_arc(lpn.get_outgoing_transitions(place))?;
 
             //place is not marked
-            if let Some(marking) = &lpn.initial_marking {
-                if marking.get(place) != 0 {
-                    return None;
-                }
+            if let Some(marking) = &lpn.initial_marking
+                && marking.get(place) != 0
+            {
+                return None;
             }
 
             //transition 2 must be silent

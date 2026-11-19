@@ -167,7 +167,7 @@ where
  */
 pub fn fasterpam(
     distances: &TriangularDistanceMatrix,
-    medoids: &mut Vec<usize>,
+    medoids: &mut [usize],
     maxiter: usize,
 ) -> (Fraction, Vec<usize>, usize, usize) {
     let (n, k) = (distances.len(), medoids.len());
