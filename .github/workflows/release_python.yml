@@ -44,7 +44,7 @@ jobs:
           echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
 
       - name: autogen Ebi python files
-        run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
+        run: cargo run --features surface_generation -- itself surface python -o src/python/python_module_autogen.rs    
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -92,7 +92,7 @@ jobs:
           cargo set-version "$VERS"
           echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
       - name: autogen Ebi python files
-        run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
+        run: cargo run --features surface_generation -- itself surface python -o src/python/python_module_autogen.rs    
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -134,7 +134,7 @@ jobs:
           SET VERS=%VERS:~1%
           cargo set-version %VERS%
       - name: autogen Ebi python files
-        run: cargo run --features python -- itself python -o src/python/python_module_autogen.rs
+        run: cargo run --features surface_generation -- itself surface python -o src/python/python_module_autogen.rs  
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -180,7 +180,7 @@ jobs:
           cargo set-version "$VERS"
           echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
       - name: autogen Ebi python files
-        run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
+        run: cargo run --features surface_generation -- itself surface python -o src/python/python_module_autogen.rs    
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -204,7 +204,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: autogen Ebi python files
-        run: cargo run --features python itself python -o src/python/python_module_autogen.rs 
+        run: cargo run --features surface_generation -- itself surface python -o src/python/python_module_autogen.rs   
       - name: Update version number
         id: version
         run: |
