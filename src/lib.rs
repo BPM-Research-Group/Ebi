@@ -1,7 +1,5 @@
-#![allow(
-  clippy::needless_range_loop
-)]
-
+#![allow(clippy::needless_range_loop, warnings)]
+#![deny(clippy::needless_return, clippy::useless_format)]
 #![doc = include_str!("../README.md")]
 
 //! ## Sister crates
