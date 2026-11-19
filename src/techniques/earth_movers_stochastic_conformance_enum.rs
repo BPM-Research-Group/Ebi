@@ -144,7 +144,7 @@ impl dyn WeightedDistances {
                 distance /= FractionEnum::Exact(Rational::from(lcm_probabilities));
                 result -= distance;
 
-                return Ok(result);
+                Ok(result)
             } else if lcm_probabilities <= Integer::from(i128::MAX)
                 && (Into::<Integer>::into(lcm_distances.clone()) + Integer::ONE)
                     * Integer::from(n + m)
@@ -217,7 +217,7 @@ impl dyn WeightedDistances {
                 distance /= FractionEnum::Exact(Rational::from(lcm_probabilities));
                 result -= distance;
 
-                return Ok(result);
+                Ok(result)
             } else {
                 // log::info!("Using BigInt for NetworkSimplex computation.");
 

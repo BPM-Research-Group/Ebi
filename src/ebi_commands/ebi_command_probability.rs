@@ -60,7 +60,7 @@ pub const EBI_PROBABILITY_LOG: EbiCommand = EbiCommand::Command {
             .get_probability_language(log)
             .with_context(|| "cannot compute probability")?;
 
-        return Ok(EbiOutput::Fraction(sum));
+        Ok(EbiOutput::Fraction(sum))
     },
     output_type: &EbiOutputType::Fraction,
 };
@@ -103,9 +103,9 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
             let result = model
                 .get_probability(&FollowerSemantics::Trace(&trace))
                 .with_context(|| format!("cannot compute probability of trace {:?}", trace))?;
-            return Ok(EbiOutput::Fraction(result));
+            Ok(EbiOutput::Fraction(result))
         } else {
-            return Err(anyhow!("no trace given"));
+            Err(anyhow!("no trace given"))
         }
     },
     output_type: &EbiOutputType::Fraction,
@@ -158,9 +158,9 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
             let result = semantics
                 .explain_trace(&trace, &balance)
                 .with_context(|| format!("cannot explain the trace {:?}", trace))?;
-            return Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)));
+            Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)))
         } else {
-            return Err(anyhow!("no trace given"));
+            Err(anyhow!("no trace given"))
         }
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::LanguageOfAlignments),

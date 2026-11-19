@@ -183,7 +183,7 @@ fn get_edges_to_filter(
         }
     }
 
-    return result;
+    result
 }
 
 #[cfg(test)]

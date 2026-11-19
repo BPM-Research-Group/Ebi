@@ -255,7 +255,7 @@ impl EbiCommand {
                 }
             }
         };
-        return command;
+        command
     }
 
     pub fn short_name(&self) -> &str {
@@ -537,10 +537,10 @@ impl EbiCommand {
                 }
 
                 //otherwise, take the default one
-                return Ok(output_type.get_default_exporter());
+                Ok(output_type.get_default_exporter())
             }
             None => {
-                return Ok(output_type.get_default_exporter());
+                Ok(output_type.get_default_exporter())
             }
         }
     }
@@ -787,7 +787,7 @@ impl EbiCommand {
             ..
         } = &self
         {
-            return cli_command.is_none() && !input_types.is_empty();
+            cli_command.is_none() && !input_types.is_empty()
         } else {
             false
         }
@@ -800,7 +800,7 @@ impl EbiCommand {
             ..
         } = &self
         {
-            return cli_command.is_none() && !input_types.is_empty();
+            cli_command.is_none() && !input_types.is_empty()
         } else {
             false
         }
@@ -813,7 +813,7 @@ impl EbiCommand {
             ..
         } = &self
         {
-            return cli_command.is_none() && !input_types.is_empty();
+            cli_command.is_none() && !input_types.is_empty()
         } else {
             false
         }

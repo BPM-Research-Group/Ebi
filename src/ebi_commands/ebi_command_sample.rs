@@ -40,10 +40,10 @@ pub fn get_sampled_object(
                 .context("Sample semantics.")
         }
         _ => {
-            return Err(anyhow!(
+            Err(anyhow!(
                 "Unsupported object {:?} provided.",
                 object.get_type()
-            ));
+            ))
         }
     }
 }
@@ -105,9 +105,9 @@ pub const EBI_SAMPLE_TRACES: EbiCommand = EbiCommand::Command {
         let object = inputs.remove(0);
         let number_of_traces = inputs.remove(0).to_type::<usize>()?;
         let result: FiniteStochasticLanguage = get_sampled_object(object, *number_of_traces)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(
+        Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(
             result,
-        )));
+        )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage),
 };
@@ -141,9 +141,9 @@ pub const EBI_SAMPLE_PARTIALLY_ORDERED_TRACES: EbiCommand = EbiCommand::Command 
 
         let result = sbpmn.sample_partially_ordered(*number_of_traces)?;
 
-        return Ok(EbiOutput::Object(
+        Ok(EbiOutput::Object(
             EbiObject::FiniteStochasticPartiallyOrderedLanguage(result),
-        ));
+        ))
     },
     output_type: &EbiOutputType::ObjectType(
         EbiObjectType::FiniteStochasticPartiallyOrderedLanguage,

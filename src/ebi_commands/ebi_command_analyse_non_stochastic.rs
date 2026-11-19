@@ -161,7 +161,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
         } else {
             log::debug!("The model has an unbounded state space.")
         }
-        return Ok(EbiOutput::Bool(result));
+        Ok(EbiOutput::Bool(result))
     },
     output_type: &EbiOutputType::Bool,
 };
@@ -186,7 +186,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
         let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         let number_of_clusters = objects.remove(0).to_type::<usize>()?;
         let result = language.k_medoids_clustering(*number_of_clusters)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+        Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
 };
@@ -236,7 +236,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
 
         let result = model.find_executions(log.as_mut())?;
 
-        return Ok(EbiOutput::Object(EbiObject::Executions(result)));
+        Ok(EbiOutput::Object(EbiObject::Executions(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::Executions),
 };
@@ -354,7 +354,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
         } else {
             log::debug!("The model can terminate and has traces.")
         }
-        return Ok(EbiOutput::Bool(result));
+        Ok(EbiOutput::Bool(result))
     },
     output_type: &EbiOutputType::Bool,
 };
@@ -437,7 +437,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
         } else {
             log::debug!("The language of the model has finitely many traces.")
         }
-        return Ok(EbiOutput::Bool(result));
+        Ok(EbiOutput::Bool(result))
     },
     output_type: &EbiOutputType::Bool,
 };
@@ -466,7 +466,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
         let number_of_traces = objects.remove(0).to_type::<usize>()?;
         let language: Box<dyn EbiTraitFiniteLanguage> = language;
         let result = language.medoid(*number_of_traces)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+        Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
 };

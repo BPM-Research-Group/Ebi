@@ -56,7 +56,7 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
             i += 1;
         }
 
-        return result;
+        result
     }
 
     fn get_deterministic_silent_livelock_probability(&self, _state: &Self::DetState) -> Fraction {
@@ -68,9 +68,9 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         state: &mut Self::DetState,
     ) -> Result<Fraction> {
         if self.is_part_of_non_decreasing_livelock(state)? {
-            return Ok(Fraction::one());
+            Ok(Fraction::one())
         } else {
-            return Ok(Fraction::zero());
+            Ok(Fraction::zero())
         }
     }
 }

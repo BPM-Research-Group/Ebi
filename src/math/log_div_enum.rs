@@ -280,9 +280,9 @@ impl One for LogDivEnum {
                         };
 
                         //the number of bits necessary (= the highest bit) must be zeroes + 1, i.e.a is not too high
-                        return a.significant_bits() == c + Natural::one();
+                        a.significant_bits() == c + Natural::one()
                     }
-                    None => return false,
+                    None => false,
                 }
             }
             LogDivEnum::Approx(f) => One::is_one(f),

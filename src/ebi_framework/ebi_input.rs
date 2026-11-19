@@ -1308,27 +1308,27 @@ impl Display for EbiObjectImporterFallible {
 
 pub fn get_reader_file(from_file: &PathBuf) -> Result<MultipleReader> {
     if from_file.as_os_str() == "-" {
-        return MultipleReader::from_stdin();
+        MultipleReader::from_stdin()
     } else {
         let file = File::open(from_file)
             .with_context(|| format!("Could not read file `{}`.", from_file.display()))?;
-        return Ok(MultipleReader::from_file(file));
+        Ok(MultipleReader::from_file(file))
     }
 }
 
 pub fn get_reader(cli_matches: &ArgMatches, cli_id: &str) -> Result<MultipleReader> {
     if let Some(from_file) = cli_matches.try_get_one::<PathBuf>(cli_id)? {
         if from_file.as_os_str() == "-" {
-            return MultipleReader::from_stdin();
+            MultipleReader::from_stdin()
         } else {
             let file = File::open(from_file)
                 .with_context(|| format!("Could not read file `{}`.", from_file.display()))?;
-            return Ok(MultipleReader::from_file(file));
+            Ok(MultipleReader::from_file(file))
         }
     } else {
-        return Err(anyhow!(
+        Err(anyhow!(
             "No argument given, or it could not be parsed as a path."
-        ));
+        ))
     }
 }
 
@@ -1641,12 +1641,12 @@ pub fn validate_object_of(
 ) -> Result<()> {
     if let Some(validator) = file_handler.validator {
         let result = (validator)(reader.get()?.as_mut());
-        return result;
+        result
     } else {
-        return Err(anyhow!(
+        Err(anyhow!(
             "file hanlder {} does not have a validator",
             file_handler
-        ));
+        ))
     }
 }
 

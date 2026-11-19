@@ -195,7 +195,7 @@ impl dyn EbiTraitEventLogTraceAttributes {
                 sum_different /= count_different;
                 let p = (sum_same, sum_different);
 
-                return Some(p);
+                Some(p)
             })
             .collect(); // end parallel execution
 

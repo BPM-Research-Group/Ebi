@@ -164,7 +164,7 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS: EbiCommand = EbiCommand
 
         let result = model.align_language(log)?;
 
-        return Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)));
+        Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::LanguageOfAlignments),
 };

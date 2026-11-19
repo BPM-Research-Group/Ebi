@@ -51,12 +51,12 @@ pub const EBI_VALIDATE: EbiCommand = EbiCommand::Command {
                 ebi_input::get_reader_file(file).context("Could not get reader for file.")?;
             ebi_input::validate_object_of(&mut reader, &file_handler)
                 .with_context(|| "validating the file")?;
-            return Ok(EbiOutput::String(format!(
+            Ok(EbiOutput::String(format!(
                 "Object is a valid {}.",
                 file_handler.name
-            )));
+            )))
         } else {
-            return Err(anyhow!("no input file given"));
+            Err(anyhow!("no input file given"))
         }
     },
     output_type: &EbiOutputType::String,

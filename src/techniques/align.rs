@@ -68,7 +68,7 @@ impl AlignmentAlgorithm {
                 EbiInput::Object(EbiObject::ProcessTree(mut tree), _) => {
                     tree.align_stochastic_language(log)
                 }
-                _ => return Err(anyhow!("Input type not supported.")),
+                _ => Err(anyhow!("Input type not supported.")),
             },
             AlignmentAlgorithm::Tree => {
                 let tree = model.to_type::<ProcessTree>().with_context(|| {

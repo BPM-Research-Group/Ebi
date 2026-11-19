@@ -25,7 +25,7 @@ impl FollowerSemantics<'_> {
                 if &trace[*state] == label {
                     return Some(state + 1);
                 }
-                return None;
+                None
             }
         }
     }
@@ -33,7 +33,7 @@ impl FollowerSemantics<'_> {
     pub fn is_final_state(&self, state: &usize) -> bool {
         match self {
             FollowerSemantics::Trace(trace) => {
-                return *state == trace.len();
+                *state == trace.len()
             }
         }
     }

@@ -172,7 +172,7 @@ impl EbiFileHandler {
                 return Tri::Fallible;
             }
         }
-        return Tri::No;
+        Tri::No
     }
 
     pub fn can_import_as_trait(&self, trait_type: &EbiTrait) -> bool {
@@ -181,7 +181,7 @@ impl EbiFileHandler {
                 return true;
             }
         }
-        return false;
+        false
     }
 
     pub fn can_export_as_object(&self, object_type: &EbiObjectType) -> Tri {
@@ -195,7 +195,7 @@ impl EbiFileHandler {
                 return Tri::Fallible;
             }
         }
-        return Tri::No;
+        Tri::No
     }
 }
 
@@ -210,7 +210,7 @@ impl FromStr for EbiFileHandler {
                 return Ok(file_handler.clone());
             }
         }
-        return Err(anyhow!("{} is not an Ebi file handler.", s));
+        Err(anyhow!("{} is not an Ebi file handler.", s))
     }
 }
 
@@ -225,7 +225,7 @@ impl FromStr for &'static EbiFileHandler {
                 return Ok(file_handler);
             }
         }
-        return Err(anyhow!("{} is not an Ebi file handler.", s));
+        Err(anyhow!("{} is not an Ebi file handler.", s))
     }
 }
 

@@ -421,38 +421,38 @@ impl EbiExporter {
             (EbiExporter::Object(exporter, _), object) => exporter.export(object, f),
             (EbiExporter::String, EbiOutput::String(object)) => object.export(f),
             (EbiExporter::String, _) => {
-                return Err(anyhow!("Cannot export {} as string", self.get_name()));
+                Err(anyhow!("Cannot export {} as string", self.get_name()))
             }
             (EbiExporter::Usize, EbiOutput::Usize(object)) => object.export(f),
             (EbiExporter::Usize, _) => {
-                return Err(anyhow!("Cannot export {} as number", self.get_name()));
+                Err(anyhow!("Cannot export {} as number", self.get_name()))
             }
             (EbiExporter::Fraction, EbiOutput::Fraction(object)) => object.export(f),
             (EbiExporter::Fraction, _) => {
-                return Err(anyhow!("Cannot export {} as fraction", self.get_name()));
+                Err(anyhow!("Cannot export {} as fraction", self.get_name()))
             }
             (EbiExporter::LogDiv, EbiOutput::LogDiv(object)) => object.export(f),
             (EbiExporter::LogDiv, _) => {
-                return Err(anyhow!("Cannot export {} as logdiv", self.get_name()));
+                Err(anyhow!("Cannot export {} as logdiv", self.get_name()))
             }
             (EbiExporter::LogPolynomial, EbiOutput::LogPolynomial(object)) => object.export(f),
             (EbiExporter::LogPolynomial, _) => {
-                return Err(anyhow!(
+                Err(anyhow!(
                     "Cannot export {} as log polynomial",
                     self.get_name()
-                ));
+                ))
             }
             (EbiExporter::ContainsRoot, EbiOutput::ContainsRoot(object)) => object.export(f),
             (EbiExporter::ContainsRoot, _) => {
-                return Err(anyhow!("Cannot export {} as containsroot", self.get_name()));
+                Err(anyhow!("Cannot export {} as containsroot", self.get_name()))
             }
             (EbiExporter::RootLogDiv, EbiOutput::RootLogDiv(object)) => object.export(f),
             (EbiExporter::RootLogDiv, _) => {
-                return Err(anyhow!("Cannot export {} as rootlogdiv", self.get_name()));
+                Err(anyhow!("Cannot export {} as rootlogdiv", self.get_name()))
             }
             (EbiExporter::Bool, EbiOutput::Bool(object)) => object.export(f),
             (EbiExporter::Bool, _) => {
-                return Err(anyhow!("Cannot export {} as bool", self.get_name()));
+                Err(anyhow!("Cannot export {} as bool", self.get_name()))
             }
         }
     }
@@ -742,9 +742,9 @@ pub fn export_object(to_file: &PathBuf, object: EbiOutput, exporter: EbiExporter
     exporter
         .export_from_object(object, &mut writer)
         .with_context(|| format!("Writing result to file {:?}.", to_file))?;
-    return writer
+    writer
         .flush()
-        .with_context(|| format!("writing result to file {:?}", to_file));
+        .with_context(|| format!("writing result to file {:?}", to_file))
 }
 
 pub fn export_to_string(object: EbiOutput, exporter: &EbiExporter) -> Result<String> {

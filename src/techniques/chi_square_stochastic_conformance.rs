@@ -59,7 +59,7 @@ impl ChiSquareStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
         }
         sum /= 2usize;
         sum = sum.one_minus();
-        return Ok(sum);
+        Ok(sum)
     }
 }
 

@@ -469,7 +469,7 @@ pub(crate) fn graph() -> Result<VisualGraph> {
         }
     }
 
-    return Ok(graph)
+    Ok(graph)
 }
 
 pub(crate) fn scale(point: &mut Point) {
