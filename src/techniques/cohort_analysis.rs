@@ -48,7 +48,7 @@ fn emsc_corrected_to_approximated_string(f: &Option<Fraction>) -> String {
 
 impl Display for RankedCohorts {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.features.len() == 0 {
+        if self.features.is_empty() {
             return write!(
                 f,
                 "No suitable cohorts found. The event log may not have supported attributes, or the cohorts that they yield are too small."
@@ -89,7 +89,7 @@ impl Display for RankedCohorts {
                 "{:<attribute_name_max_length$}  {:<attribute_value_max_length$}  {:<exact_value_max_length$}  {:>6}",
                 "Attribute", "value", "approximate corrected EMSC", "corrected EMSC"
             )?;
-            writeln!(f, "")?;
+            writeln!(f)?;
 
             for (feature, emsc_corrected) in self.features.iter().zip(emsc_corrected) {
                 writeln!(
@@ -117,7 +117,7 @@ impl Display for RankedCohorts {
                 "{:<attribute_name_max_length$}  {:<attribute_value_max_length$}  {:<exact_value_max_length$}  {:>6}",
                 "Attribute", "value", "approximate EMSC", "EMSC"
             )?;
-            writeln!(f, "")?;
+            writeln!(f)?;
 
             for (feature, emsc) in self.features.iter().zip(self.emsc.iter()) {
                 writeln!(
@@ -186,7 +186,7 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         // gather features and remove too-small or too-large cohorts
         let features = elicit_features(self, minimum_cohort_size_fraction);
 
-        if features.len() == 0 {
+        if features.is_empty() {
             return Ok(RankedCohorts {
                 attribute_key: self.attribute_key().clone(),
                 features,
@@ -408,7 +408,7 @@ fn split_log_on_feature(
 
 fn perform_random_splits(
     log: &dyn EbiTraitEventLogTraceAttributes,
-    trace_index_2_variant_index: &Vec<usize>,
+    trace_index_2_variant_index: &[usize],
     sample_size: usize,
     number_of_random_splits: usize,
     distances: Arc<WeightedTriangularDistanceMatrix>,
@@ -428,7 +428,7 @@ fn perform_random_splits(
                     }
                 }
 
-                if cohort_has.len() == 0 || cohort_has_not.len() == 0 {
+                if cohort_has.is_empty() || cohort_has_not.is_empty() {
                     //It may occasionally happen that either of the sides is empty; just try again.
                     continue;
                 }

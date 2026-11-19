@@ -456,11 +456,11 @@ impl SymbolicFraction {
         }
 
         for f in &mut self.den.factors {
-            if let Some((_, coef)) = f.leading_term() {
-                if coef < 0 {
-                    *f = f.mul(&Poly::new(-1));
-                    self.num.factors[0] = self.num.factors[0].mul(&Poly::new(-1));
-                }
+            if let Some((_, coef)) = f.leading_term()
+                && coef < 0
+            {
+                *f = f.mul(&Poly::new(-1));
+                self.num.factors[0] = self.num.factors[0].mul(&Poly::new(-1));
             }
         }
     }
@@ -699,7 +699,7 @@ impl fmt::Display for LinearSystem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for (i, eq) in self.equations.iter().enumerate() {
             if i > 0 {
-                write!(f, "\n")?;
+                writeln!(f)?;
             }
             let lhs_name = &self.variables[eq.lhs];
 
@@ -716,7 +716,7 @@ impl fmt::Display for LinearSystem {
                     write!(
                         f,
                         "{} * {}",
-                        term.coefficient, &self.variables[term.variable]
+                        term.coefficient, self.variables[term.variable]
                     )?;
                 }
             }
@@ -800,11 +800,11 @@ impl LinearSystem {
 }
 
 pub trait EquationSystemConstructor {
-    fn create_equation_system(&self, trace: &Vec<Activity>) -> Result<LinearSystem>;
+    fn create_equation_system(&self, trace: &[Activity]) -> Result<LinearSystem>;
 }
 
 impl EquationSystemConstructor for LabelledPetriNet {
-    fn create_equation_system(&self, trace: &Vec<Activity>) -> Result<LinearSystem> {
+    fn create_equation_system(&self, trace: &[Activity]) -> Result<LinearSystem> {
         if let Some(linear_system) = build_equation_system(self, trace) {
             Ok(linear_system)
         } else {
@@ -816,7 +816,7 @@ impl EquationSystemConstructor for LabelledPetriNet {
     }
 }
 
-pub fn build_equation_system<T, State>(semantics: &T, trace: &Vec<Activity>) -> Option<LinearSystem>
+pub fn build_equation_system<T, State>(semantics: &T, trace: &[Activity]) -> Option<LinearSystem>
 where
     T: Semantics<SemState = State> + ?Sized,
     State: Displayable + Eq + std::hash::Hash + Clone,
