@@ -46,6 +46,4 @@ jobs:
       - name: Publish to NPM
         run: |
           cd pkg
-          npm publish --dry-run
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          npm publish
