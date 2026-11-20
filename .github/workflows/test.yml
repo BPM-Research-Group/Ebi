@@ -9,6 +9,13 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  test_clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Clippy test
+        run: cargo clippy -- --A warnings
+        
   test_exact_arithmetic:
     runs-on: ubuntu-latest
     steps:
@@ -17,9 +24,6 @@ jobs:
         run: |
               > src/tests/tests_autogen.rs
               cargo run --features test_generation -- itself tests -o src/tests/tests_autogen.rs 
-      
-      - name: Run Clippy test
-        run: cargo clippy -- --A warnings
 
       - name: Run tests exact mode
         run: cargo test --verbose --features exactarithmetic
