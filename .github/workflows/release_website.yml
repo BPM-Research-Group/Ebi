@@ -39,7 +39,7 @@ jobs:
           > src/surfaces/javascript/javascript_autogen.rs
           cargo run --features surface_generation -- itself surface javascript -o src/surfaces/javascript/javascript_autogen.rs
           wasm-pack build -d ./website/javascript --target web -- --features javascript
-          mkdir website
+          mkdir -p website
           cp surfaces/website/stijlen.css website
           cargo run --features surface_generation -- itself surface website home -o website/index.html
           cargo run --features surface_generation -- itself surface website commands -o website/commands.html
