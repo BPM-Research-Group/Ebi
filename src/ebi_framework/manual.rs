@@ -1,6 +1,7 @@
 use ebi_objects::anyhow::{Ok, Result};
 use clap::Command;
 use ebi_objects::EbiObjectType;
+use fnv::FnvBuildHasher;
 use inflector::Inflector;
 use layout::{
     core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr},
@@ -374,7 +375,7 @@ pub(crate) fn graph() -> Result<VisualGraph> {
     let mut graph = VisualGraph::new(Orientation::LeftToRight);
 
     //traits
-    let mut traits = HashMap::new();
+    let mut traits = HashMap::<_, _, FnvBuildHasher>::default();
     for etrait in EbiTrait::iter() {
         let shape = ShapeKind::new_box(&("trait ".to_owned() + etrait.to_string().as_str()));
         let look = StyleAttr::simple();
@@ -388,7 +389,7 @@ pub(crate) fn graph() -> Result<VisualGraph> {
     }
 
     //object types
-    let mut object_types = HashMap::new();
+    let mut object_types = HashMap::<_, _, FnvBuildHasher>::default();
     for object_type in EbiObjectType::iter() {
         let shape = ShapeKind::new_box(&("type ".to_owned() + object_type.to_string().as_str()));
         let mut look = StyleAttr::simple();
@@ -403,7 +404,7 @@ pub(crate) fn graph() -> Result<VisualGraph> {
     }
 
     //file handlers
-    let mut file_handlers = HashMap::new();
+    let mut file_handlers = HashMap::<_, _, FnvBuildHasher>::default();
     for file_handler in EBI_FILE_HANDLERS {
         let shape = ShapeKind::new_circle(&(".".to_owned() + file_handler.file_extension.to_string().as_str()));
         let look = StyleAttr::simple();
@@ -427,7 +428,7 @@ pub(crate) fn graph() -> Result<VisualGraph> {
     }
 
     //commands
-    let mut commands = HashMap::new();
+    let mut commands = HashMap::<_, _, FnvBuildHasher>::default();
     for command in EBI_COMMANDS.get_command_paths() {
         let shape = ShapeKind::new_double_circle(&EbiCommand::path_to_short_string(&command));
         let look = StyleAttr::simple();

@@ -89,7 +89,8 @@ fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<div class=\"menu0\" id =\"menu0\">")?;
     writeln!(f, "<a href=\"index.html\">Ebi</a>")?;
     writeln!(f, "<a href=\"{}\">Commands</a>", COMMANDS_PAGE)?;
-    writeln!(f, "<a href=\"{}\">Files</a>", FILE_HANDLERS_PAGE)?;
+    writeln!(f, "<a href=\"{}\">Supported files</a>", FILE_HANDLERS_PAGE)?;
+    writeln!(f, "<a href=\"https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf\">Manual</a>")?;
     writeln!(
         f,
         "<a href=\"https://github.com/BPM-Research-Group/Ebi\">Github</a>"

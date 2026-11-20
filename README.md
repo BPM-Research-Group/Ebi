@@ -163,11 +163,13 @@ To get started with development, or to compile Ebi yourself:
 1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "ebi". Everything else is equivalent to the commands mentioned in the manual.
 1. To compile Ebi, give the command "cargo build --release". The binary is then placed in the project folder, in the "build/release" sub-folder.
 
-Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
+Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) and in the [code documentation](https://docs.rs/ebi/latest/).
 
 We welcome pull requests on [Github](https://github.com/BPM-Research-Group/Ebi).
-Before opening a pull request, please ensure that the test batch file src/tests/test.sh finishes without errors (on Windows, rename it to .bat and remove the first three lines).
-This file may take up to an hour to run, depending on your machine.
+Before submitting a pull request:
+
+1. Run `cargo clippy` and address lints if they are sensible.
+1. Test Ebi locally using `src/tests/test.sh`. On Windows, rename this file to .bat and remove the first 7 lines. Testing may take up to an hour to run, depending on your machine.
 
 ## License
 

@@ -4,7 +4,7 @@
     clippy::doc_overindented_list_items,
     clippy::type_complexity
 )]
-#![doc = include_str!("../README.md")]
+#![cfg_attr(not(doctest), doc = include_str!("../README.md"))]
 
 //! ## Sister crates
 //!
