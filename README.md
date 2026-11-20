@@ -7,6 +7,7 @@ Ebi can be used in several manners:
 1. Directly in a [browser](#use-ebi-from-a-browser),
 1. as a [command-line utility](#use-ebi-as-a-command-line-utility),
 1. in the [ProM](#use-ebi-in-prom) framework,
+1. in the [Knime](#use-ebi-in-the-knime-analytics-platform) analytics platform,
 1. from [Rust](#call-ebi-from-rust),
 1. from [Python](#call-ebi-from-python),
 1. from [Java](#call-ebi-from-java) and 
@@ -51,6 +52,11 @@ Then, several Ebi commands can be used like any other ProM plug-in.
 As Ebi is extremely flexible in its inputs and outputs, please ensure you choose the correct input and output plug-in (there are many). 
 
 The [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) indicates which commands are available in ProM.
+
+### Use Ebi in the Knime analytics platform
+
+Ebi is available in the Knime analytics platform on Windows and Linux.
+For instructions to install and use it, please refer to [here](https://github.com/humam-kourani/ebi-for-knime#installing-the-extension).
 
 ### Call Ebi from Python
 

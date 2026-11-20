@@ -258,7 +258,7 @@ mod tests {
 
         /// Figure (c): 2-state SDFA with a self-loop.
         pub fn build_fig_c_loop() -> Result<StochasticDeterministicFiniteAutomaton> {
-            let mut sdfa = StochasticDeterministicFiniteAutomaton::new();
+            let mut sdfa = StochasticDeterministicFiniteAutomaton::default();
             sdfa.set_initial_state(Some(AutomatonState::zero()));
 
             let a = sdfa.activity_key.process_activity("a");
@@ -275,8 +275,7 @@ mod tests {
     fn test_entropy_eventlog() -> Result<()> {
         let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
         let log = fin.parse::<EventLog>().unwrap();
-        let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(FiniteStochasticLanguage::from(log));
+        let slang = FiniteStochasticLanguage::from(log);
         let entropy = entropy_eventlog_with_lambda(&slang, &f0!())?;
         println!("entropy ≈ {:.12}", entropy.approximate().unwrap());
 
@@ -304,8 +303,7 @@ mod tests {
     fn test_gain_numerator() -> Result<()> {
         let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
         let log = fin.parse::<EventLog>().unwrap();
-        let fsl: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(FiniteStochasticLanguage::from(log));
+        let fsl = FiniteStochasticLanguage::from(log);
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
         let lambda = Fraction::zero();
 
@@ -319,8 +317,7 @@ mod tests {
     fn test_gain() -> Result<()> {
         let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
         let log = fin.parse::<EventLog>().unwrap();
-        let fsl: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(FiniteStochasticLanguage::from(log));
+        let fsl = FiniteStochasticLanguage::from(log);
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
 
         let lambda: Fraction = f!(1i64, 1_000_000i64);
