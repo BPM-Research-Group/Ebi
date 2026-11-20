@@ -3,7 +3,7 @@ use ebi_objects::{
     ebi_arithmetic::{
         ebi_number::{One, Zero},
         exact::{is_exact_globally, MaybeExact},
-        fraction::{fraction::APPROX_DIGITS, fraction_enum::FractionEnum},
+        fraction::{fraction_struct::APPROX_DIGITS, fraction_enum::FractionEnum},
         malachite::{
             base::num::{
                 arithmetic::traits::{Parity, Pow},

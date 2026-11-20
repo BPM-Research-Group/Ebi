@@ -11,7 +11,7 @@ use ebi_objects::{
     ebi_arithmetic::{
         fraction::approximate::Approximate,
         is_exact_globally,
-        log_polynomial::{log_polynomial::LogPolynomial, log_polynomial_f64::LogPolynomialF64},
+        log_polynomial::{log_polynomial_struct::LogPolynomial, log_polynomial_f64::LogPolynomialF64},
         ConstFraction, Fraction, Log, MaybeExact, One, OneMinus, Signed, Zero,
     },
     StochasticDeterministicFiniteAutomaton,

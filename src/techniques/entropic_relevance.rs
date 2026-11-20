@@ -8,7 +8,7 @@ use crate::{
 use ebi_objects::{
     anyhow::{Context, Result},
     ebi_arithmetic::{
-        log_polynomial::log_polynomial::LogPolynomial, Fraction, Log, One, Signed, Zero,
+        log_polynomial::log_polynomial_struct::LogPolynomial, Fraction, Log, One, Signed, Zero,
     },
     Activity, ActivityKeyTranslator,
 };

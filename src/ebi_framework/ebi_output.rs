@@ -59,7 +59,7 @@ use ebi_objects::{
     PortableNetworkGraphics, StochasticBusinessProcessModelAndNotation,
     StochasticNondeterministicFiniteAutomaton,
 };
-use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial::LogPolynomial;
+use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial_struct::LogPolynomial;
 use std::{
     collections::BTreeSet,
     fmt::{self, Debug, Display},
