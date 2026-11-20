@@ -42,7 +42,7 @@ impl OccurrencesStochasticMinerBPMN for BusinessProcessModelAndNotation {
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
         let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
-        for activity in self.activity_key().get_activities() {
+        for activity in self.activity_key().activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
         for (trace, probability) in language.iter_traces_probabilities() {
@@ -94,7 +94,7 @@ impl OccurrencesStochasticMinerLPN for LabelledPetriNet {
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
         let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
-        for activity in self.activity_key().get_activities() {
+        for activity in self.activity_key().activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
         for (trace, probability) in language.iter_traces_probabilities() {
@@ -135,7 +135,7 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
         let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
-        for activity in self.activity_key().get_activities() {
+        for activity in self.activity_key().activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
         for (trace, probability) in language.iter_traces_probabilities() {

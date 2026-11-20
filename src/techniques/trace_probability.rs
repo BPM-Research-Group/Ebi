@@ -174,7 +174,7 @@ impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutoma
 
                     for activity in trace.iter() {
                         let (found, pos) = self
-                            .binary_search(state, self.activity_key.get_id_from_activity(activity));
+                            .binary_search(state, self.activity_key.activity_to_id(activity));
                         if !found {
                             return Ok(Fraction::zero());
                         }

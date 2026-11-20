@@ -399,7 +399,7 @@ impl Graphable for FrequencyPrefixTree {
             let source_node = nodes[source_node_id];
             for (activity, target_node_id, weight) in arr {
                 let target_node = nodes[*target_node_id];
-                let label = self.activity_key.get_activity_label(activity);
+                let label = self.activity_key.activity_to_label(activity);
                 graphable::create_edge(
                     &mut graph,
                     &source_node,

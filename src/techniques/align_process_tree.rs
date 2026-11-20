@@ -97,7 +97,7 @@ impl<'a> ProcessTreeAligner<'a> {
                         ensure!(
                             metadata.alphabet.insert(activity),
                             "Dynamic alignments require unique activity labels; label {:?} occurs in multiple children of node {node_index}.",
-                            self.tree.activity_key.get_activity_label(&activity)
+                            self.tree.activity_key.activity_to_label(&activity)
                         );
                         metadata.activity_to_child_rank.insert(activity, child_rank);
                     }

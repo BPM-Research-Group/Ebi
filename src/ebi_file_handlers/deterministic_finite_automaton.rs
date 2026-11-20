@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn insert_wrong_edge() {
-        let mut dfa = DeterministicFiniteAutomaton::new();
+        let mut dfa = DeterministicFiniteAutomaton::default();
         let state = dfa.get_initial_state().unwrap();
         let activity = dfa.activity_key_mut().process_activity("a");
 

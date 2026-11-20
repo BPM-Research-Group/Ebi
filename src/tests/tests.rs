@@ -320,10 +320,10 @@ pub mod tests {
     #[test]
     #[should_panic]
     fn test_activities_test() {
-        let mut ak1 = ActivityKey::new();
-        let ak2 = ActivityKey::new();
+        let mut ak1 = ActivityKey::default();
+        let ak2 = ActivityKey::default();
 
         let a = ak1.process_activity("a");
-        ak2.get_activity_label(&a);
+        ak2.activity_to_label(&a);
     }
 }

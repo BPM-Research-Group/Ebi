@@ -66,7 +66,7 @@ where
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
-        let resource_key = Arc::new(Mutex::new(ActivityKey::new()));
+        let resource_key = Arc::new(Mutex::new(ActivityKey::default()));
         let attibute_key = Arc::new(Mutex::new(log.attribute_key().clone()));
 
         self.translate_using_activity_key(log.activity_key_mut());

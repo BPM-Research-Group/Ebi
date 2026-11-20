@@ -54,20 +54,20 @@ impl MarkovianAbstraction {
         {
             let max_len_start = max(
                 self.activity_key
-                    .get_activity_label(&self.start_activity)
+                    .activity_to_label(&self.start_activity)
                     .len(),
                 other
                     .activity_key
-                    .get_activity_label(&other.start_activity)
+                    .activity_to_label(&other.start_activity)
                     .len(),
             );
             //self
             {
                 let self_name = self
                     .activity_key
-                    .get_activity_label(&self.start_activity)
+                    .activity_to_label(&self.start_activity)
                     .to_string();
-                let self_id = self.activity_key.get_id_from_activity(self.start_activity);
+                let self_id = self.activity_key.activity_to_id(self.start_activity);
                 self.activity_key.name2activity.remove(&self_name);
                 self.activity_key
                     .name2activity
@@ -79,11 +79,9 @@ impl MarkovianAbstraction {
             {
                 let other_name = other
                     .activity_key
-                    .get_activity_label(&other.start_activity)
+                    .activity_to_label(&other.start_activity)
                     .to_string();
-                let other_id = other
-                    .activity_key
-                    .get_id_from_activity(other.start_activity);
+                let other_id = other.activity_key.activity_to_id(other.start_activity);
                 other.activity_key.name2activity.remove(&other_name);
                 other
                     .activity_key
@@ -96,20 +94,20 @@ impl MarkovianAbstraction {
         {
             let max_len_end = max(
                 self.activity_key
-                    .get_activity_label(&self.end_activity)
+                    .activity_to_label(&self.end_activity)
                     .len(),
                 other
                     .activity_key
-                    .get_activity_label(&other.end_activity)
+                    .activity_to_label(&other.end_activity)
                     .len(),
             );
             //self
             {
                 let self_name = self
                     .activity_key
-                    .get_activity_label(&self.end_activity)
+                    .activity_to_label(&self.end_activity)
                     .to_string();
-                let self_id = self.activity_key.get_id_from_activity(self.end_activity);
+                let self_id = self.activity_key.activity_to_id(self.end_activity);
                 self.activity_key.name2activity.remove(&self_name);
                 self.activity_key
                     .name2activity
@@ -121,9 +119,9 @@ impl MarkovianAbstraction {
             {
                 let other_name = other
                     .activity_key
-                    .get_activity_label(&other.end_activity)
+                    .activity_to_label(&other.end_activity)
                     .to_string();
-                let other_id = other.activity_key.get_id_from_activity(other.end_activity);
+                let other_id = other.activity_key.activity_to_id(other.end_activity);
                 other.activity_key.name2activity.remove(&other_name);
                 other
                     .activity_key
@@ -265,7 +263,7 @@ impl AbstractMarkovian for StochasticNondeterministicFiniteAutomaton {
         let translate = |ids: &Vec<usize>| -> Vec<Activity> {
             let mut vec: Vec<Activity> = Vec::with_capacity(ids.len());
             for id in ids.iter() {
-                vec.push(self.activity_key.get_activity_by_id(*id));
+                vec.push(self.activity_key.id_to_activity(*id));
             }
             vec
         };
@@ -444,8 +442,10 @@ pub fn build_embedded_snfa(
     net: &StochasticLabelledPetriNet,
 ) -> Result<StochasticNondeterministicFiniteAutomaton> {
     // Create a new SNFA without the default initial state
-    let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
-    snfa.activity_key = net.activity_key().clone();
+    let mut snfa = StochasticNondeterministicFiniteAutomaton {
+        activity_key: net.activity_key().clone(),
+        ..Default::default()
+    };
 
     // Reachability exploration queue
     let mut state2snfa_state: FxHashMap<LPNMarking, AutomatonState> = FxHashMap::default();
@@ -786,8 +786,8 @@ fn compute_phi_ids(
 ) -> Vec<FxHashMap<Vec<usize>, Fraction>> {
     let n = snfa.termination_probabilities.len();
     // Compute numeric IDs for "+" and "-" for quick comparisons
-    let id_plus = snfa.activity_key().get_id_from_activity(start_activity);
-    let id_minus = snfa.activity_key().get_id_from_activity(end_activity);
+    let id_plus = snfa.activity_key().activity_to_id(start_activity);
+    let id_minus = snfa.activity_key().activity_to_id(end_activity);
     let mut phi: Vec<FxHashMap<Vec<usize>, Fraction>> = vec![FxHashMap::default(); n];
 
     // println!("\tstart act {}", id_plus);
@@ -824,7 +824,7 @@ fn compute_phi_ids(
             for (_, target, label, probability) in snfa.outgoing_edges(state_idx) {
                 if label == &Some(end_activity) {
                     // End marker -> stop exploring beyond this symbol
-                    let arc = vec![snfa.activity_key().get_id_from_activity(end_activity)];
+                    let arc = vec![snfa.activity_key().activity_to_id(end_activity)];
                     result
                         .entry(arc)
                         .and_modify(|v| *v += probability)
@@ -837,7 +837,7 @@ fn compute_phi_ids(
                         let mut vec = Vec::with_capacity(1 + suf.len());
                         //at this point, every label should have a transition
                         let label = label.unwrap();
-                        vec.push(snfa.activity_key().get_id_from_activity(label));
+                        vec.push(snfa.activity_key().activity_to_id(label));
                         vec.extend_from_slice(&suf[..]);
                         let weight = probability * w;
                         result

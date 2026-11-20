@@ -759,7 +759,7 @@ impl EbiTraitImporter {
     }
 
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
-        let mut result = ImporterParameterValues::new();
+        let mut result = ImporterParameterValues::default();
         for parameter in self.parameters() {
             result.insert(*parameter, (parameter.default(), false));
         }
@@ -1022,7 +1022,7 @@ impl EbiObjectImporter {
     }
 
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
-        let mut result = ImporterParameterValues::new();
+        let mut result = ImporterParameterValues::default();
         for parameter in self.parameters() {
             result.insert(*parameter, (parameter.default(), false));
         }
@@ -1254,7 +1254,7 @@ impl EbiObjectImporterFallible {
     }
 
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
-        let mut result = ImporterParameterValues::new();
+        let mut result = ImporterParameterValues::default();
         for parameter in self.parameters() {
             result.insert(*parameter, (parameter.default(), false));
         }

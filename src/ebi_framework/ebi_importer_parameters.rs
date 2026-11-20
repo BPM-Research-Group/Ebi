@@ -215,7 +215,7 @@ pub fn extract_parameter_values(
     parameters: &'static [ImporterParameter],
     input_index: usize,
 ) -> Result<ImporterParameterValues> {
-    let mut result = ImporterParameterValues::new();
+    let mut result = ImporterParameterValues::default();
 
     for parameter in parameters {
         result.insert(

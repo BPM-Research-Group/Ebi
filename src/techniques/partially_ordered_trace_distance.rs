@@ -230,11 +230,11 @@ mod tests {
 
         let ac0 = spolang
             .activity_key()
-            .process_activity_attempt("Register claim\n(2min)")
+            .try_process_activity("Register claim\n(2min)")
             .unwrap();
         let ac1 = spolang
             .activity_key()
-            .process_activity_attempt("Check easy claim\n(5 min)")
+            .try_process_activity("Check easy claim\n(5 min)")
             .unwrap();
 
         let trace = vec![ac0, ac1];

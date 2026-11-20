@@ -7,8 +7,7 @@ use crate::{
     trait_definition_logs,
 };
 use ebi_objects::{
-    Activity, Attribute, EventLogCsv, EventLogOcel, EventLogPython, EventLogXes,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     attribute_key::has_attribute_key::HasAttributeKey,
     ebi_objects::{
         compressed_event_log_event_attributes::CompressedEventLogEventAttributes,
@@ -17,6 +16,7 @@ use ebi_objects::{
     traits::{
         event_attribute_iterators::IntoEventAttributeIterator, event_attributes::EventAttributes,
     },
+    Activity, Attribute, EventLogCsv, EventLogOcel, EventLogPython, EventLogXes,
 };
 use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;

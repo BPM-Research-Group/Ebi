@@ -402,7 +402,7 @@ mod tests {
     #[test]
     fn tau_removal_self_loop_and_cycle_rows_sum_to_one() {
         // tau self-loop on 0 (1/5) and cycle between 1 and 2 (1/4,1/2)
-        let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+        let mut snfa = StochasticNondeterministicFiniteAutomaton::default();
         for _ in 0..3 {
             snfa.add_state();
         }
@@ -461,7 +461,7 @@ mod tests {
         // SCC_A: 0 self-loop 1/2
         // SCC_B: 1,2 (1/4,1/3)
         // cross A -> B: 0 -> 1 1/2
-        let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+        let mut snfa = StochasticNondeterministicFiniteAutomaton::default();
         for _ in 0..3 {
             snfa.add_state();
         }
@@ -496,7 +496,7 @@ mod tests {
     // 3. empty automaton
     #[test]
     fn tau_removal_empty_automaton() {
-        let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+        let mut snfa = StochasticNondeterministicFiniteAutomaton::default();
         snfa.termination_probabilities.clear();
         snfa.remove_tau_transitions().unwrap(); // should not panic
         assert_eq!(snfa.termination_probabilities.len(), 0);
@@ -505,7 +505,7 @@ mod tests {
     // 4. identity when no tau-edges
     #[test]
     fn tau_removal_no_tau_edges_is_identity() {
-        let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+        let mut snfa = StochasticNondeterministicFiniteAutomaton::default();
         let actx = Some(snfa.activity_key.process_activity("x"));
         snfa.add_transition(a!(0), actx, a!(0), frac!(2, 3))
             .unwrap();
@@ -522,7 +522,7 @@ mod tests {
     // 5. single-state trivial case
     #[test]
     fn tau_removal_single_state_self_final() {
-        let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+        let mut snfa = StochasticNondeterministicFiniteAutomaton::default();
         snfa.remove_tau_transitions().unwrap();
         assert_eq!(snfa.termination_probabilities.len(), 1);
         assert_eq!(snfa.termination_probabilities[0], f1!());
@@ -532,7 +532,7 @@ mod tests {
     #[test]
     fn tau_removal_tau_chain() {
         // 0 -(1/5)->1 -(1/2)->2 , visible 2 -a->2
-        let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+        let mut snfa = StochasticNondeterministicFiniteAutomaton::default();
         for _ in 0..3 {
             snfa.add_state();
         }
@@ -565,7 +565,7 @@ mod tests {
     #[should_panic(expected = "singular")]
     fn tau_removal_singular_matrix_panics() {
         // single state with tau-self-loop weight 1  ->  I-W singular
-        let mut a = StochasticNondeterministicFiniteAutomaton::new();
+        let mut a = StochasticNondeterministicFiniteAutomaton::default();
         a.add_transition(a!(0), None, a!(0), f1!()).unwrap();
         a.remove_tau_transitions().unwrap(); // must panic
     }
@@ -573,7 +573,7 @@ mod tests {
     // 8. automaton with only tau-edges
     #[test]
     fn tau_removal_only_tau_edges() {
-        let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+        let mut snfa = StochasticNondeterministicFiniteAutomaton::default();
         snfa.add_state();
         snfa.add_transition(a!(0), None, a!(1), frac!(1, 2))
             .unwrap();
@@ -590,7 +590,7 @@ mod tests {
     #[test]
     fn tau_removal_trivial_source_state() {
         // 0 has only visible edges, 1 has tau-edges
-        let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+        let mut snfa = StochasticNondeterministicFiniteAutomaton::default();
         snfa.add_state();
 
         let actx = Some(snfa.activity_key.process_activity("x"));

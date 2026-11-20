@@ -22,7 +22,7 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         activity: Activity,
     ) -> Result<AutomatonState> {
         let (found, i) =
-            self.binary_search(*state, self.activity_key().get_id_from_activity(activity));
+            self.binary_search(*state, self.activity_key().activity_to_id(activity));
         if found {
             Ok(self.targets[i])
         } else {
@@ -40,7 +40,7 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         activity: Activity,
     ) -> Fraction {
         let (found, i) =
-            self.binary_search(*state, self.activity_key().get_id_from_activity(activity));
+            self.binary_search(*state, self.activity_key().activity_to_id(activity));
         match found {
             true => self.probabilities[i].clone(),
             false => Fraction::zero(),

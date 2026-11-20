@@ -348,7 +348,7 @@ mod log_splitting {
             .collect();
 
         //create map activity -> part
-        let mut activity_2_part = vec![usize::MAX; log.activity_key().get_number_of_activities()];
+        let mut activity_2_part = vec![usize::MAX; log.activity_key().len()];
         for (part_i, part) in parts.iter().enumerate() {
             for activity in part {
                 activity_2_part[activity.id] = part_i;

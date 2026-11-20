@@ -442,7 +442,7 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
+        let a = Some(powl.activity_key().try_process_activity("a").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -471,7 +471,7 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
+        let a = Some(powl.activity_key().try_process_activity("a").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -500,7 +500,7 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+        let b = Some(powl.activity_key().try_process_activity("b").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -554,8 +554,8 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
-        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+        let a = Some(powl.activity_key().try_process_activity("a").unwrap());
+        let b = Some(powl.activity_key().try_process_activity("b").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -628,8 +628,8 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
-        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+        let a = Some(powl.activity_key().try_process_activity("a").unwrap());
+        let b = Some(powl.activity_key().try_process_activity("b").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));

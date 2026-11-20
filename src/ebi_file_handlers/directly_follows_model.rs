@@ -65,14 +65,14 @@ mod tests {
         let fin = fs::read_to_string("testfiles/a-b_star.dfm").unwrap();
         let mut dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
 
-        let mut activity_key = ActivityKey::new();
+        let mut activity_key = ActivityKey::default();
         let x = activity_key.process_activity("xyz");
 
         dfm.translate_using_activity_key(&mut activity_key);
 
         assert_eq!(
-            dfm.activity_key().get_activity_label(&x),
-            activity_key.get_activity_label(&x)
+            dfm.activity_key().activity_to_label(&x),
+            activity_key.activity_to_label(&x)
         );
     }
 }

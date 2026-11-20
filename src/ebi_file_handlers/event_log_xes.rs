@@ -227,7 +227,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let mut log = fin.parse::<EventLog>().unwrap();
 
-        let mut activity_key = ActivityKey::new();
+        let mut activity_key = ActivityKey::default();
         log.translate_using_activity_key(&mut activity_key);
     }
 

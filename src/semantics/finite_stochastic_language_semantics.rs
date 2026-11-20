@@ -74,7 +74,7 @@ impl FiniteStochasticLanguageSemantics {
         if transition == 0 {
             None
         } else {
-            Some(self.activity_key.get_activity_by_id(transition - 1))
+            Some(self.activity_key.id_to_activity(transition - 1))
         }
     }
 
@@ -83,7 +83,7 @@ impl FiniteStochasticLanguageSemantics {
         activity: &Option<Activity>,
     ) -> TransitionIndex {
         match activity {
-            Some(ai) => 1 + self.activity_key.get_id_from_activity(ai),
+            Some(ai) => 1 + self.activity_key.activity_to_id(ai),
             None => 0,
         }
     }

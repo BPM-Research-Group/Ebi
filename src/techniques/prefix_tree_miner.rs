@@ -18,7 +18,7 @@ pub trait PrefixTreeMinerTree {
 
 impl PrefixTreeMinerDFA for dyn EbiTraitFiniteLanguage {
     fn mine_prefix_tree_dfa(&self) -> DeterministicFiniteAutomaton {
-        let mut result = DeterministicFiniteAutomaton::new();
+        let mut result = DeterministicFiniteAutomaton::default();
         result.set_activity_key(self.activity_key().clone());
 
         if self.number_of_traces().is_zero() {
@@ -68,7 +68,7 @@ pub fn node_2_tree(lang: FiniteLanguage, tree: &mut Vec<Node>) {
             let first_activity = trace.remove(0);
             activity_2_lang
                 .entry(first_activity)
-                .or_insert_with(FiniteLanguage::new)
+                .or_insert_with(FiniteLanguage::default)
                 .push(trace);
         }
     }
