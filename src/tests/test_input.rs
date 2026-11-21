@@ -50,18 +50,6 @@ impl TestInput {
         }
     }
 
-    // #[cfg(test)]
-    // pub(crate) fn get_input_type(&self) -> Option<&'static EbiInputType> {
-    //     match self {
-    //         TestInput::Trait(_, _) => None,
-    //         TestInput::Object(_, _, _) => None,
-    //         TestInput::String(_, ebi_input_type) => Some(ebi_input_type),
-    //         TestInput::Usize(_, ebi_input_type) => Some(ebi_input_type),
-    //         TestInput::FileHandler(_) => None,
-    //         TestInput::Fraction(_, ebi_input_type) => Some(ebi_input_type),
-    //     }
-    // }
-
     pub fn to_unique_string(&self) -> String {
         match self {
             TestInput::Trait(ebi_trait, path_buf) => {
@@ -80,78 +68,6 @@ impl TestInput {
             TestInput::Fraction(f, _) => format!("fraction {f}"),
         }
     }
-
-    // pub fn from_unique_string(string: &str, input_types: &[&'static EbiInputType]) -> Result<Self> {
-    //     let (variant, value) = string
-    //         .split_once(' ')
-    //         .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
-    //     match variant {
-    //         "trait" => {
-    //             let (trait_name, path) = value
-    //                 .split_once('#')
-    //                 .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
-    //             let path_buf = path.parse::<PathBuf>()?;
-    //             let ebi_trait = trait_name.parse::<EbiTrait>()?;
-    //             Ok(Self::Trait(ebi_trait, path_buf))
-    //         }
-    //         "object" => {
-    //             let (_object_name, path) = value
-    //                 .split_once('#')
-    //                 .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
-    //             let path_buf = path.parse::<PathBuf>()?;
-    //             let reader = MultipleReader::File(File::open(path)?);
-    //             if let Ok(EbiInput::Object(ebi_object, file_handler)) =
-    //                 attempt_parse(input_types, reader)
-    //             {
-    //                 Ok(Self::Object(ebi_object, file_handler, path_buf))
-    //             } else {
-    //                 Err(anyhow!("not a valid testinput {}", string))
-    //             }
-    //         }
-    //         "string" => {
-    //             for input_type in input_types {
-    //                 if let EbiInputType::String(allowed_values, _) = input_type {
-    //                     if let Some(allowed_values) = allowed_values
-    //                         && allowed_values.contains(&value)
-    //                     {
-    //                         return Ok(TestInput::String(value.to_string(), input_type));
-    //                     } else if allowed_values.is_none() {
-    //                         return Ok(TestInput::String(value.to_string(), input_type));
-    //                     }
-    //                 }
-    //             }
-    //             Err(anyhow!("not a valid testinput {}", string))
-    //         }
-    //         "usize" => {
-    //             let reader = MultipleReader::String(value.to_string());
-    //             if let Ok(EbiInput::Usize(val, file_handler)) = attempt_parse(input_types, reader) {
-    //                 Ok(Self::Usize(val, file_handler))
-    //             } else {
-    //                 Err(anyhow!("not a valid testinput {}", string))
-    //             }
-    //         }
-    //         "filehandler" => {
-    //             let reader = MultipleReader::String(value.to_string());
-    //             if let Ok(EbiInput::FileHandler(file_handler)) = attempt_parse(input_types, reader)
-    //             {
-    //                 Ok(Self::FileHandler(file_handler))
-    //             } else {
-    //                 Err(anyhow!("not a valid testinput {}", string))
-    //             }
-    //         }
-    //         "fraction" => {
-    //             let reader = MultipleReader::String(value.to_string());
-    //             if let Ok(EbiInput::Fraction(val, file_handler)) =
-    //                 attempt_parse(input_types, reader)
-    //             {
-    //                 Ok(Self::Fraction(val, file_handler))
-    //             } else {
-    //                 Err(anyhow!("not a valid testinput {}", string))
-    //             }
-    //         }
-    //         _ => Err(anyhow!("not a valid testinput {}", string)),
-    //     }
-    // }
 
     pub(crate) fn find_inputs(input_typess: &[&[&'static EbiInputType]]) -> Vec<Vec<TestInput>> {
         let mut it = input_typess.iter();
