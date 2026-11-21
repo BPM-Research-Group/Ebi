@@ -248,8 +248,8 @@ impl TestInput {
                                 .unwrap()
                                 .contains("irregular")
                         {
-                            let mut reader =
-                                MultipleReader::from_file(File::open(file.path()).unwrap());
+                            let path = test_file_path(&file.file_name().into_string().unwrap());
+                            let mut reader = MultipleReader::from_file(File::open(&path).unwrap());
 
                             match input_type {
                                 EbiInputType::Trait(etrait) => {
@@ -257,7 +257,7 @@ impl TestInput {
 
                                     match ebi_input::read_as_trait(etrait, &mut reader, None, 0) {
                                         Ok((_, _)) => {
-                                            result.push(TestInput::Trait(*etrait, file.path()));
+                                            result.push(TestInput::Trait(*etrait, path));
                                         }
                                         Err(_) => {}
                                     }
@@ -269,7 +269,7 @@ impl TestInput {
                                             result.push(TestInput::Object(
                                                 object,
                                                 file_handler,
-                                                file.path(),
+                                                path,
                                             ));
                                         }
                                         Err(_) => {}
@@ -281,7 +281,7 @@ impl TestInput {
                                             result.push(TestInput::Object(
                                                 object,
                                                 file_handler,
-                                                file.path(),
+                                                path,
                                             ));
                                         }
                                         Err(_) => {}
@@ -297,6 +297,21 @@ impl TestInput {
 
         result
     }
+}
+
+/// The directory that the test files live in, relative to the crate root.
+const TEST_FILES_DIRECTORY: &str = "./testfiles";
+
+/// The path of a file in the test files directory.
+///
+/// The path is built with forward slashes on every platform, rather than
+/// with `Path::join` or `DirEntry::path`, which use the platform separator
+/// and so yield `./testfiles\x.xes` on Windows. The path is written into
+/// generated Rust string literals, where a backslash is an escape character,
+/// and into the keys of the fallible test list, which must be identical on
+/// every platform. Windows opens forward-slash paths without trouble.
+pub(crate) fn test_file_path(file_name: &str) -> PathBuf {
+    PathBuf::from(format!("{TEST_FILES_DIRECTORY}/{file_name}"))
 }
 
 impl Debug for TestInput {
@@ -336,6 +351,32 @@ impl PartialEq for TestInput {
             (Self::FileHandler(l0), Self::FileHandler(r0)) => l0 == r0,
             (Self::Fraction(l0, l1), Self::Fraction(r0, r1)) => l0 == r0 && l1 == r1,
             _ => false,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{TEST_FILES_DIRECTORY, test_file_path};
+    use std::fs::{self, File};
+
+    #[test]
+    fn test_file_path_uses_forward_slashes() {
+        let path = test_file_path("a-b.xes");
+        assert_eq!(path.to_str().unwrap(), "./testfiles/a-b.xes");
+    }
+
+    #[test]
+    fn test_file_paths_open_and_are_portable() {
+        for entry in fs::read_dir(TEST_FILES_DIRECTORY).unwrap() {
+            let name = entry.unwrap().file_name().into_string().unwrap();
+            let path = test_file_path(&name);
+            let text = path.to_str().unwrap();
+
+            // The text ends up inside generated string literals and
+            // fallible-list keys, so it must not depend on the platform.
+            assert!(!text.contains('\\'), "backslash in {text}");
+            assert!(File::open(&path).is_ok(), "cannot open {text}");
         }
     }
 }
