@@ -350,10 +350,8 @@ impl EbiCommand {
             }
             EbiCommand::Command {
                 exact_arithmetic,
-                input_types: input_typess,
                 execute,
                 output_type,
-                input_names,
                 ..
             } => {
                 //set exact arithmetic
@@ -362,27 +360,7 @@ impl EbiCommand {
                     set_exact_globally(false);
                 }
 
-                //read the inputs
-                let mut inputs = vec![];
-                for (i, (input_types, input_name)) in
-                    input_typess.iter().zip(input_names.iter()).enumerate()
-                {
-                    let cli_id = format!("{}x{}", input_name, i);
-
-                    //read input
-                    log::info!("Reading {}", input_name);
-                    let input = Self::attempt_parse(input_types, cli_matches, &cli_id, i)
-                        .with_context(|| format!("Reading parameter {}.", input_name))?;
-                    log::debug!(
-                        "Read {input_name} as {} ({})",
-                        input.get_type(),
-                        input
-                            .importing_file_handler()
-                            .map(|x| format!("file handler: {}", x.name))
-                            .unwrap_or_else(|| "no file handler".to_string())
-                    );
-                    inputs.push(input);
-                }
+                let inputs = self.read_inputs(cli_matches)?;
 
                 log::info!("Starting {} command", self.long_name());
                 let result = {
@@ -427,6 +405,46 @@ impl EbiCommand {
             }
         }
         Err(anyhow!("command not recognised"))
+    }
+
+    /// Reads the inputs of this command from a parsed command line by opening
+    /// the files and selecting the importers. 
+    ///
+    /// Does not touch the arithmetic mode, so it changes no global state.
+    pub(crate) fn read_inputs(
+        &self,
+        cli_matches: &ArgMatches,
+    ) -> Result<Vec<EbiInput>> {
+        let EbiCommand::Command {
+            input_types: input_typess,
+            input_names,
+            ..
+        } = self
+        else {
+            return Err(anyhow!("Not a command variant."));
+        };
+
+        let mut inputs = vec![];
+        for (i, (input_types, input_name)) in
+            input_typess.iter().zip(input_names.iter()).enumerate()
+        {
+            let cli_id = format!("{}x{}", input_name, i);
+
+            //read input
+            log::info!("Reading {}", input_name);
+            let input = Self::attempt_parse(input_types, cli_matches, &cli_id, i)
+                .with_context(|| format!("Reading parameter {}.", input_name))?;
+            log::debug!(
+                "Read {input_name} as {} ({})",
+                input.get_type(),
+                input
+                    .importing_file_handler()
+                    .map(|x| format!("file handler: {}", x.name))
+                    .unwrap_or_else(|| "no file handler".to_string())
+            );
+            inputs.push(input);
+        }
+        Ok(inputs)
     }
 
     /**
@@ -1106,11 +1124,47 @@ fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::{EbiCommand, EBI_COMMANDS};
+    use clap::{error::ErrorKind, Command};
     use std::collections::HashSet;
 
     #[test]
     fn build_cli() {
-        EBI_COMMANDS.build_cli();
+        //include clap checks for definitions
+        EBI_COMMANDS.build_cli().debug_assert();
+    }
+
+    /// The kind of error that clap reports when asked for the help of the
+    /// given command names. Help is reported by clap as an error.
+    fn help_error_kind(cli: &Command, names: &[&str]) -> ErrorKind {
+        let args = ["ebi"].into_iter().chain(names.iter().copied());
+        cli.clone()
+            .try_get_matches_from(args.chain(["--help"]))
+            .unwrap_err()
+            .kind()
+    }
+
+    #[test]
+    fn help_of_every_command_and_group() {
+        let cli = EBI_COMMANDS.build_cli();
+        for path in EBI_COMMANDS.get_command_paths() {
+            //the first element is the root, which has no name on the line
+            let long: Vec<&str> =
+                path.iter().skip(1).map(|c| c.long_name()).collect();
+            let short: Vec<&str> =
+                path.iter().skip(1).map(|c| c.short_name()).collect();
+            for names in [long, short] {
+                //every prefix: the groups on the way, then the command
+                for end in 1..=names.len() {
+                    let prefix = &names[..end];
+                    assert_eq!(
+                        help_error_kind(&cli, prefix),
+                        ErrorKind::DisplayHelp,
+                        "ebi {} --help",
+                        prefix.join(" ")
+                    );
+                }
+            }
+        }
     }
 
     #[test]

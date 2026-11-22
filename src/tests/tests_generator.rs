@@ -7,6 +7,10 @@ use itertools::Itertools;
 
 pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 25;
 
+/// The number of command lines tried per command. Each is a different
+/// combination of inputs, spread across all the combinations found.
+pub const NUMBER_OF_CLI_TESTS_PER_COMMAND: usize = 3;
+
 pub(crate) fn generate_tests() -> Result<String> {
     let path = EBI_COMMANDS;
     Ok(format!(
@@ -22,9 +26,95 @@ mod tests{{
 \tuse ntest::timeout;
 \tuse std::fs::File;
 
-{result}}}",
-        result = generate_tests_for_command(&EBI_COMMANDS, &vec![&path])?
+{result}}}
+
+mod cli_tests{{
+\tuse crate::tests::cli_test_support::assert_cli_reads_inputs;
+\tuse ntest::timeout;
+
+{cli_result}}}",
+        result = generate_tests_for_command(&EBI_COMMANDS, &vec![&path])?,
+        cli_result = generate_cli_tests_for_command(&EBI_COMMANDS, &vec![&path])?
     ))
+}
+
+/// Generates tests that read the inputs of a command through the command line
+/// interface, without running the command.
+///
+/// Commands with a `cli_command` are skipped: they need further arguments that
+/// are not known here. So are commands without inputs.
+pub(crate) fn generate_cli_tests_for_command(
+    command: &EbiCommand,
+    path: &Vec<&EbiCommand>,
+) -> Result<String> {
+    match command {
+        EbiCommand::Group { children, .. } => {
+            let mut result = String::new();
+            for child in children.iter() {
+                let mut child_path = path.clone();
+                child_path.push(child);
+                result += &generate_cli_tests_for_command(child, &child_path)?;
+            }
+            Ok(result)
+        }
+        EbiCommand::Command {
+            input_types,
+            cli_command: None,
+            ..
+        } if !input_types.is_empty() => {
+            let mut inputss = TestInput::find_inputs(input_types);
+            inputss.sort();
+            //a command line cannot name some inputs; leave those combinations out
+            inputss.retain(|inputs| {
+                inputs.iter().all(|i| i.to_cli_argument().is_some())
+            });
+            if inputss.is_empty() {
+                return Err(anyhow!(
+                    "Could not find input to call command {}.",
+                    EbiCommand::path_to_short_string(path)
+                ));
+            }
+
+            //the root has no name on the command line
+            let names = path.iter().skip(1).map(|c| c.short_name()).collect_vec();
+            let function_name = names.join("_").replace("-", "_").to_ascii_lowercase();
+
+            let mut result = format!("\t// ==== command {} ====\n", names.join(" "));
+            let chosen = evenly_spaced(inputss, NUMBER_OF_CLI_TESTS_PER_COMMAND);
+            for (input_i, inputs) in chosen.into_iter().enumerate() {
+                let arguments = inputs
+                    .iter()
+                    .map(|i| format!("{:?}", i.to_cli_argument().unwrap()))
+                    .join(", ");
+                result += &format!(
+                    "\t#[test]
+\t#[timeout(30000)]
+\tpub fn {function_name}_cli_{input_i}() {{
+\t\tassert_cli_reads_inputs(&{names:?}, &[{arguments}]);
+\t}}\n\n"
+                );
+            }
+            Ok(result)
+        }
+        _ => Ok(String::new()),
+    }
+}
+
+/// At most `count` items, evenly spaced through the given ones, so that the
+/// first and later parts of a long list are both represented.
+fn evenly_spaced<T>(items: Vec<T>, count: usize) -> Vec<T> {
+    if items.len() <= count {
+        return items;
+    }
+    let wanted = (0..count)
+        .map(|k| k * items.len() / count)
+        .collect::<Vec<_>>();
+    items
+        .into_iter()
+        .enumerate()
+        .filter(|(i, _)| wanted.contains(i))
+        .map(|(_, item)| item)
+        .collect()
 }
 
 pub(crate) fn generate_tests_for_command(
@@ -190,4 +280,28 @@ fn test_inputs_to_fallible_list_code(test_inputs: &Vec<TestInput>) -> String {
         .iter()
         .map(|test_input| format!("\"{}\"", test_input.to_unique_string()))
         .join(",\n\t\t\t\t")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::evenly_spaced;
+
+    #[test]
+    fn evenly_spaced_keeps_all_when_few() {
+        assert_eq!(evenly_spaced(vec![1, 2], 3), vec![1, 2]);
+        assert_eq!(evenly_spaced(vec![1, 2, 3], 3), vec![1, 2, 3]);
+    }
+
+    #[test]
+    fn evenly_spaced_spreads_across_the_list() {
+        assert_eq!(evenly_spaced((0..10).collect(), 3), vec![0, 3, 6]);
+        assert_eq!(evenly_spaced((0..100).collect(), 4), vec![0, 25, 50, 75]);
+    }
+
+    #[test]
+    fn evenly_spaced_gives_requested_count() {
+        for len in 4..60 {
+            assert_eq!(evenly_spaced((0..len).collect(), 3).len(), 3);
+        }
+    }
 }

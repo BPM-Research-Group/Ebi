@@ -50,6 +50,25 @@ impl TestInput {
         }
     }
 
+    /// The positional argument that gives this input on a command line.
+    ///
+    /// A file handler is given by its extension. Returns None for a file
+    /// handler that the command line cannot name, as it has no validator.
+    pub fn to_cli_argument(&self) -> Option<String> {
+        match self {
+            TestInput::Trait(_, path_buf) | TestInput::Object(_, _, path_buf) => {
+                Some(path_buf.to_str().unwrap().to_string())
+            }
+            TestInput::String(s, _) => Some(s.clone()),
+            TestInput::Usize(u, _) => Some(u.to_string()),
+            TestInput::FileHandler(file_handler) => file_handler
+                .validator
+                .is_some()
+                .then(|| file_handler.file_extension.to_string()),
+            TestInput::Fraction(f, _) => Some(f.to_string()),
+        }
+    }
+
     pub fn to_unique_string(&self) -> String {
         match self {
             TestInput::Trait(ebi_trait, path_buf) => {
@@ -273,8 +292,31 @@ impl PartialEq for TestInput {
 
 #[cfg(test)]
 mod tests {
-    use super::{TEST_FILES_DIRECTORY, test_file_path};
-    use std::fs::{self, File};
+    use super::{TEST_FILES_DIRECTORY, TestInput, test_file_path};
+    use crate::ebi_framework::ebi_file_handler::{
+        EBI_FILE_HANDLERS, EbiFileHandler,
+    };
+    use std::{
+        fs::{self, File},
+        str::FromStr,
+    };
+
+    #[test]
+    fn file_handler_cli_argument_round_trips() {
+        for file_handler in EBI_FILE_HANDLERS {
+            let argument =
+                TestInput::FileHandler(file_handler.clone()).to_cli_argument();
+            match argument {
+                //the command line can name the handler: it must read back
+                Some(text) => assert_eq!(
+                    &EbiFileHandler::from_str(&text).unwrap(),
+                    file_handler
+                ),
+                //otherwise the command line must be unable to name it
+                None => assert!(file_handler.validator.is_none()),
+            }
+        }
+    }
 
     #[test]
     fn test_file_path_uses_forward_slashes() {

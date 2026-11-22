@@ -61346,3 +61346,1803 @@ mod tests{
 		}
 	}
 }
+
+mod cli_tests{
+	use crate::tests::cli_test_support::assert_cli_reads_inputs;
+	use ntest::timeout;
+
+	// ==== command ana all ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_all_cli_0() {
+		assert_cli_reads_inputs(&["ana", "all"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_all_cli_1() {
+		assert_cli_reads_inputs(&["ana", "all"], &["./testfiles/simple_log_markovian_abstraction.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_all_cli_2() {
+		assert_cli_reads_inputs(&["ana", "all"], &["./testfiles/ba-aa-ab.slang"]);
+	}
+
+	// ==== command ana ca ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_ca_cli_0() {
+		assert_cli_reads_inputs(&["ana", "ca"], &["./testfiles/a-b-double.xes", "10", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_ca_cli_1() {
+		assert_cli_reads_inputs(&["ana", "ca"], &["./testfiles/alergia.xes", "10", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_ca_cli_2() {
+		assert_cli_reads_inputs(&["ana", "ca"], &["./testfiles/fig_a.xes", "10", "1/20"]);
+	}
+
+	// ==== command ana comp ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_comp_cli_0() {
+		assert_cli_reads_inputs(&["ana", "comp"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_comp_cli_1() {
+		assert_cli_reads_inputs(&["ana", "comp"], &["./testfiles/a-b_multiple_separators.csv"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_comp_cli_2() {
+		assert_cli_reads_inputs(&["ana", "comp"], &["./testfiles/fig_a.xes"]);
+	}
+
+	// ==== command ana cov ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_cov_cli_0() {
+		assert_cli_reads_inputs(&["ana", "cov"], &["./testfiles/a-b-double.xes", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_cov_cli_1() {
+		assert_cli_reads_inputs(&["ana", "cov"], &["./testfiles/simple_log_markovian_abstraction.xes", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_cov_cli_2() {
+		assert_cli_reads_inputs(&["ana", "cov"], &["./testfiles/ba-aa-ab.slang", "0"]);
+	}
+
+	// ==== command ana dfgedi ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_dfgedi_cli_0() {
+		assert_cli_reads_inputs(&["ana", "dfgedi"], &["./testfiles/aa-ab-ba.dfg", "./testfiles/aa-ab-ba.dfg"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_dfgedi_cli_1() {
+		assert_cli_reads_inputs(&["ana", "dfgedi"], &["./testfiles/aa-ab-ba.dfg", "./testfiles/bpic12-a.xes.gz-dfg.dfg"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_dfgedi_cli_2() {
+		assert_cli_reads_inputs(&["ana", "dfgedi"], &["./testfiles/bpic12-a.xes.gz-dfg.dfg", "./testfiles/aa-ab-ba.dfg"]);
+	}
+
+	// ==== command ana dfgedi-nf ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_dfgedi_nf_cli_0() {
+		assert_cli_reads_inputs(&["ana", "dfgedi-nf"], &["./testfiles/aa-ab-ba.dfg", "./testfiles/aa-ab-ba.dfg"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_dfgedi_nf_cli_1() {
+		assert_cli_reads_inputs(&["ana", "dfgedi-nf"], &["./testfiles/aa-ab-ba.dfg", "./testfiles/bpic12-a.xes.gz-dfg.dfg"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_dfgedi_nf_cli_2() {
+		assert_cli_reads_inputs(&["ana", "dfgedi-nf"], &["./testfiles/bpic12-a.xes.gz-dfg.dfg", "./testfiles/aa-ab-ba.dfg"]);
+	}
+
+	// ==== command ana en ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_en_cli_0() {
+		assert_cli_reads_inputs(&["ana", "en"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_en_cli_1() {
+		assert_cli_reads_inputs(&["ana", "en"], &["./testfiles/caise24_concurrency.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_en_cli_2() {
+		assert_cli_reads_inputs(&["ana", "en"], &["./testfiles/aa-ab-ba.slang"]);
+	}
+
+	// ==== command ana med ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_med_cli_0() {
+		assert_cli_reads_inputs(&["ana", "med"], &["./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_med_cli_1() {
+		assert_cli_reads_inputs(&["ana", "med"], &["./testfiles/abc-acb-aaabc.slang", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_med_cli_2() {
+		assert_cli_reads_inputs(&["ana", "med"], &["./testfiles/cohort_test.xes", "1"]);
+	}
+
+	// ==== command ana minprob ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_minprob_cli_0() {
+		assert_cli_reads_inputs(&["ana", "minprob"], &["./testfiles/a-aa-bb.slpn", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_minprob_cli_1() {
+		assert_cli_reads_inputs(&["ana", "minprob"], &["./testfiles/aa-ab-ba_uni.slpn", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_minprob_cli_2() {
+		assert_cli_reads_inputs(&["ana", "minprob"], &["./testfiles/cohort_test.xes", "0"]);
+	}
+
+	// ==== command ana mode ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_mode_cli_0() {
+		assert_cli_reads_inputs(&["ana", "mode"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_mode_cli_1() {
+		assert_cli_reads_inputs(&["ana", "mode"], &["./testfiles/simple_log_markovian_abstraction.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_mode_cli_2() {
+		assert_cli_reads_inputs(&["ana", "mode"], &["./testfiles/ba-aa-ab.slang"]);
+	}
+
+	// ==== command ana mostlikely ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_mostlikely_cli_0() {
+		assert_cli_reads_inputs(&["ana", "mostlikely"], &["./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_mostlikely_cli_1() {
+		assert_cli_reads_inputs(&["ana", "mostlikely"], &["./testfiles/simple_log_markovian_abstraction.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_mostlikely_cli_2() {
+		assert_cli_reads_inputs(&["ana", "mostlikely"], &["./testfiles/ba-aa-ab.slang", "1"]);
+	}
+
+	// ==== command ana var ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_var_cli_0() {
+		assert_cli_reads_inputs(&["ana", "var"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_var_cli_1() {
+		assert_cli_reads_inputs(&["ana", "var"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn ana_var_cli_2() {
+		assert_cli_reads_inputs(&["ana", "var"], &["./testfiles/cohort_test.xes"]);
+	}
+
+	// ==== command anans act ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_act_cli_0() {
+		assert_cli_reads_inputs(&["anans", "act"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_act_cli_1() {
+		assert_cli_reads_inputs(&["anans", "act"], &["./testfiles/aa-ab-ba_uni.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_act_cli_2() {
+		assert_cli_reads_inputs(&["anans", "act"], &["./testfiles/empty.sdfa"]);
+	}
+
+	// ==== command anans at ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_at_cli_0() {
+		assert_cli_reads_inputs(&["anans", "at"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_at_cli_1() {
+		assert_cli_reads_inputs(&["anans", "at"], &["./testfiles/empty.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_at_cli_2() {
+		assert_cli_reads_inputs(&["anans", "at"], &["./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa"]);
+	}
+
+	// ==== command anans bnd ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_bnd_cli_0() {
+		assert_cli_reads_inputs(&["anans", "bnd"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_bnd_cli_1() {
+		assert_cli_reads_inputs(&["anans", "bnd"], &["./testfiles/empty.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_bnd_cli_2() {
+		assert_cli_reads_inputs(&["anans", "bnd"], &["./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa"]);
+	}
+
+	// ==== command anans clus ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_clus_cli_0() {
+		assert_cli_reads_inputs(&["anans", "clus"], &["./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_clus_cli_1() {
+		assert_cli_reads_inputs(&["anans", "clus"], &["./testfiles/abc-acb-aaabc.slang", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_clus_cli_2() {
+		assert_cli_reads_inputs(&["anans", "clus"], &["./testfiles/carrasco.slang", "1"]);
+	}
+
+	// ==== command anans et ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_et_cli_0() {
+		assert_cli_reads_inputs(&["anans", "et"], &["./testfiles/a-b-flower.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_et_cli_1() {
+		assert_cli_reads_inputs(&["anans", "et"], &["./testfiles/all_operators.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_et_cli_2() {
+		assert_cli_reads_inputs(&["anans", "et"], &["./testfiles/seq(a-xor(b-c))-uniform.sptree"]);
+	}
+
+	// ==== command anans exs ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_exs_cli_0() {
+		assert_cli_reads_inputs(&["anans", "exs"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_exs_cli_1() {
+		assert_cli_reads_inputs(&["anans", "exs"], &["./testfiles/a-b_multiple_separators.csv", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_exs_cli_2() {
+		assert_cli_reads_inputs(&["anans", "exs"], &["./testfiles/fig_a.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	// ==== command anans inft ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_inft_cli_0() {
+		assert_cli_reads_inputs(&["anans", "inft"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_inft_cli_1() {
+		assert_cli_reads_inputs(&["anans", "inft"], &["./testfiles/svn60.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_inft_cli_2() {
+		assert_cli_reads_inputs(&["anans", "inft"], &["./testfiles/aa-ab-ba.dfg"]);
+	}
+
+	// ==== command anans med ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_med_cli_0() {
+		assert_cli_reads_inputs(&["anans", "med"], &["./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_med_cli_1() {
+		assert_cli_reads_inputs(&["anans", "med"], &["./testfiles/abc-acb-aaabc.slang", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_med_cli_2() {
+		assert_cli_reads_inputs(&["anans", "med"], &["./testfiles/carrasco.slang", "1"]);
+	}
+
+	// ==== command anans to ====
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_to_cli_0() {
+		assert_cli_reads_inputs(&["anans", "to"], &["./testfiles/a-b.exs"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_to_cli_1() {
+		assert_cli_reads_inputs(&["anans", "to"], &["./testfiles/a-b.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn anans_to_cli_2() {
+		assert_cli_reads_inputs(&["anans", "to"], &["./testfiles/empty.xes"]);
+	}
+
+	// ==== command asso att ====
+	#[test]
+	#[timeout(30000)]
+	pub fn asso_att_cli_0() {
+		assert_cli_reads_inputs(&["asso", "att"], &["./testfiles/a-b-double.xes", "some string", "10"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn asso_att_cli_1() {
+		assert_cli_reads_inputs(&["asso", "att"], &["./testfiles/alergia.xes", "some string", "10"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn asso_att_cli_2() {
+		assert_cli_reads_inputs(&["asso", "att"], &["./testfiles/fig_a.xes", "some string", "10"]);
+	}
+
+	// ==== command asso atts ====
+	#[test]
+	#[timeout(30000)]
+	pub fn asso_atts_cli_0() {
+		assert_cli_reads_inputs(&["asso", "atts"], &["./testfiles/a-b-double.xes", "10"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn asso_atts_cli_1() {
+		assert_cli_reads_inputs(&["asso", "atts"], &["./testfiles/alergia.xes", "10"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn asso_atts_cli_2() {
+		assert_cli_reads_inputs(&["asso", "atts"], &["./testfiles/fig_a.xes", "10"]);
+	}
+
+	// ==== command conf cssc ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_cssc_cli_0() {
+		assert_cli_reads_inputs(&["conf", "cssc"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_cssc_cli_1() {
+		assert_cli_reads_inputs(&["conf", "cssc"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/cohort_test.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_cssc_cli_2() {
+		assert_cli_reads_inputs(&["conf", "cssc"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba_uni.slpn"]);
+	}
+
+	// ==== command conf cssc-sample ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_cssc_sample_cli_0() {
+		assert_cli_reads_inputs(&["conf", "cssc-sample"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_cssc_sample_cli_1() {
+		assert_cli_reads_inputs(&["conf", "cssc-sample"], &["./testfiles/simple_log_markovian_abstraction.xes", "./testfiles/ba-aa-ab.slang", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_cssc_sample_cli_2() {
+		assert_cli_reads_inputs(&["conf", "cssc-sample"], &["./testfiles/ba-aa-ab.slang", "./testfiles/simple_log_markovian_abstraction.xes", "1"]);
+	}
+
+	// ==== command conf emsc ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_emsc_cli_0() {
+		assert_cli_reads_inputs(&["conf", "emsc"], &["./testfiles/flower.sbpmn.spolang", "./testfiles/flower.sbpmn.spolang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_emsc_cli_1() {
+		assert_cli_reads_inputs(&["conf", "emsc"], &["./testfiles/aa.slang", "./testfiles/aa.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_emsc_cli_2() {
+		assert_cli_reads_inputs(&["conf", "emsc"], &["./testfiles/carrasco.slang", "./testfiles/carrasco.slang"]);
+	}
+
+	// ==== command conf emsc-sample ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_emsc_sample_cli_0() {
+		assert_cli_reads_inputs(&["conf", "emsc-sample"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_emsc_sample_cli_1() {
+		assert_cli_reads_inputs(&["conf", "emsc-sample"], &["./testfiles/simple_log_markovian_abstraction.xes", "./testfiles/ba-aa-ab.slang", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_emsc_sample_cli_2() {
+		assert_cli_reads_inputs(&["conf", "emsc-sample"], &["./testfiles/ba-aa-ab.slang", "./testfiles/simple_log_markovian_abstraction.xes", "1"]);
+	}
+
+	// ==== command conf er ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_er_cli_0() {
+		assert_cli_reads_inputs(&["conf", "er"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_er_cli_1() {
+		assert_cli_reads_inputs(&["conf", "er"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/cohort_test.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_er_cli_2() {
+		assert_cli_reads_inputs(&["conf", "er"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba_uni.slpn"]);
+	}
+
+	// ==== command conf gp ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_gp_cli_0() {
+		assert_cli_reads_inputs(&["conf", "gp"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_gp_cli_1() {
+		assert_cli_reads_inputs(&["conf", "gp"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/cohort_test.xes", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_gp_cli_2() {
+		assert_cli_reads_inputs(&["conf", "gp"], &["./testfiles/cohort_test.xes", "./testfiles/abc-acb-aaabc.slang", "0"]);
+	}
+
+	// ==== command conf gr ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_gr_cli_0() {
+		assert_cli_reads_inputs(&["conf", "gr"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_gr_cli_1() {
+		assert_cli_reads_inputs(&["conf", "gr"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/cohort_test.xes", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_gr_cli_2() {
+		assert_cli_reads_inputs(&["conf", "gr"], &["./testfiles/cohort_test.xes", "./testfiles/abc-acb-aaabc.slang", "0"]);
+	}
+
+	// ==== command conf hsc ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_hsc_cli_0() {
+		assert_cli_reads_inputs(&["conf", "hsc"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_hsc_cli_1() {
+		assert_cli_reads_inputs(&["conf", "hsc"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/cohort_test.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_hsc_cli_2() {
+		assert_cli_reads_inputs(&["conf", "hsc"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba_uni.slpn"]);
+	}
+
+	// ==== command conf hsc-sample ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_hsc_sample_cli_0() {
+		assert_cli_reads_inputs(&["conf", "hsc-sample"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_hsc_sample_cli_1() {
+		assert_cli_reads_inputs(&["conf", "hsc-sample"], &["./testfiles/simple_log_markovian_abstraction.xes", "./testfiles/ba-aa-ab.slang", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_hsc_sample_cli_2() {
+		assert_cli_reads_inputs(&["conf", "hsc-sample"], &["./testfiles/ba-aa-ab.slang", "./testfiles/simple_log_markovian_abstraction.xes", "1"]);
+	}
+
+	// ==== command conf jssc ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_jssc_cli_0() {
+		assert_cli_reads_inputs(&["conf", "jssc"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_jssc_cli_1() {
+		assert_cli_reads_inputs(&["conf", "jssc"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/ba-aa-ab.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_jssc_cli_2() {
+		assert_cli_reads_inputs(&["conf", "jssc"], &["./testfiles/cohort_test.xes", "./testfiles/simple_log_markovian_abstraction.xes"]);
+	}
+
+	// ==== command conf jssc-sample ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_jssc_sample_cli_0() {
+		assert_cli_reads_inputs(&["conf", "jssc-sample"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_jssc_sample_cli_1() {
+		assert_cli_reads_inputs(&["conf", "jssc-sample"], &["./testfiles/simple_log_markovian_abstraction.xes", "./testfiles/ba-aa-ab.slang", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_jssc_sample_cli_2() {
+		assert_cli_reads_inputs(&["conf", "jssc-sample"], &["./testfiles/ba-aa-ab.slang", "./testfiles/simple_log_markovian_abstraction.xes", "1"]);
+	}
+
+	// ==== command conf ma ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_ma_cli_0() {
+		assert_cli_reads_inputs(&["conf", "ma"], &["./testfiles/a-aa-bb.slpn", "./testfiles/a-aa-bb.slpn", "1", "cssc"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_ma_cli_1() {
+		assert_cli_reads_inputs(&["conf", "ma"], &["./testfiles/aa-ab-ba.sdfm", "./testfiles/simple_log_markovian_abstraction.xes", "1", "cssc"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_ma_cli_2() {
+		assert_cli_reads_inputs(&["conf", "ma"], &["./testfiles/simple_log_markovian_abstraction.xes", "./testfiles/aa-ab-ba.sdfm", "1", "cssc"]);
+	}
+
+	// ==== command conf uemsc ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_uemsc_cli_0() {
+		assert_cli_reads_inputs(&["conf", "uemsc"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_uemsc_cli_1() {
+		assert_cli_reads_inputs(&["conf", "uemsc"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/cohort_test.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_uemsc_cli_2() {
+		assert_cli_reads_inputs(&["conf", "uemsc"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba_uni.slpn"]);
+	}
+
+	// ==== command conf uemsc-sample ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_uemsc_sample_cli_0() {
+		assert_cli_reads_inputs(&["conf", "uemsc-sample"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_uemsc_sample_cli_1() {
+		assert_cli_reads_inputs(&["conf", "uemsc-sample"], &["./testfiles/simple_log_markovian_abstraction.xes", "./testfiles/ba-aa-ab.slang", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conf_uemsc_sample_cli_2() {
+		assert_cli_reads_inputs(&["conf", "uemsc-sample"], &["./testfiles/ba-aa-ab.slang", "./testfiles/simple_log_markovian_abstraction.xes", "1"]);
+	}
+
+	// ==== command confns ali ====
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_ali_cli_0() {
+		assert_cli_reads_inputs(&["confns", "ali"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-flower.ptree", "auto"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_ali_cli_1() {
+		assert_cli_reads_inputs(&["confns", "ali"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/empty.lang", "auto"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_ali_cli_2() {
+		assert_cli_reads_inputs(&["confns", "ali"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba.sdfa", "auto"]);
+	}
+
+	// ==== command confns eep ====
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_eep_cli_0() {
+		assert_cli_reads_inputs(&["confns", "eep"], &["./testfiles/aa-ab-ba.sali", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_eep_cli_1() {
+		assert_cli_reads_inputs(&["confns", "eep"], &["./testfiles/aa-ab-ba.sali", "./testfiles/aa-ab-ba_unreachable_final_state.dfa"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_eep_cli_2() {
+		assert_cli_reads_inputs(&["confns", "eep"], &["./testfiles/aa-ab-ba.sali", "./testfiles/empty.sdfa"]);
+	}
+
+	// ==== command confns fitt ====
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_fitt_cli_0() {
+		assert_cli_reads_inputs(&["confns", "fitt"], &["./testfiles/aa-ab-ba.sali"]);
+	}
+
+	// ==== command confns setali ====
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_setali_cli_0() {
+		assert_cli_reads_inputs(&["confns", "setali"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_setali_cli_1() {
+		assert_cli_reads_inputs(&["confns", "setali"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/aa-ab-ba_unreachable_final_state.dfa"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_setali_cli_2() {
+		assert_cli_reads_inputs(&["confns", "setali"], &["./testfiles/carrasco.slang", "./testfiles/empty.sdfa"]);
+	}
+
+	// ==== command confns tfit ====
+	#[test]
+	#[timeout(30000)]
+	pub fn confns_tfit_cli_0() {
+		assert_cli_reads_inputs(&["confns", "tfit"], &["./testfiles/aa-ab-ba.sali"]);
+	}
+
+	// ==== command conv bpmn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_bpmn_cli_0() {
+		assert_cli_reads_inputs(&["conv", "bpmn"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_bpmn_cli_1() {
+		assert_cli_reads_inputs(&["conv", "bpmn"], &["./testfiles/aa-ab-ba.slang.dfm"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_bpmn_cli_2() {
+		assert_cli_reads_inputs(&["conv", "bpmn"], &["./testfiles/fig_c.sdfa"]);
+	}
+
+	// ==== command conv lang ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_lang_cli_0() {
+		assert_cli_reads_inputs(&["conv", "lang"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_lang_cli_1() {
+		assert_cli_reads_inputs(&["conv", "lang"], &["./testfiles/aa-ab-ba.lang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_lang_cli_2() {
+		assert_cli_reads_inputs(&["conv", "lang"], &["./testfiles/empty.lang"]);
+	}
+
+	// ==== command conv log ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_log_cli_0() {
+		assert_cli_reads_inputs(&["conv", "log"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_log_cli_1() {
+		assert_cli_reads_inputs(&["conv", "log"], &["./testfiles/a-b_multiple_separators.csv"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_log_cli_2() {
+		assert_cli_reads_inputs(&["conv", "log"], &["./testfiles/fig_a.xes"]);
+	}
+
+	// ==== command conv lpn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_lpn_cli_0() {
+		assert_cli_reads_inputs(&["conv", "lpn"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_lpn_cli_1() {
+		assert_cli_reads_inputs(&["conv", "lpn"], &["./testfiles/aa-ab-ba_ali.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_lpn_cli_2() {
+		assert_cli_reads_inputs(&["conv", "lpn"], &["./testfiles/empty.pnml"]);
+	}
+
+	// ==== command conv slang ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_slang_cli_0() {
+		assert_cli_reads_inputs(&["conv", "slang"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_slang_cli_1() {
+		assert_cli_reads_inputs(&["conv", "slang"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_slang_cli_2() {
+		assert_cli_reads_inputs(&["conv", "slang"], &["./testfiles/cohort_test.xes"]);
+	}
+
+	// ==== command conv sdfa ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_sdfa_cli_0() {
+		assert_cli_reads_inputs(&["conv", "sdfa"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_sdfa_cli_1() {
+		assert_cli_reads_inputs(&["conv", "sdfa"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_sdfa_cli_2() {
+		assert_cli_reads_inputs(&["conv", "sdfa"], &["./testfiles/cohort_test.xes"]);
+	}
+
+	// ==== command conv sdfm ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_sdfm_cli_0() {
+		assert_cli_reads_inputs(&["conv", "sdfm"], &["./testfiles/aa-ab-ba.dfg"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_sdfm_cli_1() {
+		assert_cli_reads_inputs(&["conv", "sdfm"], &["./testfiles/aa-ab-ba.sdfm"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_sdfm_cli_2() {
+		assert_cli_reads_inputs(&["conv", "sdfm"], &["./testfiles/bpic12-a.xes.gz-dfg.dfg"]);
+	}
+
+	// ==== command conv slpn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_slpn_cli_0() {
+		assert_cli_reads_inputs(&["conv", "slpn"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_slpn_cli_1() {
+		assert_cli_reads_inputs(&["conv", "slpn"], &["./testfiles/aa-ab-ba_ali.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_slpn_cli_2() {
+		assert_cli_reads_inputs(&["conv", "slpn"], &["./testfiles/bpic12-a.xes.gz-dfg.sdfm"]);
+	}
+
+	// ==== command conv snfa ====
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_snfa_cli_0() {
+		assert_cli_reads_inputs(&["conv", "snfa"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_snfa_cli_1() {
+		assert_cli_reads_inputs(&["conv", "snfa"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn conv_snfa_cli_2() {
+		assert_cli_reads_inputs(&["conv", "snfa"], &["./testfiles/bb.slang"]);
+	}
+
+	// ==== command disc al ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_al_cli_0() {
+		assert_cli_reads_inputs(&["disc", "al"], &["./testfiles/a-b-double.xes", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_al_cli_1() {
+		assert_cli_reads_inputs(&["disc", "al"], &["./testfiles/a-b_multiple_separators.csv", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_al_cli_2() {
+		assert_cli_reads_inputs(&["disc", "al"], &["./testfiles/fig_a.xes", "1/20"]);
+	}
+
+	// ==== command disc ali sbpmn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_ali_sbpmn_cli_0() {
+		assert_cli_reads_inputs(&["disc", "ali", "sbpmn"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_ali_sbpmn_cli_1() {
+		assert_cli_reads_inputs(&["disc", "ali", "sbpmn"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/fig_c.sdfa"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_ali_sbpmn_cli_2() {
+		assert_cli_reads_inputs(&["disc", "ali", "sbpmn"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba.slang.dfm"]);
+	}
+
+	// ==== command disc ali slpn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_ali_slpn_cli_0() {
+		assert_cli_reads_inputs(&["disc", "ali", "slpn"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_ali_slpn_cli_1() {
+		assert_cli_reads_inputs(&["disc", "ali", "slpn"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/empty.pnml"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_ali_slpn_cli_2() {
+		assert_cli_reads_inputs(&["disc", "ali", "slpn"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba_ali.slpn"]);
+	}
+
+	// ==== command disc cibdo ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_cibdo_cli_0() {
+		assert_cli_reads_inputs(&["disc", "cibdo"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_cibdo_cli_1() {
+		assert_cli_reads_inputs(&["disc", "cibdo"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/empty.pnml"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_cibdo_cli_2() {
+		assert_cli_reads_inputs(&["disc", "cibdo"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba_ali.slpn"]);
+	}
+
+	// ==== command disc dfg ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_dfg_cli_0() {
+		assert_cli_reads_inputs(&["disc", "dfg"], &["./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_dfg_cli_1() {
+		assert_cli_reads_inputs(&["disc", "dfg"], &["./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_dfg_cli_2() {
+		assert_cli_reads_inputs(&["disc", "dfg"], &["./testfiles/bb.slang", "1"]);
+	}
+
+	// ==== command disc occ sbpmn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_sbpmn_cli_0() {
+		assert_cli_reads_inputs(&["disc", "occ", "sbpmn"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_sbpmn_cli_1() {
+		assert_cli_reads_inputs(&["disc", "occ", "sbpmn"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/fig_c.sdfa"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_sbpmn_cli_2() {
+		assert_cli_reads_inputs(&["disc", "occ", "sbpmn"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba.slang.dfm"]);
+	}
+
+	// ==== command disc occ slpn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_slpn_cli_0() {
+		assert_cli_reads_inputs(&["disc", "occ", "slpn"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_slpn_cli_1() {
+		assert_cli_reads_inputs(&["disc", "occ", "slpn"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/empty.pnml"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_slpn_cli_2() {
+		assert_cli_reads_inputs(&["disc", "occ", "slpn"], &["./testfiles/cohort_test.xes", "./testfiles/aa-ab-ba_ali.slpn"]);
+	}
+
+	// ==== command disc occ sptree ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_sptree_cli_0() {
+		assert_cli_reads_inputs(&["disc", "occ", "sptree"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-flower.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_sptree_cli_1() {
+		assert_cli_reads_inputs(&["disc", "occ", "sptree"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/seq(a-xor(b-c))-uniform.sptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_occ_sptree_cli_2() {
+		assert_cli_reads_inputs(&["disc", "occ", "sptree"], &["./testfiles/cohort_test.xes", "./testfiles/all_operators.ptree"]);
+	}
+
+	// ==== command disc rnd sbpmn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_sbpmn_cli_0() {
+		assert_cli_reads_inputs(&["disc", "rnd", "sbpmn"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_sbpmn_cli_1() {
+		assert_cli_reads_inputs(&["disc", "rnd", "sbpmn"], &["./testfiles/aa-ab-ba.slang.dfm"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_sbpmn_cli_2() {
+		assert_cli_reads_inputs(&["disc", "rnd", "sbpmn"], &["./testfiles/fig_c.sdfa"]);
+	}
+
+	// ==== command disc rnd slpn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_slpn_cli_0() {
+		assert_cli_reads_inputs(&["disc", "rnd", "slpn"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_slpn_cli_1() {
+		assert_cli_reads_inputs(&["disc", "rnd", "slpn"], &["./testfiles/aa-ab-ba_ali.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_slpn_cli_2() {
+		assert_cli_reads_inputs(&["disc", "rnd", "slpn"], &["./testfiles/empty.pnml"]);
+	}
+
+	// ==== command disc rnd sptree ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_sptree_cli_0() {
+		assert_cli_reads_inputs(&["disc", "rnd", "sptree"], &["./testfiles/a-b-flower.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_sptree_cli_1() {
+		assert_cli_reads_inputs(&["disc", "rnd", "sptree"], &["./testfiles/all_operators.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_rnd_sptree_cli_2() {
+		assert_cli_reads_inputs(&["disc", "rnd", "sptree"], &["./testfiles/seq(a-xor(b-c))-uniform.sptree"]);
+	}
+
+	// ==== command disc uni sbpmn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_sbpmn_cli_0() {
+		assert_cli_reads_inputs(&["disc", "uni", "sbpmn"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_sbpmn_cli_1() {
+		assert_cli_reads_inputs(&["disc", "uni", "sbpmn"], &["./testfiles/aa-ab-ba.slang.dfm"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_sbpmn_cli_2() {
+		assert_cli_reads_inputs(&["disc", "uni", "sbpmn"], &["./testfiles/fig_c.sdfa"]);
+	}
+
+	// ==== command disc uni slpn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_slpn_cli_0() {
+		assert_cli_reads_inputs(&["disc", "uni", "slpn"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_slpn_cli_1() {
+		assert_cli_reads_inputs(&["disc", "uni", "slpn"], &["./testfiles/aa-ab-ba_ali.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_slpn_cli_2() {
+		assert_cli_reads_inputs(&["disc", "uni", "slpn"], &["./testfiles/empty.pnml"]);
+	}
+
+	// ==== command disc uni sptree ====
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_sptree_cli_0() {
+		assert_cli_reads_inputs(&["disc", "uni", "sptree"], &["./testfiles/a-b-flower.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_sptree_cli_1() {
+		assert_cli_reads_inputs(&["disc", "uni", "sptree"], &["./testfiles/all_operators.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn disc_uni_sptree_cli_2() {
+		assert_cli_reads_inputs(&["disc", "uni", "sptree"], &["./testfiles/seq(a-xor(b-c))-uniform.sptree"]);
+	}
+
+	// ==== command dins flw dfa ====
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_flw_dfa_cli_0() {
+		assert_cli_reads_inputs(&["dins", "flw", "dfa"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_flw_dfa_cli_1() {
+		assert_cli_reads_inputs(&["dins", "flw", "dfa"], &["./testfiles/all_operators.sptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_flw_dfa_cli_2() {
+		assert_cli_reads_inputs(&["dins", "flw", "dfa"], &["./testfiles/sepsis.powl"]);
+	}
+
+	// ==== command dins flw ptree ====
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_flw_ptree_cli_0() {
+		assert_cli_reads_inputs(&["dins", "flw", "ptree"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_flw_ptree_cli_1() {
+		assert_cli_reads_inputs(&["dins", "flw", "ptree"], &["./testfiles/all_operators.sptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_flw_ptree_cli_2() {
+		assert_cli_reads_inputs(&["dins", "flw", "ptree"], &["./testfiles/sepsis.powl"]);
+	}
+
+	// ==== command dins pfxt dfa ====
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_pfxt_dfa_cli_0() {
+		assert_cli_reads_inputs(&["dins", "pfxt", "dfa"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_pfxt_dfa_cli_1() {
+		assert_cli_reads_inputs(&["dins", "pfxt", "dfa"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_pfxt_dfa_cli_2() {
+		assert_cli_reads_inputs(&["dins", "pfxt", "dfa"], &["./testfiles/carrasco.slang"]);
+	}
+
+	// ==== command dins pfxt ptree ====
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_pfxt_ptree_cli_0() {
+		assert_cli_reads_inputs(&["dins", "pfxt", "ptree"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_pfxt_ptree_cli_1() {
+		assert_cli_reads_inputs(&["dins", "pfxt", "ptree"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_pfxt_ptree_cli_2() {
+		assert_cli_reads_inputs(&["dins", "pfxt", "ptree"], &["./testfiles/carrasco.slang"]);
+	}
+
+	// ==== command dins tm ====
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_tm_cli_0() {
+		assert_cli_reads_inputs(&["dins", "tm"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_tm_cli_1() {
+		assert_cli_reads_inputs(&["dins", "tm"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_tm_cli_2() {
+		assert_cli_reads_inputs(&["dins", "tm"], &["./testfiles/carrasco.slang"]);
+	}
+
+	// ==== command dins im ====
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_im_cli_0() {
+		assert_cli_reads_inputs(&["dins", "im"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_im_cli_1() {
+		assert_cli_reads_inputs(&["dins", "im"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_im_cli_2() {
+		assert_cli_reads_inputs(&["dins", "im"], &["./testfiles/carrasco.slang"]);
+	}
+
+	// ==== command dins imf ====
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_imf_cli_0() {
+		assert_cli_reads_inputs(&["dins", "imf"], &["./testfiles/a-b-double.xes", "1/5"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_imf_cli_1() {
+		assert_cli_reads_inputs(&["dins", "imf"], &["./testfiles/abc-acb-aaabc.slang", "1/5"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_imf_cli_2() {
+		assert_cli_reads_inputs(&["dins", "imf"], &["./testfiles/cohort_test.xes", "1/5"]);
+	}
+
+	// ==== command dins sm ====
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_sm_cli_0() {
+		assert_cli_reads_inputs(&["dins", "sm"], &["./testfiles/a-b-double.xes", "1/10", "2/5"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_sm_cli_1() {
+		assert_cli_reads_inputs(&["dins", "sm"], &["./testfiles/abc-acb-aaabc.slang", "1/10", "2/5"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn dins_sm_cli_2() {
+		assert_cli_reads_inputs(&["dins", "sm"], &["./testfiles/cohort_test.xes", "1/10", "2/5"]);
+	}
+
+	// ==== command fil lang tr empty ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_empty_cli_0() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "empty"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_empty_cli_1() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "empty"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_empty_cli_2() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "empty"], &["./testfiles/carrasco.slang"]);
+	}
+
+	// ==== command fil lang tr len ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_len_cli_0() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "len"], &["./testfiles/a-b-double.xes", "<", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_len_cli_1() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "len"], &["./testfiles/abc-acb-aaabc.slang", "<", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_len_cli_2() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "len"], &["./testfiles/carrasco.slang", "<", "0"]);
+	}
+
+	// ==== command fil lang tr event act ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_event_act_cli_0() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "event", "act"], &["./testfiles/a-b-double.xes", "any", "some string"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_event_act_cli_1() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "event", "act"], &["./testfiles/abc-acb-aaabc.slang", "any", "some string"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_lang_tr_event_act_cli_2() {
+		assert_cli_reads_inputs(&["fil", "lang", "tr", "event", "act"], &["./testfiles/carrasco.slang", "any", "some string"]);
+	}
+
+	// ==== command fil log tr empty ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_empty_cli_0() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "empty"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_empty_cli_1() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "empty"], &["./testfiles/a-b.xes.gz"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_empty_cli_2() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "empty"], &["./testfiles/empty.xes"]);
+	}
+
+	// ==== command fil log tr len ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_len_cli_0() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "len"], &["./testfiles/a-b-double.xes", "<", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_len_cli_1() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "len"], &["./testfiles/a-b.xes.gz", "<", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_len_cli_2() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "len"], &["./testfiles/empty.xes", "<", "0"]);
+	}
+
+	// ==== command fil log tr event act ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_event_act_cli_0() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "event", "act"], &["./testfiles/a-b-double.xes", "any", "some string"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_event_act_cli_1() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "event", "act"], &["./testfiles/a-b.xes.gz", "any", "some string"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_log_tr_event_act_cli_2() {
+		assert_cli_reads_inputs(&["fil", "log", "tr", "event", "act"], &["./testfiles/empty.xes", "any", "some string"]);
+	}
+
+	// ==== command fil slang tr empty ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_empty_cli_0() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "empty"], &["./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_empty_cli_1() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "empty"], &["./testfiles/abc-acb-aaabc.slang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_empty_cli_2() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "empty"], &["./testfiles/cohort_test.xes"]);
+	}
+
+	// ==== command fil slang tr ll ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_ll_cli_0() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "ll"], &["./testfiles/a-b-double.xes", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_ll_cli_1() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "ll"], &["./testfiles/abc-acb-aaabc.slang", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_ll_cli_2() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "ll"], &["./testfiles/cohort_test.xes", "0"]);
+	}
+
+	// ==== command fil slang tr len ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_len_cli_0() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "len"], &["./testfiles/a-b-double.xes", "<", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_len_cli_1() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "len"], &["./testfiles/abc-acb-aaabc.slang", "<", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_len_cli_2() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "len"], &["./testfiles/cohort_test.xes", "<", "0"]);
+	}
+
+	// ==== command fil slang tr ml ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_ml_cli_0() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "ml"], &["./testfiles/a-b-double.xes", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_ml_cli_1() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "ml"], &["./testfiles/abc-acb-aaabc.slang", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_ml_cli_2() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "ml"], &["./testfiles/cohort_test.xes", "0"]);
+	}
+
+	// ==== command fil slang tr event act ====
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_event_act_cli_0() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "event", "act"], &["./testfiles/a-b-double.xes", "any", "some string"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_event_act_cli_1() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "event", "act"], &["./testfiles/abc-acb-aaabc.slang", "any", "some string"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn fil_slang_tr_event_act_cli_2() {
+		assert_cli_reads_inputs(&["fil", "slang", "tr", "event", "act"], &["./testfiles/cohort_test.xes", "any", "some string"]);
+	}
+
+	// ==== command info ====
+	#[test]
+	#[timeout(30000)]
+	pub fn info_cli_0() {
+		assert_cli_reads_inputs(&["info"], &["./testfiles/flower.bpmn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn info_cli_1() {
+		assert_cli_reads_inputs(&["info"], &["./testfiles/empty.lang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn info_cli_2() {
+		assert_cli_reads_inputs(&["info"], &["./testfiles/aa-ab-ba.ptml"]);
+	}
+
+	// ==== command prob log ====
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_log_cli_0() {
+		assert_cli_reads_inputs(&["prob", "log"], &["./testfiles/a-aa-bb.slpn", "./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_log_cli_1() {
+		assert_cli_reads_inputs(&["prob", "log"], &["./testfiles/aa-ab-ba_uni.slpn", "./testfiles/a-b-double.xes"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_log_cli_2() {
+		assert_cli_reads_inputs(&["prob", "log"], &["./testfiles/cohort_test.xes", "./testfiles/a-b-double.xes"]);
+	}
+
+	// ==== command red lpn ====
+	#[test]
+	#[timeout(30000)]
+	pub fn red_lpn_cli_0() {
+		assert_cli_reads_inputs(&["red", "lpn"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn red_lpn_cli_1() {
+		assert_cli_reads_inputs(&["red", "lpn"], &["./testfiles/aa-ab-ba_ali.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn red_lpn_cli_2() {
+		assert_cli_reads_inputs(&["red", "lpn"], &["./testfiles/empty.pnml"]);
+	}
+
+	// ==== command red ptr ====
+	#[test]
+	#[timeout(30000)]
+	pub fn red_ptr_cli_0() {
+		assert_cli_reads_inputs(&["red", "ptr"], &["./testfiles/a-b-flower.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn red_ptr_cli_1() {
+		assert_cli_reads_inputs(&["red", "ptr"], &["./testfiles/all_operators.ptree"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn red_ptr_cli_2() {
+		assert_cli_reads_inputs(&["red", "ptr"], &["./testfiles/seq(a-xor(b-c))-uniform.sptree"]);
+	}
+
+	// ==== command sam folds ====
+	#[test]
+	#[timeout(30000)]
+	pub fn sam_folds_cli_0() {
+		assert_cli_reads_inputs(&["sam", "folds"], &["./testfiles/a-b-double.xes", "1", "0", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn sam_folds_cli_1() {
+		assert_cli_reads_inputs(&["sam", "folds"], &["./testfiles/a-b_multiple_separators.csv", "1", "0", "0"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn sam_folds_cli_2() {
+		assert_cli_reads_inputs(&["sam", "folds"], &["./testfiles/fig_a.xes", "1", "0", "0"]);
+	}
+
+	// ==== command sam potr ====
+	#[test]
+	#[timeout(30000)]
+	pub fn sam_potr_cli_0() {
+		assert_cli_reads_inputs(&["sam", "potr"], &["./testfiles/flower.sbpmn", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn sam_potr_cli_1() {
+		assert_cli_reads_inputs(&["sam", "potr"], &["./testfiles/model.sbpmn", "1"]);
+	}
+
+	// ==== command sam tra ====
+	#[test]
+	#[timeout(30000)]
+	pub fn sam_tra_cli_0() {
+		assert_cli_reads_inputs(&["sam", "tra"], &["./testfiles/a-b-double.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn sam_tra_cli_1() {
+		assert_cli_reads_inputs(&["sam", "tra"], &["./testfiles/simple_log_markovian_abstraction.xes", "1"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn sam_tra_cli_2() {
+		assert_cli_reads_inputs(&["sam", "tra"], &["./testfiles/ba-aa-ab.slang", "1"]);
+	}
+
+	// ==== command tst btst ====
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_btst_cli_0() {
+		assert_cli_reads_inputs(&["tst", "btst"], &["./testfiles/a-b-double.xes", "./testfiles/a-b-double.xes", "10", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_btst_cli_1() {
+		assert_cli_reads_inputs(&["tst", "btst"], &["./testfiles/abc-acb-aaabc.slang", "./testfiles/cohort_test.xes", "10", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_btst_cli_2() {
+		assert_cli_reads_inputs(&["tst", "btst"], &["./testfiles/cohort_test.xes", "./testfiles/abc-acb-aaabc.slang", "10", "1/20"]);
+	}
+
+	// ==== command tst perm-l-m ====
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_perm_l_m_cli_0() {
+		assert_cli_reads_inputs(&["tst", "perm-l-m"], &["./testfiles/a-b-double.xes", "./testfiles/a-aa-bb.slpn", "10", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_perm_l_m_cli_1() {
+		assert_cli_reads_inputs(&["tst", "perm-l-m"], &["./testfiles/a-b_multiple_separators.csv", "./testfiles/a-aa-bb.slpn", "10", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_perm_l_m_cli_2() {
+		assert_cli_reads_inputs(&["tst", "perm-l-m"], &["./testfiles/fig_a.xes", "./testfiles/a-aa-bb.slpn", "10", "1/20"]);
+	}
+
+	// ==== command tst lcat ====
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_lcat_cli_0() {
+		assert_cli_reads_inputs(&["tst", "lcat"], &["./testfiles/a-b-double.xes", "some string", "10", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_lcat_cli_1() {
+		assert_cli_reads_inputs(&["tst", "lcat"], &["./testfiles/alergia.xes", "some string", "10", "1/20"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn tst_lcat_cli_2() {
+		assert_cli_reads_inputs(&["tst", "lcat"], &["./testfiles/fig_a.xes", "some string", "10", "1/20"]);
+	}
+
+	// ==== command vis graph ====
+	#[test]
+	#[timeout(30000)]
+	pub fn vis_graph_cli_0() {
+		assert_cli_reads_inputs(&["vis", "graph"], &["./testfiles/a-aa-bb.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn vis_graph_cli_1() {
+		assert_cli_reads_inputs(&["vis", "graph"], &["./testfiles/aa-ab-ba_occ.slpn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn vis_graph_cli_2() {
+		assert_cli_reads_inputs(&["vis", "graph"], &["./testfiles/empty_net.slpn"]);
+	}
+
+	// ==== command vis txt ====
+	#[test]
+	#[timeout(30000)]
+	pub fn vis_txt_cli_0() {
+		assert_cli_reads_inputs(&["vis", "txt"], &["./testfiles/flower.bpmn"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn vis_txt_cli_1() {
+		assert_cli_reads_inputs(&["vis", "txt"], &["./testfiles/empty.lang"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn vis_txt_cli_2() {
+		assert_cli_reads_inputs(&["vis", "txt"], &["./testfiles/aa-ab-ba.ptml"]);
+	}
+
+}
