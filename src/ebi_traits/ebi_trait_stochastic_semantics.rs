@@ -6,22 +6,22 @@ use crate::{
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
         labelled_petri_net_semantics::LPNMarking,
+        stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     },
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
     trait_definition_finalisation,
 };
 use ebi_objects::{
-    ActivityKey, AutomatonState, DirectlyFollowsGraph, EventLog, EventLogPython,
-    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    TranslateActivityKey,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
     },
+    ActivityKey, AutomatonState, DirectlyFollowsGraph, EventLog, EventLogPython,
+    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    TranslateActivityKey,
 };
 
 pub const TRAIT_DEFINITION_LATEX: &str = concat!(
@@ -33,41 +33,41 @@ pub enum EbiTraitStochasticSemantics {
     Usize(
         Box<
             dyn StochasticSemantics<
-                    StoSemState = usize,
-                    SemState = usize,
-                    AliState = usize,
-                    LivState = usize,
-                >,
+                StoSemState = usize,
+                SemState = usize,
+                AliState = usize,
+                LivState = usize,
+            >,
         >,
     ),
     AutomatonState(
         Box<
             dyn StochasticSemantics<
-                    StoSemState = AutomatonState,
-                    SemState = AutomatonState,
-                    AliState = AutomatonState,
-                    LivState = AutomatonState,
-                >,
+                StoSemState = AutomatonState,
+                SemState = AutomatonState,
+                AliState = AutomatonState,
+                LivState = AutomatonState,
+            >,
         >,
     ),
     Marking(
         Box<
             dyn StochasticSemantics<
-                    StoSemState = LPNMarking,
-                    SemState = LPNMarking,
-                    AliState = LPNMarking,
-                    LivState = LPNMarking,
-                >,
+                StoSemState = LPNMarking,
+                SemState = LPNMarking,
+                AliState = LPNMarking,
+                LivState = LPNMarking,
+            >,
         >,
     ),
     TreeMarking(
         Box<
             dyn StochasticSemantics<
-                    StoSemState = TreeMarking,
-                    SemState = TreeMarking,
-                    AliState = TreeMarking,
-                    LivState = TreeMarking,
-                >,
+                StoSemState = TreeMarking,
+                SemState = TreeMarking,
+                AliState = TreeMarking,
+                LivState = TreeMarking,
+            >,
         >,
     ),
 }

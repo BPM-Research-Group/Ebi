@@ -19,7 +19,7 @@ impl FromEbiTraitObject for dyn EbiTraitActivities {
         match object {
             EbiInput::Trait(EbiTraitObject::Activities(e), _) => Ok(e),
             _ => Err(anyhow!(
-                "cannot read {} {} as activities",
+                "Cannot read {} {} as activities.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

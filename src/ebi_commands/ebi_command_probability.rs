@@ -10,7 +10,7 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
-    follower_semantics::FollowerSemantics,
+    semantics::follower_semantics::FollowerSemantics,
     techniques::explain_trace::ExplainTrace,
 };
 use ebi_objects::{
@@ -59,7 +59,7 @@ pub const EBI_PROBABILITY_LOG: EbiCommand = EbiCommand::Command {
             .get_probability_language(log)
             .with_context(|| "cannot compute probability")?;
 
-        return Ok(EbiOutput::Fraction(sum));
+        Ok(EbiOutput::Fraction(sum))
     },
     output_type: &EbiOutputType::Fraction,
 };

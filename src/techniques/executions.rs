@@ -4,16 +4,16 @@ use crate::{
         ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         ebi_trait_semantics::EbiTraitSemantics,
     },
-    semantics::semantics::Semantics,
+    semantics::semantics_trait::Semantics,
     techniques::{align::Align, resource_utilisation::set_resource_utilisations},
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
-    Activity, ActivityKey, Attribute, Executions,
-    anyhow::{Context, Error, Ok, Result, anyhow},
+    anyhow::{anyhow, Context, Error, Ok, Result},
     ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },
+    Activity, ActivityKey, Attribute, Executions,
 };
 use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;
@@ -28,14 +28,14 @@ use std::{
 pub trait FindExecutions {
     fn find_executions(
         &mut self,
-        log: &mut Box<dyn EbiTraitEventLogEventAttributes>,
+        log: &mut dyn EbiTraitEventLogEventAttributes,
     ) -> Result<Executions>;
 }
 
 impl FindExecutions for EbiTraitSemantics {
     fn find_executions(
         &mut self,
-        log: &mut Box<dyn EbiTraitEventLogEventAttributes>,
+        log: &mut dyn EbiTraitEventLogEventAttributes,
     ) -> Result<Executions> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.find_executions(log),
@@ -55,7 +55,7 @@ where
 {
     fn find_executions(
         &mut self,
-        log: &mut Box<dyn EbiTraitEventLogEventAttributes>,
+        log: &mut dyn EbiTraitEventLogEventAttributes,
     ) -> Result<Executions> {
         if self.get_initial_state().is_none() {
             return Err(anyhow!(
@@ -66,7 +66,7 @@ where
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
-        let resource_key = Arc::new(Mutex::new(ActivityKey::new()));
+        let resource_key = Arc::new(Mutex::new(ActivityKey::default()));
         let attibute_key = Arc::new(Mutex::new(log.attribute_key().clone()));
 
         self.translate_using_activity_key(log.activity_key_mut());
@@ -76,7 +76,7 @@ where
             .enumerate()
             .filter_map(|(trace_index, trace)| {
                 //align the trace
-                let alignment = self.align_trace(&trace);
+                let alignment = self.align_trace(trace);
 
                 progress_bar.inc(1);
 
@@ -85,7 +85,7 @@ where
                         //process the moves of this trace
                         // println!("{:?}", aligned_trace);
                         let c = C::new(trace_index, aligned_trace);
-                        match c.alignment_to_executions(self, &log, &resource_key) {
+                        match c.alignment_to_executions(self, log, &resource_key) {
                             Result::Ok(c) => Some(c),
                             Err(err) => {
                                 let error = Arc::clone(&error);
@@ -109,12 +109,11 @@ where
         // println!("{}", self.activity_key());
 
         //see whether an error was reported
-        if let Result::Ok(mutex) = Arc::try_unwrap(error) {
-            if let Result::Ok(err) = mutex.into_inner() {
-                if let Some(err) = err {
-                    return Err(err);
-                }
-            }
+        if let Result::Ok(mutex) = Arc::try_unwrap(error)
+            && let Result::Ok(err) = mutex.into_inner()
+            && let Some(err) = err
+        {
+            return Err(err);
         }
 
         //merge sort the executions
@@ -144,15 +143,15 @@ struct C {
 impl C {
     fn new(trace_index: usize, moves: Vec<Move>) -> Self {
         Self {
-            trace_index: trace_index,
-            moves: moves,
+            trace_index,
+            moves,
         }
     }
 
     fn alignment_to_executions<T, FS>(
         &self,
         semantics: &T,
-        log: &Box<dyn EbiTraitEventLogEventAttributes>,
+        log: &dyn EbiTraitEventLogEventAttributes,
         resource_key: &Arc<Mutex<ActivityKey>>,
     ) -> Result<VecDeque<Execution>>
     where
@@ -257,16 +256,16 @@ impl C {
     fn get_time<'a>(
         &self,
         move_index: Option<usize>,
-        log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
+        log: &'a dyn EbiTraitEventLogEventAttributes,
     ) -> Option<&'a DateTime<FixedOffset>> {
         let event_index = self.get_event_index(move_index?)?;
         log.get_event_time(self.trace_index, event_index)
     }
 
-    fn get_resource<'a>(
+    fn get_resource(
         &self,
         move_index: Option<usize>,
-        log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
+        log: &dyn EbiTraitEventLogEventAttributes,
         resource_key: &Arc<Mutex<ActivityKey>>,
     ) -> Option<Activity> {
         let event_index = self.get_event_index(move_index?)?;
@@ -281,10 +280,10 @@ impl C {
         )
     }
 
-    fn get_event_attributes<'a>(
+    fn get_event_attributes(
         &self,
         move_index: usize,
-        log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
+        log: &dyn EbiTraitEventLogEventAttributes,
     ) -> Option<IntMap<Attribute, AttributeValue>> {
         let event_index = self.get_event_index(move_index)?;
         log.get_event_attributes(self.trace_index, event_index)
@@ -302,7 +301,11 @@ impl C {
                 _ => last = false,
             }
         }
-        if last { Some(event_index - 1) } else { None }
+        if last {
+            Some(event_index - 1)
+        } else {
+            None
+        }
     }
 
     /**
@@ -382,7 +385,7 @@ impl MoveEnabled {
             .expect("transition was not enabled and nevertheless fired");
 
         let now_enabled = semantics
-            .get_enabled_transitions(&state)
+            .get_enabled_transitions(state)
             .contains(&transition_that_may_get_enabled);
         *self = match (now_enabled, &self) {
             (true, MoveEnabled::FromStartOfTrace) => MoveEnabled::FromStartOfTrace,
@@ -434,15 +437,15 @@ impl ExecutionsSorter {
                 .iter()
                 .enumerate()
                 .filter_map(|(trace_index, first_timestamp)| {
-                    if let Some(first) = first_timestamp {
-                        Some((trace_index, first))
-                    } else {
-                        None
-                    }
+                    first_timestamp.as_ref().map(|first| (trace_index, first))
                 })
                 .min_by(|a, b| {
-                    let c = a.1.cmp(&b.1);
-                    if !c.is_eq() { c } else { a.0.cmp(&b.0) }
+                    let c = a.1.cmp(b.1);
+                    if !c.is_eq() {
+                        c
+                    } else {
+                        a.0.cmp(&b.0)
+                    }
                 })
             {
                 //process the trace with the lowest timestamp
@@ -480,21 +483,19 @@ impl ExecutionsSorter {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
-        techniques::executions::FindExecutions,
+        ebi_framework::trait_importers::ToSemanticsTrait, techniques::executions::FindExecutions,
     };
     use ebi_objects::{
-        LabelledPetriNet, StochasticDeterministicFiniteAutomaton,
-        StochasticNondeterministicFiniteAutomaton, ebi_arithmetic::is_exact_globally,
-        ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+        ebi_arithmetic::is_exact_globally,
+        ebi_objects::event_log_event_attributes::EventLogEventAttributes, LabelledPetriNet,
+        StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton,
     };
     use std::fs;
 
     #[test]
     fn executions() {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
-        let log = fin.parse::<EventLogEventAttributes>().unwrap();
+        let mut log = fin.parse::<EventLogEventAttributes>().unwrap();
 
         let fin2 = fs::read_to_string("testfiles/a-b-c-livelock.sdfa").unwrap();
         let mut model = fin2
@@ -503,8 +504,7 @@ mod tests {
 
         let out = fs::read_to_string("testfiles/a-b.exs").unwrap();
 
-        let mut log2: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
-        let x = model.find_executions(&mut log2).unwrap();
+        let x = model.find_executions(&mut log).unwrap();
 
         assert_eq!(out, x.to_string());
     }
@@ -512,8 +512,7 @@ mod tests {
     #[test]
     fn svn60() {
         let fin = fs::read_to_string("testfiles/svn60.xes").unwrap();
-        let log = fin.parse::<EventLogEventAttributes>().unwrap();
-        let mut log: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
+        let mut log = fin.parse::<EventLogEventAttributes>().unwrap();
 
         let fin2 = fs::read_to_string("testfiles/svn60.lpn").unwrap();
         let lpn = fin2.parse::<LabelledPetriNet>().unwrap();
@@ -536,14 +535,13 @@ mod tests {
     #[test]
     fn snfa_executions() {
         let fin = fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
-        let log = fin.parse::<EventLogEventAttributes>().unwrap();
+        let mut log = fin.parse::<EventLogEventAttributes>().unwrap();
 
         let fin2 = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
         let mut model = fin2
             .parse::<StochasticNondeterministicFiniteAutomaton>()
             .unwrap();
 
-        let mut log2: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
-        model.find_executions(&mut log2).unwrap();
+        model.find_executions(&mut log).unwrap();
     }
 }

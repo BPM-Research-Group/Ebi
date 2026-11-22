@@ -130,9 +130,9 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
         let result: Box<dyn EbiTraitGraphable + 'static> =
             inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
-        return Ok(EbiOutput::Object(EbiObject::ScalableVectorGraphics(
+        Ok(EbiOutput::Object(EbiObject::ScalableVectorGraphics(
             result.to_svg()?,
-        )));
+        )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics),
 };

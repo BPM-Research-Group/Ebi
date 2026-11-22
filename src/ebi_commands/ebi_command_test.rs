@@ -161,7 +161,7 @@ pub const EBI_TEST_BOOTSTRAP: EbiCommand = EbiCommand::Command {
 
         let (value, sustained) = log1
             .bootstrap_test(log2.as_mut(), *number_of_samples, &p_value)
-            .with_context(|| format!("performing test"))?;
+            .with_context(|| "performing test".to_string())?;
 
         let mut f = vec![];
         writeln!(f, "p-value \t {}", value)?;
@@ -226,7 +226,7 @@ pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
 
         let (value, sustained) = log1
             .permutation_test(log2.as_mut(), *number_of_samples, &p_value)
-            .with_context(|| format!("performing test"))?;
+            .with_context(|| "performing test".to_string())?;
 
         let mut f = vec![];
         writeln!(f, "p-value \t {}", value)?;

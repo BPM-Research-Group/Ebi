@@ -4,15 +4,22 @@ use crate::{
         ebi_input::EbiInputType,
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
-    }, ebi_traits::{
+    },
+    ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_semantics::EbiTraitSemantics,
-    }, techniques::{
-        align::Align, escaping_edges_precision::EscapingEdgesPrecision, fitness::Fitness, fitting_traces::FittingTraces,
     },
+    techniques::{
+        align::{Align, AlignmentAlgorithm},
+        escaping_edges_precision::EscapingEdgesPrecision,
+        fitness::Fitness,
+        fitting_traces::FittingTraces,
+    },
+    EbiInputTypeEnumDefault,
 };
-use ebi_objects::{EbiObject, EbiObjectType, StochasticLanguageOfAlignments, anyhow::Context};
+use ebi_objects::{anyhow::Context, EbiObject, EbiObjectType, StochasticLanguageOfAlignments};
+use strum::VariantNames;
 
 pub const EBI_CONFORMANCE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     name_short: "confns",
@@ -33,32 +40,39 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS: EbiCommand = EbiCommand::Co
     name_long: Some("alignments"),
     explanation_short: "Compute alignments.",
     explanation_long: Some(
-        "Compute alignments.\nThe model must be able to terminate and its states must be bounded. The search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
+        "Compute alignments.\nThe model must be able to terminate (that is, reach a deadlock state) and its number of states must be bounded.",
     ),
     latex_link: Some(
-        "Alignments are computed according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}. 
+        "If the model is a process tree that is free of duplicated activity labels, alignments will be computed using~\\cite{DBLP:conf/icpm/SchwanenPA24}.
+        Otherwise, alignments are computed according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}.
+        This choice can be overridden using the ALGO parameter.
+
+        Every deadlock is considered to be an accepting state (or final marking).
+        For Petri nets, this may lead to different outcomes compared to other alignment computing tools, where an explicit final marking must be given.
+        For sound workflow nets, process trees and automata, Ebi yields however equivalent alignments.
+
         By default, all traces are computed concurrently on all CPU cores. 
-        If this requires too much RAM, please see speed trick~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} for how to reduce the number of CPU cores utilised.",
+        If this requires too much RAM, please consider applying some speed tricks~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} to reduce the number of CPU cores utilised.",
     ),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-        &[&EbiInputType::Trait(EbiTrait::Semantics)],
+        &[&EbiInputType::Object(EbiObjectType::ProcessTree), &EbiInputType::Trait(EbiTrait::Semantics)],
+        &[&EbiInputTypeEnumDefault!(AlignmentAlgorithm, AlignmentAlgorithm::Auto)]
     ],
-    input_names: &["SLANG", "MODEL"],
-    input_helps: &["The finite stochastic language.", "The model."],
+    input_names: &["SLANG", "MODEL", "ALGO"],
+    input_helps: &["The finite stochastic language.", "The model.", "The algorithm to be applied."],
     execute: |mut objects, _| {
         let log = objects
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
+        let model = objects.remove(0);
+        let algorithm = objects.remove(0).to_type::<AlignmentAlgorithm>()?;
 
-        let result = model.align_stochastic_language(log)?;
-
-        return Ok(EbiOutput::Object(
-            EbiObject::StochasticLanguageOfAlignments(result),
-        ));
+        Ok(EbiOutput::Object(
+            EbiObject::StochasticLanguageOfAlignments(algorithm.execute(log, model)?),
+        ))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments),
 };
@@ -150,7 +164,7 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS: EbiCommand = EbiCommand
 
         let result = model.align_language(log)?;
 
-        return Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)));
+        Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::LanguageOfAlignments),
 };

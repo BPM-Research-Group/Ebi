@@ -3,15 +3,17 @@ use crate::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
         trait_importers::ToEventLogTraceAttributesTrait,
     },
-    ebi_traits::ebi_trait_event_log::EbiTraitEventLog, trait_definition_logs,
+    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
+    trait_definition_logs,
 };
 use ebi_objects::{
-    Activity, Attribute, EventLogOcel, EventLogTraceAttributes, EventLogXes, Importable,
-    IntoAttributeIterator, IntoAttributeTraceIterator, TraceAttributes,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     attribute_key::has_attribute_key::HasAttributeKey,
     ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+    Activity, Attribute, EventLogOcel, EventLogTraceAttributes, EventLogXes, Importable,
+    IntoAttributeIterator, IntoAttributeTraceIterator, TraceAttributes,
 };
+use fnv::FnvBuildHasher;
 use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;
 use std::collections::HashMap;
@@ -47,8 +49,8 @@ impl dyn EbiTraitEventLogTraceAttributes {
     pub fn get_traces_with_categorical_attribute(
         &self,
         attribute: Attribute,
-    ) -> HashMap<Vec<Activity>, HashMap<String, u64>> {
-        let mut result = HashMap::new();
+    ) -> HashMap<Vec<Activity>, HashMap<String, u64, FnvBuildHasher>, FnvBuildHasher> {
+        let mut result = HashMap::<_, _, FnvBuildHasher>::default();
 
         for (trace_index, trace) in self.iter_traces().enumerate() {
             if let Some(attribute_value) =
@@ -58,7 +60,7 @@ impl dyn EbiTraitEventLogTraceAttributes {
                 match result.entry(trace.clone()) {
                     std::collections::hash_map::Entry::Occupied(mut e) => {
                         //we have seen this trace before
-                        let attributes: &mut HashMap<String, u64> = e.get_mut();
+                        let attributes: &mut HashMap<String, u64, FnvBuildHasher> = e.get_mut();
                         match attributes.entry(attribute_value) {
                             std::collections::hash_map::Entry::Occupied(mut ae) => {
                                 //attribute was seen before
@@ -72,7 +74,7 @@ impl dyn EbiTraitEventLogTraceAttributes {
                     }
                     std::collections::hash_map::Entry::Vacant(e) => {
                         //trace was not seen before
-                        let mut map = HashMap::new();
+                        let mut map = HashMap::<_, _, FnvBuildHasher>::default();
                         map.insert(attribute_value, 1);
                         e.insert(map);
                     }
@@ -89,7 +91,7 @@ impl FromEbiTraitObject for dyn EbiTraitEventLogTraceAttributes {
         match object {
             EbiInput::Trait(EbiTraitObject::EventLogTraceAttributes(e), _) => Ok(e),
             _ => Err(anyhow!(
-                "cannot read {} {} as an event log",
+                "Cannot read {} {} as an event log.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

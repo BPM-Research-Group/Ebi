@@ -67,12 +67,12 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
                 EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => {
                     let lang: Box<dyn HasActivityKey> = lang;
                     lang.mine_flower_dfa()
-                        .with_context(|| format!("cannot compute flower model"))?
+                        .with_context(|| "cannot compute flower model".to_string())?
                 }
                 EbiInput::Trait(EbiTraitObject::Activities(lang), _) => {
                     let lang: Box<dyn HasActivityKey> = lang;
                     lang.mine_flower_dfa()
-                        .with_context(|| format!("cannot compute flower model"))?
+                        .with_context(|| "cannot compute flower model".to_string())?
                 }
                 object => {
                     return Err(anyhow!(

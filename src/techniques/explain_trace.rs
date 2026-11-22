@@ -1,13 +1,13 @@
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
-    techniques::align::transform_alignment,
+    semantics::stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
+    techniques::align_astar::transform_alignment,
 };
 use ebi_objects::{
-    Activity, LanguageOfAlignments,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, One, OneMinus, Zero},
+    Activity, LanguageOfAlignments,
 };
 use ebi_optimisation::astar;
 use std::ops::{Add, AddAssign};
@@ -40,7 +40,7 @@ impl Add for StochasticWeightedCost {
         let probability = &self.probability * &other.probability;
         let cost = self.cost + other.cost;
         StochasticWeightedCost {
-            cost: cost,
+            cost,
             probability: probability.clone(),
             stochastic_weighted_cost: &probability.clone().one_minus() * cost,
         }
@@ -79,7 +79,7 @@ impl Eq for StochasticWeightedCost {}
 pub trait ExplainTrace {
     fn explain_trace(
         &self,
-        trace: &Vec<Activity>,
+        trace: &[Activity],
         balance: &Fraction,
     ) -> Result<LanguageOfAlignments>;
 }
@@ -87,7 +87,7 @@ pub trait ExplainTrace {
 impl ExplainTrace for EbiTraitStochasticSemantics {
     fn explain_trace(
         &self,
-        trace: &Vec<Activity>,
+        trace: &[Activity],
         balance: &Fraction,
     ) -> Result<LanguageOfAlignments> {
         match self {
@@ -99,10 +99,17 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     }
 }
 
-impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State, AliState = State, LivState = State> {
+impl<State: Displayable>
+    dyn StochasticSemantics<
+        StoSemState = State,
+        SemState = State,
+        AliState = State,
+        LivState = State,
+    >
+{
     pub fn explain_trace(
         &self,
-        trace: &Vec<Activity>,
+        trace: &[Activity],
         _balance: &Fraction,
     ) -> Result<LanguageOfAlignments> {
         // get the start state
@@ -129,9 +136,9 @@ impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState =
                 }
 
                 //walk through the enabled transitions in the model
-                for transition in self.get_enabled_transitions(&state) {
+                for transition in self.get_enabled_transitions(state) {
                     let total_weight = self
-                        .get_total_weight_of_enabled_transitions(&state)
+                        .get_total_weight_of_enabled_transitions(state)
                         .unwrap();
 
                     let mut new_state = state.clone();
@@ -139,7 +146,7 @@ impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState =
                     let _ = self.execute_transition(&mut new_state, transition);
                     // log::debug!("\t\tnew state after {}", new_state);
 
-                    let transition_weight = self.get_transition_weight(&state, transition).unwrap();
+                    let transition_weight = self.get_transition_weight(state, transition).unwrap();
                     let transition_probability = transition_weight / &total_weight;
 
                     if let Some(activity) = self.get_transition_activity(transition, state) {
@@ -194,12 +201,12 @@ impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState =
 
             //function that returns whether we are in a final synchronous product state
             let success = |(trace_index, state): &(usize, State)| {
-                trace_index == &trace.len() && self.is_final_state(&state)
+                trace_index == &trace.len() && self.is_final_state(state)
             };
 
             match astar::astar(&start, successors, heuristic, success) {
                 Some((path, _cost)) => {
-                    let moves = transform_alignment(self, &trace, path)?;
+                    let moves = transform_alignment(self, trace, path)?;
                     let mut alignments = LanguageOfAlignments::new(self.activity_key().clone());
                     alignments.push(moves);
                     // log::debug!("cost:{:.4},", cost, prefix_cost, prefix_probability);

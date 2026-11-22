@@ -95,7 +95,7 @@ impl FromEbiTraitObject for StochasticNondeterministicFiniteAutomaton {
                 Ok(Box::new(e))
             }
             _ => Err(anyhow!(
-                "cannot read {} {} as a stochastic non-deterministic finite automaton",
+                "Cannot read {} {} as a stochastic non-deterministic finite automaton.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

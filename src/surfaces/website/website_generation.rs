@@ -1,16 +1,20 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand},
-        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_command::{EbiCommand, EBI_COMMANDS},
+        ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
         ebi_importer_parameters,
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
     },
-    javascript::javascript_generator_html::{
-        javascript_function_name, javascript_html_form, javascript_html_header,
-    },
     multiple_reader::MultipleReader,
     python::python::pm4py_function_name,
+    surfaces::{
+        javascript::{
+            javascript_generator_html::{javascript_html_form, javascript_html_header},
+            javascript_link::javascript_function_name,
+        },
+        website::website_link::{COMMANDS_PAGE, FILE_HANDLERS_PAGE},
+    },
     text::HTMLEscaper,
 };
 use clap::Command;
@@ -23,9 +27,6 @@ use std::{
     fs::{self, File},
     io::Write,
 };
-
-pub const COMMANDS_PAGE: &'static str = "https://bpm-research-group.github.io/Ebi/commands.html";
-pub const FILE_HANDLERS_PAGE: &'static str = "https://bpm-research-group.github.io/Ebi/file_handlers.html";
 
 pub fn page_start(f: &mut Vec<u8>, headers: &str) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E
@@ -88,16 +89,17 @@ fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<div class=\"menu0\" id =\"menu0\">")?;
     writeln!(f, "<a href=\"index.html\">Ebi</a>")?;
     writeln!(f, "<a href=\"{}\">Commands</a>", COMMANDS_PAGE)?;
-    writeln!(f, "<a href=\"{}\">Files</a>", FILE_HANDLERS_PAGE)?;
-    writeln!(
-        f,
-        "<a href=\"https://github.com/BPM-Research-Group/Ebi\">Github</a>"
-    )?;
+    writeln!(f, "<a href=\"{}\">Supported files</a>", FILE_HANDLERS_PAGE)?;
+    writeln!(f, "<a href=\"https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf\">Manual</a>")?;
     writeln!(f, "<a href=\"https://crates.io/crates/ebi\">crates.io</a>")?;
     writeln!(f, "<a href=\"https://pypi.org/project/ebi-pm/\">PyPI</a>")?;
     writeln!(
         f,
         "<a href=\"https://www.npmjs.com/package/ebi_pm\">NPM</a>"
+    )?;
+    writeln!(
+        f,
+        "<a href=\"https://github.com/BPM-Research-Group/Ebi\">Github</a>"
     )?;
     writeln!(
         f,

@@ -4,18 +4,18 @@ use crate::{
         ebi_command::EbiCommand, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
         ebi_trait_object::EbiTraitObject, trait_importers::ToQueriableStochasticLanguageTrait,
     },
-    follower_semantics::FollowerSemantics,
+    semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
-    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython,
-    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    anyhow::{Context, Error, Result, anyhow},
+    anyhow::{anyhow, Context, Error, Result},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel,
     },
+    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython,
+    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
 };
 use std::sync::{Arc, Mutex};
 
@@ -60,13 +60,11 @@ pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
         progress_bar.finish_and_clear();
 
         //see whether an error was reported
-        if let Result::Ok(mutex) = Arc::try_unwrap(error) {
-            if let Result::Ok(err) = mutex.into_inner() {
-                if let Some(err) = err {
+        if let Result::Ok(mutex) = Arc::try_unwrap(error)
+            && let Result::Ok(err) = mutex.into_inner()
+                && let Some(err) = err {
                     return Err(err);
                 }
-            }
-        }
 
         Ok(sum)
     }
@@ -89,10 +87,10 @@ impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
     fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
         match follower {
             FollowerSemantics::Trace(trace) => {
-                return match self.traces.get(*trace) {
+                match self.traces.get(*trace) {
                     Some(x) => Ok(x.clone()),
                     None => Ok(Fraction::zero()),
-                };
+                }
             }
         }
     }
@@ -149,8 +147,8 @@ queriable_via_slang!(EventLogPython);
 mod tests {
     use crate::ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage;
     use ebi_objects::{
-        FiniteLanguage, StochasticLabelledPetriNet,
         ebi_arithmetic::{Fraction, Zero},
+        FiniteLanguage, StochasticLabelledPetriNet,
     };
     use std::fs;
 

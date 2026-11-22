@@ -56,13 +56,13 @@ pub fn split_miner(
     //special case: empty log
     if log.number_of_traces() == 0 {
         //empty model
-        return BPMNCreator::new().to_bpmn();
+        return BPMNCreator::default().to_bpmn();
     }
 
     //special case: only empty traces
     if log.number_of_events() == 0 {
         //model with only an empty trace
-        let mut bpmn_creator = BPMNCreator::new();
+        let mut bpmn_creator = BPMNCreator::default();
         let process = bpmn_creator.add_process(None);
         let start_event = bpmn_creator.add_start_event(process, StartEventType::None)?;
         let end_event = bpmn_creator.add_end_event(process, EndEventType::None)?;
@@ -208,8 +208,8 @@ fn algorithm_1_prune_dfg(
     let mut e_o = IntMap::new();
 
     //line 17
-    algorithm_2_discover_best_incoming_edges(&dfg, &mut c_f, &mut e_i)?;
-    algorithm_3_discover_best_outgoing_edges(&dfg, &mut c_b, &mut e_o)?;
+    algorithm_2_discover_best_incoming_edges(dfg, &mut c_f, &mut e_i)?;
+    algorithm_3_discover_best_outgoing_edges(dfg, &mut c_b, &mut e_o)?;
 
     //line 19
     //here, the paper removes edges; we instead remove them

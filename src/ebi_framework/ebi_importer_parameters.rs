@@ -107,7 +107,7 @@ pub fn build_cli(
                 default_value,
                 ..
             } => {
-                let parser: ValueParser = value_parser!(String).into();
+                let parser: ValueParser = value_parser!(String);
 
                 if let Some(allowed) = allowed_values {
                     let allowed = allowed
@@ -215,7 +215,7 @@ pub fn extract_parameter_values(
     parameters: &'static [ImporterParameter],
     input_index: usize,
 ) -> Result<ImporterParameterValues> {
-    let mut result = ImporterParameterValues::new();
+    let mut result = ImporterParameterValues::default();
 
     for parameter in parameters {
         result.insert(

@@ -8,13 +8,13 @@ use crate::{
     techniques::sample::Resampler,
 };
 use ebi_objects::{
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{Fraction, OneMinus},
 };
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::sync::{
-    Arc,
     atomic::{AtomicUsize, Ordering},
+    Arc,
 };
 
 pub trait PermutationTest {
@@ -40,7 +40,9 @@ impl PermutationTest for dyn EbiTraitFiniteStochasticLanguage {
         let base_conformance = Arc::new(
             self_other_distances
                 .earth_movers_stochastic_conformance()
-                .with_context(|| format!("computing base earth movers' stochastic conformance"))?,
+                .with_context(|| {
+                    "computing base earth movers' stochastic conformance".to_string()
+                })?,
         );
 
         log::info!("Compute the trace distances");
@@ -79,7 +81,11 @@ impl PermutationTest for dyn EbiTraitFiniteStochasticLanguage {
 
                 if let Ok(d) = sample_conformance {
                     //Here, the paper says "<=", however that does not match intuition.
-                    if &d < &base_conformance { 1 } else { 0 }
+                    if &d < base_conformance {
+                        1
+                    } else {
+                        0
+                    }
                 } else {
                     err.fetch_add(1, Ordering::Relaxed);
                     0

@@ -3,12 +3,12 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
-    follower_semantics::FollowerSemantics,
+    semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
-    ActivityKeyTranslator,
     anyhow::Result,
     ebi_arithmetic::{Fraction, OneMinus},
+    ActivityKeyTranslator,
 };
 use rayon::iter::ParallelIterator;
 use std::{
@@ -56,16 +56,15 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
             .sum::<Fraction>();
 
         //something went wrong
-        if let Ok(mutex) = Arc::try_unwrap(error) {
-            if let Ok(err) = mutex.into_inner() {
-                if let Some(err) = err {
-                    return Err(err);
-                }
-            }
+        if let Ok(mutex) = Arc::try_unwrap(error)
+            && let Ok(err) = mutex.into_inner()
+            && let Some(err) = err
+        {
+            return Err(err);
         }
 
         sum = sum.one_minus();
-        return Ok(sum);
+        Ok(sum)
     }
 }
 
@@ -76,8 +75,8 @@ mod tests {
         techniques::unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     };
     use ebi_objects::{
-        FiniteStochasticLanguage,
         ebi_arithmetic::{Fraction, One},
+        FiniteStochasticLanguage,
     };
     use std::fs;
 

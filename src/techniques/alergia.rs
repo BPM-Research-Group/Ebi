@@ -64,7 +64,7 @@ pub fn alergia_algorithm(
 
         let mut found_merge: bool = false;
         for &q_red in &red {
-            if alergia_compatible(&confidence_factor, fpta, q_blue, q_red) {
+            if alergia_compatible(confidence_factor, fpta, q_blue, q_red) {
                 found_merge = true;
                 // println!("MERGE   qb={q_blue}  into qr={q_red}");
                 stochastic_merge(fpta, &mut parents, q_red, q_blue);
@@ -99,14 +99,13 @@ fn stochastic_merge(
     q: usize,
     q_prime: usize,
 ) {
-    if let Some(&parent) = parents.get(&q_prime) {
-        if let Some((_, next_q, _)) = fpta.node_2_transitions[parent]
+    if let Some(&parent) = parents.get(&q_prime)
+        && let Some((_, next_q, _)) = fpta.node_2_transitions[parent]
             .iter_mut()
             .find(|(_, next_q, _)| *next_q == q_prime)
         {
             *next_q = q;
         }
-    }
 
     stochastic_fold(fpta, parents, q, q_prime);
 }
@@ -117,8 +116,8 @@ fn stochastic_fold(
     q: usize,
     q_prime: usize,
 ) {
-    let term_prime = fpta.node_2_termination_counts[q_prime].clone();
-    let visit_prime = fpta.node_2_visit_counts[q_prime].clone();
+    let term_prime = fpta.node_2_termination_counts[q_prime];
+    let visit_prime = fpta.node_2_visit_counts[q_prime];
     fpta.node_2_termination_counts[q] += term_prime;
     fpta.node_2_visit_counts[q] += visit_prime;
     fpta.node_2_termination_counts[q_prime] = 0;
@@ -194,11 +193,10 @@ fn alergia_compatible(
         if let (Some(blue_target), Some(red_target)) = (
             fpta.get_edge_target(activity, q_blue),
             fpta.get_edge_target(activity, q_red),
-        ) {
-            if !alergia_compatible(confidence_factor, fpta, blue_target, red_target) {
+        )
+            && !alergia_compatible(confidence_factor, fpta, blue_target, red_target) {
                 return false;
             }
-        }
     }
 
     true
@@ -401,7 +399,7 @@ impl Graphable for FrequencyPrefixTree {
             let source_node = nodes[source_node_id];
             for (activity, target_node_id, weight) in arr {
                 let target_node = nodes[*target_node_id];
-                let label = self.activity_key.get_activity_label(activity);
+                let label = self.activity_key.activity_to_label(activity);
                 graphable::create_edge(
                     &mut graph,
                     &source_node,

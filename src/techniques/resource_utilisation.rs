@@ -10,7 +10,7 @@ use std::fmt::Display;
 pub fn set_resource_utilisations(executions: &mut Executions) -> Result<()> {
     log::info!("Computing resource utilisations");
     //discover a resource model
-    let resource_model = ResourceModel::from_executions(&executions);
+    let resource_model = ResourceModel::from_executions(executions);
 
     //find the earliest execution where each execution could start
     let (execution_2_starting, execution_2_started_by) = execution_2_starts(executions);
@@ -172,7 +172,7 @@ pub struct ResourceModel {
 
 impl ResourceModel {
     pub fn from_executions(executions: &Executions) -> Self {
-        let number_of_resources = executions.resource_key.get_number_of_activities();
+        let number_of_resources = executions.resource_key.len();
         let mut transition_2_resources = vec![];
         for execution in executions.executions.iter() {
             //ensure length
@@ -191,7 +191,7 @@ impl ResourceModel {
     }
 
     pub fn empty_resource_marking(&self) -> ResourceMarking {
-        ResourceMarking(vec![false; self.resource_key.get_number_of_activities()])
+        ResourceMarking(vec![false; self.resource_key.len()])
     }
 
     fn resource_utilisation(
@@ -230,7 +230,7 @@ impl Display for ResourceModel {
                         .iter_ones()
                         .map(|r| self
                             .resource_key
-                            .get_activity_label(&self.resource_key.get_activity_by_id(r)))
+                            .activity_to_label(&self.resource_key.id_to_activity(r)))
                         .join(", ")
                 ))
                 .join("\n")

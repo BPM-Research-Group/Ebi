@@ -57,7 +57,7 @@ pub const EBI_CONVERT_BPMN: EbiCommand = EbiCommand::Command {
 pub const EBI_CONVERT_LOG: EbiCommand = EbiCommand::Command {
     name_short: "log",
     name_long: None,
-    explanation_short: "Convert an object to an event log, considering only its traces.",
+    explanation_short: "Convert an object to an event log, considering only its traces, that is, its sequences of activities. Any other attribute will not be converted.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,

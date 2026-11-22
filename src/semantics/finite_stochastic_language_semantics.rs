@@ -1,10 +1,10 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
-    Activity, ActivityKey, ActivityKeyTranslator, FiniteStochasticLanguage, HasActivityKey,
-    IntoRefTraceProbabilityIterator, NumberOfTraces, TranslateActivityKey,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::labelled_petri_net::TransitionIndex,
+    Activity, ActivityKey, ActivityKeyTranslator, FiniteStochasticLanguage, HasActivityKey,
+    IntoRefTraceProbabilityIterator, NumberOfTraces, TranslateActivityKey,
 };
 use std::collections::HashMap;
 
@@ -62,8 +62,8 @@ impl FiniteStochasticLanguageSemantics {
         }
 
         Self {
-            activity_key: activity_key,
-            nodes: nodes,
+            activity_key,
+            nodes,
         }
     }
 
@@ -74,7 +74,7 @@ impl FiniteStochasticLanguageSemantics {
         if transition == 0 {
             None
         } else {
-            Some(self.activity_key.get_activity_by_id(transition - 1))
+            Some(self.activity_key.id_to_activity(transition - 1))
         }
     }
 
@@ -83,7 +83,7 @@ impl FiniteStochasticLanguageSemantics {
         activity: &Option<Activity>,
     ) -> TransitionIndex {
         match activity {
-            Some(ai) => 1 + self.activity_key.get_id_from_activity(ai),
+            Some(ai) => 1 + self.activity_key.activity_to_id(ai),
             None => 0,
         }
     }
@@ -141,10 +141,10 @@ impl Semantics for FiniteStochasticLanguageSemantics {
             *state = *new_state;
             return Ok(());
         }
-        return Err(anyhow!(
+        Err(anyhow!(
             "transition cannot be executed as it is not enabled in state {}",
             state
-        ));
+        ))
     }
 
     fn is_final_state(&self, state: &usize) -> bool {
@@ -169,12 +169,11 @@ impl Semantics for FiniteStochasticLanguageSemantics {
 
     fn get_enabled_transitions(&self, state: &usize) -> Vec<TransitionIndex> {
         let mut result = vec![];
-        for (activity, _) in &self.nodes[*state] {
+        for activity in self.nodes[*state].keys() {
             result.push(self.activity_to_transition_index(activity));
         }
-        return result;
+        result
     }
-
 }
 
 #[cfg(test)]

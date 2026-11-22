@@ -1,4 +1,4 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
     Activity, BusinessProcessModelAndNotation, anyhow::Result, ebi_bpmn::BPMNMarking,
     ebi_objects::labelled_petri_net::TransitionIndex,
@@ -16,7 +16,7 @@ impl Semantics for BusinessProcessModelAndNotation {
         state: &mut <Self as Semantics>::SemState,
         transition: TransitionIndex,
     ) -> Result<()> {
-        BusinessProcessModelAndNotation::execute_transition(&self, state, transition)
+        BusinessProcessModelAndNotation::execute_transition(self, state, transition)
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
@@ -28,7 +28,7 @@ impl Semantics for BusinessProcessModelAndNotation {
         transition: TransitionIndex,
         state: &<Self as Semantics>::SemState,
     ) -> bool {
-        BusinessProcessModelAndNotation::is_transition_silent(&self, transition, state)
+        BusinessProcessModelAndNotation::is_transition_silent(self, transition, state)
     }
 
     fn get_transition_activity(
@@ -36,14 +36,14 @@ impl Semantics for BusinessProcessModelAndNotation {
         transition: TransitionIndex,
         state: &<Self as Semantics>::SemState,
     ) -> Option<Activity> {
-        BusinessProcessModelAndNotation::get_transition_activity(&self, transition, state)
+        BusinessProcessModelAndNotation::get_transition_activity(self, transition, state)
     }
 
     fn get_enabled_transitions(
         &self,
         state: &<Self as Semantics>::SemState,
     ) -> Vec<TransitionIndex> {
-        BusinessProcessModelAndNotation::get_enabled_transitions(&self, state).unwrap()
+        BusinessProcessModelAndNotation::get_enabled_transitions(self, state).unwrap()
     }
 
 }

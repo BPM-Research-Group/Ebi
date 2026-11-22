@@ -1,7 +1,19 @@
 use crate::{
     ebi_framework::ebi_trait::EbiTrait,
     ebi_traits::{
-        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes, ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_graphable::EbiTraitGraphable, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_graphable::EbiTraitGraphable,
+        ebi_trait_iterable_language::EbiTraitIterableLanguage,
+        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
+        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+        ebi_trait_semantics::EbiTraitSemantics,
+        ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
+        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
+        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
 };
 
@@ -59,7 +71,9 @@ mod tests {
             ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING},
             ebi_trait::FromEbiTraitObject,
         },
-        prom::java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport},
+        surfaces::java::java_object_handler::{
+            JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport,
+        },
     };
 
     #[test]

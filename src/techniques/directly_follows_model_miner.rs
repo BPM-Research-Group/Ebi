@@ -102,7 +102,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
             let mut edge = (None, None);
             for activity in trace {
                 let activity: &Activity = activity;
-                edge = (edge.1, Some(activity.clone()));
+                edge = (edge.1, Some(*activity));
 
                 if edges_to_filter.contains(&edge) {
                     return false;
@@ -124,7 +124,7 @@ impl dyn EbiTraitEventLog {
             let mut edge = (None, None);
             for activity in trace {
                 let activity: &Activity = activity;
-                edge = (edge.1, Some(activity.clone()));
+                edge = (edge.1, Some(*activity));
 
                 if edges_to_filter.contains(&edge) {
                     return false;
@@ -163,11 +163,11 @@ fn get_edges_to_filter(
             let source = dfm.state_2_activity[source];
             let target = dfm.state_2_activity[target];
             if weight == min {
-                result.insert((Some(source.clone()), Some(target.clone())));
+                result.insert((Some(source), Some(target)));
             } else {
                 min = weight;
                 result.clear();
-                result.insert((Some(source.clone()), Some(target.clone())));
+                result.insert((Some(source), Some(target)));
             }
         });
 
@@ -175,22 +175,22 @@ fn get_edges_to_filter(
     for (node, weight) in dfm.end_states.iter() {
         let activity = dfm.state_2_activity[node];
         if weight == min {
-            result.insert((Some(activity.clone()), None));
+            result.insert((Some(activity), None));
         } else if weight < min {
             min = weight;
             result.clear();
-            result.insert((Some(activity.clone()), None));
+            result.insert((Some(activity), None));
         }
     }
 
-    return result;
+    result
 }
 
 #[cfg(test)]
 mod tests {
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        semantics::semantics::Semantics,
+        semantics::semantics_trait::Semantics,
         techniques::directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
     };
     use ebi_objects::{

@@ -57,7 +57,7 @@ mod tests {
 
     use ebi_objects::ProcessTreeMarkupLanguage;
 
-    use crate::semantics::semantics::Semantics;
+    use crate::semantics::semantics_trait::Semantics;
 
     #[test]
     fn nested_ptml() {

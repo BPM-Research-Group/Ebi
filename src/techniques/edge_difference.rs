@@ -15,14 +15,14 @@ impl EdgeDifference for DirectlyFollowsGraph {
         let mut result = (&self.empty_traces_weight - &other.empty_traces_weight).abs();
 
         //start activities
-        for activity in self.activity_key.get_activities() {
+        for activity in self.activity_key.activities() {
             let start1 = self.start_activity_weight(*activity);
             let start2 = other.start_activity_weight(*activity);
 
             if start1 != start2 {
                 log::debug!(
                     "start different: {} first {} second {}",
-                    self.activity_key.get_activity_label(activity),
+                    self.activity_key.activity_to_label(activity),
                     start1,
                     start2
                 );
@@ -32,14 +32,14 @@ impl EdgeDifference for DirectlyFollowsGraph {
         }
 
         //end activities
-        for activity in self.activity_key.get_activities() {
+        for activity in self.activity_key.activities() {
             let end1 = self.end_activity_weight(*activity);
             let end2 = other.end_activity_weight(*activity);
 
             if end1 != end2 {
                 log::debug!(
                     "end different: {} first {} second {}",
-                    self.activity_key.get_activity_label(activity),
+                    self.activity_key.activity_to_label(activity),
                     end1,
                     end2
                 );
@@ -57,8 +57,8 @@ impl EdgeDifference for DirectlyFollowsGraph {
             if e1 != e2 {
                 log::debug!(
                     "edge different: {}->{} first {} second {}",
-                    self.activity_key.get_activity_label(&a),
-                    self.activity_key.get_activity_label(&b),
+                    self.activity_key.activity_to_label(&a),
+                    self.activity_key.activity_to_label(&b),
                     e1,
                     e2,
                 );

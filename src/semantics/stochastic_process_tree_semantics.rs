@@ -1,6 +1,5 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
-    Activity, StochasticProcessTree,
     anyhow::Result,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
@@ -10,6 +9,7 @@ use ebi_objects::{
             get_transition_activity, is_final_state,
         },
     },
+    Activity, StochasticProcessTree,
 };
 
 impl Semantics for StochasticProcessTree {
@@ -57,13 +57,12 @@ impl Semantics for StochasticProcessTree {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        semantics::semantics::Semantics,
-        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    use crate::semantics::{
+        semantics_trait::Semantics, stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     };
     use ebi_objects::{
-        LabelledPetriNet, ProcessTree, StochasticProcessTree,
         ebi_arithmetic::{Fraction, One},
+        LabelledPetriNet, ProcessTree, StochasticProcessTree,
     };
     use std::fs;
 
@@ -200,7 +199,10 @@ mod tests {
                 .unwrap(),
             Fraction::one()
         );
-        assert_eq!(tree.get_transition_weight(&state, 0).unwrap(), &Fraction::one());
+        assert_eq!(
+            tree.get_transition_weight(&state, 0).unwrap(),
+            &Fraction::one()
+        );
 
         assert!(tree.execute_transition(&mut state, 0).is_ok());
 
@@ -221,7 +223,10 @@ mod tests {
                 .unwrap(),
             Fraction::from(4)
         );
-        assert_eq!(tree.get_transition_weight(&state, 4).unwrap(), &Fraction::from(4));
+        assert_eq!(
+            tree.get_transition_weight(&state, 4).unwrap(),
+            &Fraction::from(4)
+        );
 
         assert!(tree.execute_transition(&mut state, 4).is_ok());
         assert!(tree.is_final_state(&state));

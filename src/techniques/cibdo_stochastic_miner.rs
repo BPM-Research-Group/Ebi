@@ -1,12 +1,12 @@
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    semantics::semantics::Semantics,
+    semantics::semantics_trait::Semantics,
 };
-use ebi_objects::anyhow::{Context, Result, anyhow, ensure};
+use ebi_objects::anyhow::{anyhow, ensure, Context, Result};
 use ebi_objects::{
-    Activity, LabelledPetriNet, StochasticLabelledPetriNet, TranslateActivityKey,
     ebi_arithmetic::{ConstFraction, Fraction, One, OneMinus, Round, Signed, Zero},
+    Activity, LabelledPetriNet, StochasticLabelledPetriNet, TranslateActivityKey,
 };
 use rayon::iter::ParallelIterator;
 use std::{
@@ -152,7 +152,8 @@ impl Poly {
             }
             let coef_div = rem_lt.1 / divisor_lt.1;
 
-            if let Some(vars_div) = divide_monomial(&rem_lt.0, &divisor_lt.0) {
+            {
+                let vars_div = divide_monomial(&rem_lt.0, &divisor_lt.0)?;
                 let mut term_map = HashMap::new();
                 term_map.insert(vars_div, coef_div);
                 let q_term = Poly { terms: term_map };
@@ -160,8 +161,6 @@ impl Poly {
                 quotient = quotient.add(&q_term);
                 let sub_poly = q_term.mul(other);
                 remainder = remainder.sub(&sub_poly);
-            } else {
-                return None;
             }
         }
         Some(quotient)
@@ -282,13 +281,13 @@ fn lcm_factored(f1: &FactoredPoly, f2: &FactoredPoly) -> (FactoredPoly, Poly, Po
                         }
                         break;
                     }
-                } else if let Some(q) = f_other.exact_div(f_self) {
-                    if format!("{}", q) == "-1" {
-                        used_in_self[i] = true;
-                        found = true;
-                        other_mult = other_mult.mul(&Poly::new(-1));
-                        break;
-                    }
+                } else if let Some(q) = f_other.exact_div(f_self)
+                    && format!("{}", q) == "-1"
+                {
+                    used_in_self[i] = true;
+                    found = true;
+                    other_mult = other_mult.mul(&Poly::new(-1));
+                    break;
                 }
             }
         }
@@ -456,11 +455,11 @@ impl SymbolicFraction {
         }
 
         for f in &mut self.den.factors {
-            if let Some((_, coef)) = f.leading_term() {
-                if coef < 0 {
-                    *f = f.mul(&Poly::new(-1));
-                    self.num.factors[0] = self.num.factors[0].mul(&Poly::new(-1));
-                }
+            if let Some((_, coef)) = f.leading_term()
+                && coef < 0
+            {
+                *f = f.mul(&Poly::new(-1));
+                self.num.factors[0] = self.num.factors[0].mul(&Poly::new(-1));
             }
         }
     }
@@ -699,7 +698,7 @@ impl fmt::Display for LinearSystem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for (i, eq) in self.equations.iter().enumerate() {
             if i > 0 {
-                write!(f, "\n")?;
+                writeln!(f)?;
             }
             let lhs_name = &self.variables[eq.lhs];
 
@@ -716,7 +715,7 @@ impl fmt::Display for LinearSystem {
                     write!(
                         f,
                         "{} * {}",
-                        term.coefficient, &self.variables[term.variable]
+                        term.coefficient, self.variables[term.variable]
                     )?;
                 }
             }
@@ -800,11 +799,11 @@ impl LinearSystem {
 }
 
 pub trait EquationSystemConstructor {
-    fn create_equation_system(&self, trace: &Vec<Activity>) -> Result<LinearSystem>;
+    fn create_equation_system(&self, trace: &[Activity]) -> Result<LinearSystem>;
 }
 
 impl EquationSystemConstructor for LabelledPetriNet {
-    fn create_equation_system(&self, trace: &Vec<Activity>) -> Result<LinearSystem> {
+    fn create_equation_system(&self, trace: &[Activity]) -> Result<LinearSystem> {
         if let Some(linear_system) = build_equation_system(self, trace) {
             Ok(linear_system)
         } else {
@@ -816,7 +815,7 @@ impl EquationSystemConstructor for LabelledPetriNet {
     }
 }
 
-pub fn build_equation_system<T, State>(semantics: &T, trace: &Vec<Activity>) -> Option<LinearSystem>
+pub fn build_equation_system<T, State>(semantics: &T, trace: &[Activity]) -> Option<LinearSystem>
 where
     T: Semantics<SemState = State> + ?Sized,
     State: Displayable + Eq + std::hash::Hash + Clone,
@@ -1692,7 +1691,11 @@ fn quantize_weight(value: Fraction) -> Fraction {
 }
 
 fn max_fraction(left: Fraction, right: Fraction) -> Fraction {
-    if left >= right { left } else { right }
+    if left >= right {
+        left
+    } else {
+        right
+    }
 }
 
 fn distinct_population_indices(
@@ -1752,6 +1755,11 @@ impl CIBDOStochasticMinerLPN for LabelledPetriNet {
         mut self,
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLabelledPetriNet> {
+        //if there is no initial marking, then the language is empty and we can return an SLPN with the empty language.
+        if self.initial_marking.is_none() {
+            return Ok(StochasticLabelledPetriNet::new_empty_language());
+        }
+
         // Step 1: translate the LPN once, before entering the parallel trace loop.
         let mut activity_key = log.activity_key().clone();
         self.translate_using_activity_key(&mut activity_key);

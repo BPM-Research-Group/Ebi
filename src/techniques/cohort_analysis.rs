@@ -7,9 +7,9 @@ use crate::{
     math::{distances::WeightedDistances, distances_triangular::WeightedTriangularDistanceMatrix},
 };
 use ebi_objects::{
-    Attribute, AttributeKey, DataType,
     anyhow::Result,
-    ebi_arithmetic::{Fraction, Recip, ToNative, Zero, fraction::approximate::Approximate},
+    ebi_arithmetic::{fraction::approximate::Approximate, Fraction, Recip, ToNative, Zero},
+    Attribute, AttributeKey, DataType,
 };
 use fnv::FnvBuildHasher;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -34,7 +34,7 @@ fn emsc_corrected_to_string(f: &Option<Fraction>) -> String {
     if let Some(f) = f {
         f.to_string()
     } else {
-        format!("correction failed")
+        "correction failed".to_string()
     }
 }
 
@@ -42,13 +42,13 @@ fn emsc_corrected_to_approximated_string(f: &Option<Fraction>) -> String {
     if let Some(f) = f {
         f.clone().approximate().unwrap().to_string()
     } else {
-        format!("correction failed")
+        "correction failed".to_string()
     }
 }
 
 impl Display for RankedCohorts {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.features.len() == 0 {
+        if self.features.is_empty() {
             return write!(
                 f,
                 "No suitable cohorts found. The event log may not have supported attributes, or the cohorts that they yield are too small."
@@ -79,7 +79,7 @@ impl Display for RankedCohorts {
         if let Some(emsc_corrected) = &self.emsc_corrected {
             let exact_value_max_length = emsc_corrected
                 .iter()
-                .map(|emsc| format!("{}", emsc_corrected_to_string(emsc)).len())
+                .map(|emsc| emsc_corrected_to_string(emsc).to_string().len())
                 .max()
                 .unwrap()
                 .max(26);
@@ -89,7 +89,7 @@ impl Display for RankedCohorts {
                 "{:<attribute_name_max_length$}  {:<attribute_value_max_length$}  {:<exact_value_max_length$}  {:>6}",
                 "Attribute", "value", "approximate corrected EMSC", "corrected EMSC"
             )?;
-            writeln!(f, "")?;
+            writeln!(f)?;
 
             for (feature, emsc_corrected) in self.features.iter().zip(emsc_corrected) {
                 writeln!(
@@ -117,7 +117,7 @@ impl Display for RankedCohorts {
                 "{:<attribute_name_max_length$}  {:<attribute_value_max_length$}  {:<exact_value_max_length$}  {:>6}",
                 "Attribute", "value", "approximate EMSC", "EMSC"
             )?;
-            writeln!(f, "")?;
+            writeln!(f)?;
 
             for (feature, emsc) in self.features.iter().zip(self.emsc.iter()) {
                 writeln!(
@@ -161,16 +161,16 @@ impl Feature {
         match self {
             Feature::Categorical { value, .. } => {
                 if let Some(s) = value {
-                    format!("{s}")
+                    s.to_string()
                 } else {
-                    format!("-missing-")
+                    "-missing-".to_string()
                 }
             }
             Feature::NumericLess { threshold, .. } => {
                 if let Some(s) = threshold {
                     format!("< {s}")
                 } else {
-                    format!("-missing-")
+                    "-missing-".to_string()
                 }
             }
         }
@@ -186,7 +186,7 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         // gather features and remove too-small or too-large cohorts
         let features = elicit_features(self, minimum_cohort_size_fraction);
 
-        if features.len() == 0 {
+        if features.is_empty() {
             return Ok(RankedCohorts {
                 attribute_key: self.attribute_key().clone(),
                 features,
@@ -198,8 +198,7 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         //create variant map
         let variant_2_cardinality = <dyn EbiTraitEventLog>::to_multiset(self);
         let variant_2_variant_index = variant_2_cardinality
-            .iter()
-            .map(|(trace, _)| trace)
+            .keys()
             .enumerate()
             .map(|(x, y)| (y, x))
             .collect::<HashMap<_, _, FnvBuildHasher>>();
@@ -258,12 +257,12 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
 
         results.sort_by(|a, b| {
             if number_of_random_splits == 0 {
-                a.1.0
-                    .partial_cmp(&b.1.0)
+                a.1 .0
+                    .partial_cmp(&b.1 .0)
                     .unwrap_or(std::cmp::Ordering::Equal)
             } else {
-                a.1.1
-                    .partial_cmp(&b.1.1)
+                a.1 .1
+                    .partial_cmp(&b.1 .1)
                     .unwrap_or(std::cmp::Ordering::Equal)
             }
         });
@@ -284,7 +283,6 @@ fn elicit_features(
     log: &dyn EbiTraitEventLogTraceAttributes,
     minimum_cohort_size_fraction: &Fraction,
 ) -> Vec<Feature> {
-
     if log.number_of_traces() == 0 {
         return vec![];
     }
@@ -341,7 +339,7 @@ fn elicit_features(
 
 fn split_log_on_feature(
     log: &dyn EbiTraitEventLogTraceAttributes,
-    trace_index_2_variant_index: &Vec<usize>,
+    trace_index_2_variant_index: &[usize],
     feature: &Feature,
     distances: Arc<WeightedTriangularDistanceMatrix>,
 ) -> (Box<dyn WeightedDistances>, usize) {
@@ -410,7 +408,7 @@ fn split_log_on_feature(
 
 fn perform_random_splits(
     log: &dyn EbiTraitEventLogTraceAttributes,
-    trace_index_2_variant_index: &Vec<usize>,
+    trace_index_2_variant_index: &[usize],
     sample_size: usize,
     number_of_random_splits: usize,
     distances: Arc<WeightedTriangularDistanceMatrix>,
@@ -430,7 +428,7 @@ fn perform_random_splits(
                     }
                 }
 
-                if cohort_has.len() == 0 || cohort_has_not.len() == 0 {
+                if cohort_has.is_empty() || cohort_has_not.is_empty() {
                     //It may occasionally happen that either of the sides is empty; just try again.
                     continue;
                 }

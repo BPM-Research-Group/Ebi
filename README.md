@@ -1,9 +1,17 @@
 # Ebi - a process mining tool
 
-Ebi is a process mining software suite, maintained by the [BPM group](https://bpm.rwth-aachen.de) of RWTH Aachen University, Germany. 
+Ebi is a process mining software suite, maintained by the [BPM group](https://leemans.ch/group) of the RWTH Aachen University, Germany. 
 It contains several algorithms and techniques that perform analyses on event logs and process models.
-Ebi can be used as a command-line utility, from a browser and in ProM.
-Furthermore, Ebi can be called from Rust, Python, Java and Javascript. 
+
+Ebi can be used in several manners:
+1. Directly in a [browser](#use-ebi-from-a-browser),
+1. as a [command-line utility](#use-ebi-as-a-command-line-utility),
+1. in the [ProM](#use-ebi-in-prom) framework,
+1. in the [Knime](#use-ebi-in-the-knime-analytics-platform) analytics platform,
+1. from [Rust](#call-ebi-from-rust),
+1. from [Python](#call-ebi-from-python),
+1. from [Java](#call-ebi-from-java) and 
+1. from [Javascript](#call-ebi-from-javascript). 
 
 Ebi provides process mining and stochastic process mining algorithms, and supports exact arithmetic for most of these algorithms.
 
@@ -15,19 +23,26 @@ More information on its use can be found in its [PDF manual](https://github.com/
 
 Most commands of Ebi can be used directly from the browser on the [commands page](https://bpm-research-group.github.io/Ebi/commands.html).
 
-This will run fully on your computer, is limited to 4GB of RAM and single-threaded, but does not upload files.
+This will run fully on your computer, is limited to 4GB of RAM and single-threaded.
+Ebi does not upload or store files; everything is ran locally on your computer or smart device.
 
 ### Use Ebi as a command line utility
 
-1. Download Ebi CLI for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-windows.exe) or for [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-linux).
-1. In Linux, give the file execution permissions. In Windows, this step is not necessary.
+1. Download Ebi CLI for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-windows.exe), for [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-linux) or for [Mac](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-arm-apple).
+    Older versions are available [here](https://github.com/BPM-Research-Group/Ebi/releases/).
+1. In Linux or on a Mac, give the file execution permissions:
+
+    `sudo chmod +x [ebi executable]`
+
+    On Windows, this step is not necessary.
+
 1. Open a command prompt and run the executable.
     Installation is not necessary, and Ebi does not require internet access.
 1. For an overview of the commands, refer to the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
-Ebi runs on Mac OS X and many other platforms by self-compilation; please see below.
+Ebi runs on many other platforms by self-compilation; please see the [development](#feedback--development) section.
 
-A good way to get started is to try `ebi info` followed by a file name, which will parse the file and print some information about it.
+A good way to get started is to try `ebi info` followed by the name of a file, which will parse the file and print some information about it.
 
 ### Use Ebi in ProM
 
@@ -37,6 +52,11 @@ Then, several Ebi commands can be used like any other ProM plug-in.
 As Ebi is extremely flexible in its inputs and outputs, please ensure you choose the correct input and output plug-in (there are many). 
 
 The [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) indicates which commands are available in ProM.
+
+### Use Ebi in the Knime analytics platform
+
+Ebi is available in the Knime analytics platform on Windows and Linux.
+For instructions to install and use it, please refer to [here](https://github.com/humam-kourani/ebi-for-knime#installing-the-extension).
 
 ### Call Ebi from Python
 
@@ -86,14 +106,17 @@ Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/cr
         };
         use ebi_objects::ebi_arithmetic::{Fraction, One};
         use std::fs;
-        // Read the first file and box it
+
+        // Read the first file, box it and cast it as a trait
         let fin1 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
         let slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
         let mut object1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang1);
-        // Read the second file and box it
+
+        // Read the second file, box it and cast it as a trait
         let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
         let slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
         let mut object2: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang2);
+
         // Compute EMSC
         let emsc = object1
             .earth_movers_stochastic_conformance(object2.as_mut())
@@ -103,23 +126,26 @@ Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/cr
 ### Call Ebi from Java
 
 To use Ebi from Java:
-1.  Download the Ebi library for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/java/ebi.dll?ref_type=heads&inline=false) or [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/java/libebi.so?ref_type=heads&inline=false) and put it in a folder that is accessible to the Path of your program.
+1.  Download the Ebi [Java library](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi.jar) and add it to the Class Path of your program.
 
-1.  Add the following static declarations:
+1.  Then, one can use Ebi as follows:
+        
+        import org.ebitools.Ebi;
+        import java.nio.file.Files;
+        import java.nio.charset.StandardCharsets;
 
-        static native String call_ebi_internal(String command_name, String output_format, String[] inputs);
-        static {
-            try {
-                System.loadLibrary("ebi");
-                System.out.println("Ebi library loaded");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-1.  Then, Ebi can be called through the native function, for instance:
-
+        //Load the inputs as strings.
         String log = Files.readString("log.xes", StandardCharsets.UTF_8);
-        String result = call_ebi_internal("Ebi analyse completeness", ".frac", new String[] {log});
+
+        //Call Ebi through a generic function.
+        //The first argument is the full name of the Ebi command, 
+        // the second is the desired output format, 
+        // and the third is an array of command parameters in string format.
+        String result = Ebi.callEbi("Ebi analyse completeness", ".frac", new String[] {log});
+
+        //Call Ebi through a command-specific function.
+        //The first argument is the desired output format, the remaining arguments are the command's inputs.
+        String info = Ebi.information(".txt", log);
 
 The [commands](https://bpm-research-group.github.io/Ebi/commands.html) page indicates the commands that can be called from Java.
 
@@ -133,7 +159,7 @@ Got a feature request? Found a bug?
 Please use our [Github issue page](https://github.com/BPM-Research-Group/Ebi/issues).
 
 Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi).
-To get started with development, or to compile for Mac OS X:
+To get started with development, or to compile Ebi yourself:
 
 1. Install [Rustup](https://www.rust-lang.org/tools/install)
 1. Log out and in again
@@ -143,11 +169,13 @@ To get started with development, or to compile for Mac OS X:
 1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "ebi". Everything else is equivalent to the commands mentioned in the manual.
 1. To compile Ebi, give the command "cargo build --release". The binary is then placed in the project folder, in the "build/release" sub-folder.
 
-Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
+Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) and in the [code documentation](https://docs.rs/ebi/latest/).
 
 We welcome pull requests on [Github](https://github.com/BPM-Research-Group/Ebi).
-Before opening a pull request, please ensure that the test batch file src/tests/test.sh finishes without errors (on Windows, rename it to .bat and remove the first three lines).
-This file may take up to an hour to run, depending on your machine.
+Before submitting a pull request:
+
+1. Run `cargo clippy` and address lints if they are sensible.
+1. Test Ebi locally using `src/tests/test.sh`. On Windows, rename this file to .bat and remove the first 7 lines. Testing may take up to an hour to run, depending on your machine.
 
 ## License
 

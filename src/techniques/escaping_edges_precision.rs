@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::displayable::Displayable, ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
-    semantics::semantics::Semantics,
+    semantics::semantics_trait::Semantics,
 };
 use ebi_objects::{
     StochasticLanguageOfAlignments,
@@ -84,7 +84,7 @@ where
                             ));
                         }
                         self.execute_transition(&mut state, transition)
-                            .with_context(|| format!("Cannot execute transition."))?;
+                            .with_context(|| "Cannot execute transition.".to_string())?;
 
                         //process the model move
                         let new_node_index = nodes.len();
@@ -147,7 +147,7 @@ impl PrefixTreeNode {
     pub fn new(number_of_outgoing_edges_in_model: usize) -> Self {
         Self {
             probability: Fraction::zero(),
-            number_of_outgoing_edges_in_model: number_of_outgoing_edges_in_model,
+            number_of_outgoing_edges_in_model,
             children: HashMap::default(),
         }
     }

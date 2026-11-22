@@ -5,7 +5,7 @@ use ebi_objects::{
         Fraction, Recip, Signed,
         ebi_number::{One, Zero},
         exact::MaybeExact,
-        fraction::{fraction::APPROX_DIGITS, fraction_exact::FractionExact},
+        fraction::{fraction_struct::APPROX_DIGITS, fraction_exact::FractionExact},
         malachite::{
             Natural,
             base::num::{

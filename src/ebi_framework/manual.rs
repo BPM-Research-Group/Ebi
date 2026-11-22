@@ -1,6 +1,7 @@
 use ebi_objects::anyhow::{Ok, Result};
 use clap::Command;
 use ebi_objects::EbiObjectType;
+use fnv::FnvBuildHasher;
 use inflector::Inflector;
 use layout::{
     core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr},
@@ -15,9 +16,9 @@ use std::{
     io::Write,
 };
 use strum::IntoEnumIterator;
-use crate::{ebi_commands::ebi_command_itself::EBI_ITSELF, ebi_framework::{ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, prom::java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport}, python::python::{PYTHON_PACKAGE, pm4py_function_name}, text::{Joiner, LatexEscaper, Rank}};
+use crate::{ebi_framework::{ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, surfaces::java::java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport}, python::python::{PYTHON_PACKAGE, pm4py_function_name}, text::{Joiner, LatexEscaper, Rank}};
 
-pub fn manual() -> Result<EbiOutput> {
+pub(crate) fn manual() -> Result<EbiOutput> {
     let mut f = vec![];
 
     //version
@@ -94,7 +95,7 @@ pub fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\long\\def\\ebitraitlist{{")?;
     for etrait in EbiTrait::iter() {
         writeln!(f, "\\subsection{{{}}}", etrait.to_string().to_sentence_case())?;
-        writeln!(f, "\\label{{trait:{}}}", etrait.to_string())?;
+        writeln!(f, "\\label{{trait:{}}}", etrait)?;
         writeln!(f, "{}", etrait.get_explanation())?;
 
         writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
@@ -214,7 +215,7 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
     if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output_type, .. } = path[path.len()-1] {
 
         //alias
-        if let Some(_) = name_long {
+        if name_long.is_some() {
             writeln!(f, "Alias: \\texttt{{{}}}.\\\\", EbiCommand::path_to_short_string(&path))?;
         }
 
@@ -347,14 +348,14 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
     Ok(())
 }
 
-pub fn or_none(string: &str) -> &str {
+pub(crate) fn or_none(string: &str) -> &str {
     if string.is_empty() {
         return "none";
     }
     string
 }
 
-pub fn output_types(output_type: &EbiOutputType) -> String {
+pub(crate) fn output_types(output_type: &EbiOutputType) -> String {
     let mut list = output_type.get_exporters().into_iter().map(
         |exp| exp.get_article().to_string() 
         + " " 
@@ -370,11 +371,11 @@ pub fn output_types(output_type: &EbiOutputType) -> String {
     format!("{} {} {}", list.join(", "), "or", last)
 }
 
-pub fn graph() -> Result<VisualGraph> {
+pub(crate) fn graph() -> Result<VisualGraph> {
     let mut graph = VisualGraph::new(Orientation::LeftToRight);
 
     //traits
-    let mut traits = HashMap::new();
+    let mut traits = HashMap::<_, _, FnvBuildHasher>::default();
     for etrait in EbiTrait::iter() {
         let shape = ShapeKind::new_box(&("trait ".to_owned() + etrait.to_string().as_str()));
         let look = StyleAttr::simple();
@@ -388,7 +389,7 @@ pub fn graph() -> Result<VisualGraph> {
     }
 
     //object types
-    let mut object_types = HashMap::new();
+    let mut object_types = HashMap::<_, _, FnvBuildHasher>::default();
     for object_type in EbiObjectType::iter() {
         let shape = ShapeKind::new_box(&("type ".to_owned() + object_type.to_string().as_str()));
         let mut look = StyleAttr::simple();
@@ -403,7 +404,7 @@ pub fn graph() -> Result<VisualGraph> {
     }
 
     //file handlers
-    let mut file_handlers = HashMap::new();
+    let mut file_handlers = HashMap::<_, _, FnvBuildHasher>::default();
     for file_handler in EBI_FILE_HANDLERS {
         let shape = ShapeKind::new_circle(&(".".to_owned() + file_handler.file_extension.to_string().as_str()));
         let look = StyleAttr::simple();
@@ -427,7 +428,7 @@ pub fn graph() -> Result<VisualGraph> {
     }
 
     //commands
-    let mut commands = HashMap::new();
+    let mut commands = HashMap::<_, _, FnvBuildHasher>::default();
     for command in EBI_COMMANDS.get_command_paths() {
         let shape = ShapeKind::new_double_circle(&EbiCommand::path_to_short_string(&command));
         let look = StyleAttr::simple();
@@ -469,55 +470,14 @@ pub fn graph() -> Result<VisualGraph> {
         }
     }
 
-    return Ok(graph)
+    Ok(graph)
 }
 
-pub fn scale(point: &mut Point) {
+pub(crate) fn scale(point: &mut Point) {
     point.x *= 0.5;
 }
 
-pub fn html() -> String {
-    let commands_html = EBI_COMMANDS
-        .get_command_paths()
-        .iter()
-        .filter_map(|path| {
-            if path[1].long_name() != EBI_ITSELF.long_name() {
-                Some(format!(
-                    "<i>{}</i>. {}",
-                    EbiCommand::path_to_string(&path[1..]).to_sentence_case(),
-                    path.last().unwrap().explanation_short()
-                ))
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<_>>()
-        .join("</li><li>");
-
-    let file_formats_html = EBI_FILE_HANDLERS
-        .iter()
-        .map(|file_handler| {
-            format!(
-                "{} (.{})",
-                file_handler.name.to_sentence_case(),
-                file_handler.file_extension
-            )
-        })
-        .collect::<Vec<_>>()
-        .join("</li><li>");
-
-    format!(
-        "<h2>Commands</h2>\
-        Ebi offers the following comands and techniques. \
-        Please refer to the <a href=\"https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf\">manual</a> for more information. \
-        <ul><li>{}</li></ul>\
-        <h2>Supported file formats</h2>\
-        <ul><li>{}</li></ul>",
-        commands_html, file_formats_html
-    )
-}
-
-pub fn object_importers_table() -> Result<String> {
+pub(crate) fn object_importers_table() -> Result<String> {
     let mut f = vec![];
 
     let types = EbiObjectType::iter().collect::<BTreeSet<_>>();
@@ -540,7 +500,7 @@ pub fn object_importers_table() -> Result<String> {
     for file_handler in handlers {
         writeln!(f, "{}\\hfill .{}", file_handler.name, file_handler.file_extension)?;
         for object_type in &types {
-            write!(f, "&{}", file_handler.can_import_as_object(&object_type).to_latex_circle())?;
+            write!(f, "&{}", file_handler.can_import_as_object(object_type).to_latex_circle())?;
         }
         writeln!(f, "\\\\")?;
     }
@@ -553,7 +513,7 @@ pub fn object_importers_table() -> Result<String> {
     Ok(String::from_utf8(f)?)
 }
 
-pub fn trait_importers_table() -> Result<String> {
+pub(crate) fn trait_importers_table() -> Result<String> {
     let mut f = vec![];
 
     let types = EbiTrait::iter().collect::<BTreeSet<_>>();
@@ -577,7 +537,7 @@ pub fn trait_importers_table() -> Result<String> {
         writeln!(f, "{}\\hfill .{}", file_handler.name, file_handler.file_extension)?;
 
         for object_type in &types {
-            if file_handler.can_import_as_trait(&object_type) {
+            if file_handler.can_import_as_trait(object_type) {
                 write!(f, "&\\CIRCLE")?;
             } else {
                 write!(f, "&\\Circle")?;
@@ -593,7 +553,7 @@ pub fn trait_importers_table() -> Result<String> {
     Ok(String::from_utf8(f)?)
 }
 
-pub fn object_exporters_table() -> Result<String> {
+pub(crate) fn object_exporters_table() -> Result<String> {
     let mut f = vec![];
 
     let types = EbiObjectType::iter().collect::<BTreeSet<_>>();

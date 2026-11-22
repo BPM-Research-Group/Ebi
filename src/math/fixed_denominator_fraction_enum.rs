@@ -1,10 +1,10 @@
 use ebi_objects::{
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{
         ebi_number::Zero,
         exact::is_exact_globally,
         fraction::fraction_enum::FractionEnum,
-        malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational},
+        malachite::{base::num::arithmetic::traits::Lcm, rational::Rational, Natural},
     },
 };
 use std::{
@@ -22,7 +22,7 @@ pub enum FixedDenominatorFractionEnum {
 }
 
 impl FixedDenominatorFractionEnum {
-    pub fn create(fractions: &Vec<Arc<FractionEnum>>) -> Result<Vec<Arc<Self>>> {
+    pub fn create(fractions: &[Arc<FractionEnum>]) -> Result<Vec<Arc<Self>>> {
         match fractions.iter().next() {
             None => Ok(vec![]),
             Some(x) => match x.as_ref() {
@@ -32,9 +32,9 @@ impl FixedDenominatorFractionEnum {
                 FractionEnum::Approx(_) => {
                     //approximate mode
                     Ok(fractions
-                        .into_iter()
+                        .iter()
                         .map(|f| match f.as_ref() {
-                            FractionEnum::Approx(f) => Arc::new(Self::Approximate(f.clone())),
+                            FractionEnum::Approx(f) => Arc::new(Self::Approximate(*f)),
                             _ => Arc::new(Self::CannotCombineExactAndApprox),
                         })
                         .collect::<Vec<_>>())
@@ -75,7 +75,7 @@ impl FixedDenominatorFractionEnum {
 
         let mut it = numbers.iter();
         let mut result = it.next().unwrap().to_owned().to_owned();
-        while let Some(number) = it.next() {
+        for number in it {
             result = result.lcm(number);
         }
 

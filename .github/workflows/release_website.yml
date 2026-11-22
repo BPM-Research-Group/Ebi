@@ -1,0 +1,56 @@
+name: Release website
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_website:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Wasm
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Setup Github pages
+        uses: actions/configure-pages@v4
+        
+      - name: Build website
+        run: |
+          > src/surfaces/javascript/javascript_autogen.rs
+          cargo run --features surface_generation -- itself surface javascript -o src/surfaces/javascript/javascript_autogen.rs
+          wasm-pack build -d ./website/javascript --target web -- --features javascript
+          mkdir -p website
+          cp src/surfaces/website/stijlen.css website
+          cargo run --features surface_generation -- itself surface website home -o website/index.html
+          cargo run --features surface_generation -- itself surface website commands -o website/commands.html
+          cargo run --features surface_generation -- itself surface website file-handlers -o website/file_handlers.html
+      
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'website/'
+          
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+          

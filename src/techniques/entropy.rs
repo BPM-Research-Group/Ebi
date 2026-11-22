@@ -9,7 +9,7 @@ use ebi_objects::{
         EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Log, One, Signed, Zero, f,
     },
 };
-use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial::LogPolynomial;
+use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial_struct::LogPolynomial;
 use std::ops::Neg;
 
 pub trait Entropy {
@@ -54,7 +54,7 @@ impl Entropy for StochasticDeterministicFiniteAutomaton {
             }
         }
 
-        return Ok(-sum);
+        Ok(-sum)
     }
 }
 

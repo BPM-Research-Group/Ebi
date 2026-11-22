@@ -1,4 +1,4 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
     Activity, AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton,
     DirectlyFollowsGraph, DirectlyFollowsModel, StochasticDeterministicFiniteAutomaton,
@@ -66,7 +66,7 @@ aut!(StochasticDirectlyFollowsModel);
 
 #[cfg(test)]
 mod tests {
-    use crate::semantics::semantics::Semantics;
+    use crate::semantics::semantics_trait::Semantics;
     use ebi_objects::{DirectlyFollowsGraph, HasActivityKey};
     use std::fs;
 

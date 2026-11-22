@@ -1,7 +1,7 @@
 use ebi_objects::{
-    ProcessTree,
     ebi_arithmetic::Zero,
     ebi_objects::process_tree::{Node, Operator},
+    ProcessTree,
 };
 
 use crate::ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage;
@@ -14,7 +14,7 @@ impl TraceModelMinerTree for dyn EbiTraitFiniteLanguage {
     fn mine_trace_model_tree(&self) -> ProcessTree {
         if self.number_of_traces().is_zero() {
             //empty language; empty tree
-            return (self.activity_key().clone(), vec![]).into();
+            (self.activity_key().clone(), vec![]).into()
         } else {
             let mut tree = vec![Node::Operator(Operator::Xor, self.number_of_traces())];
 
@@ -25,16 +25,11 @@ impl TraceModelMinerTree for dyn EbiTraitFiniteLanguage {
                 } else {
                     //non-empty trace
                     tree.push(Node::Operator(Operator::Sequence, trace.len()));
-                    tree.append(
-                        &mut trace
-                            .iter()
-                            .map(|a| Node::Activity(a.clone()))
-                            .collect::<Vec<_>>(),
-                    );
+                    tree.append(&mut trace.iter().map(|a| Node::Activity(*a)).collect::<Vec<_>>());
                 }
             }
 
-            return (self.activity_key().clone(), tree).into();
+            (self.activity_key().clone(), tree).into()
         }
     }
 }

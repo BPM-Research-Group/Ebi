@@ -2,14 +2,40 @@ pub trait ReduceLanguageEquivalently {
     fn reduce_language_equivalently(&mut self);
 }
 
+pub trait ReduceLanguageEquivalentlyForPetriNets {
+    /// Reduce a model language-equivalently, with a focus on a neat Petri net translation.
+    fn reduce_language_equivalently_for_petri_nets(&mut self);
+}
+
 mod tree {
     use crate::techniques::{
-        empty_traces::has_empty_traces_node, reduce::ReduceLanguageEquivalently,
+        empty_traces::has_empty_traces_node,
+        reduce::{ReduceLanguageEquivalently, ReduceLanguageEquivalentlyForPetriNets},
     };
     use ebi_objects::{
-        ProcessTree,
         ebi_objects::process_tree::{Node, Operator},
+        ProcessTree,
     };
+
+    impl ReduceLanguageEquivalentlyForPetriNets for ProcessTree {
+        fn reduce_language_equivalently_for_petri_nets(&mut self) {
+            let rules: Vec<Box<dyn TreeRule>> = vec![
+                Box::new(Singularity),
+                Box::new(Associativity),
+                Box::new(Tau),
+                Box::new(ImplicitConcurrent),
+            ];
+            let mut changed = true;
+            while changed {
+                changed = false;
+                for node in (0..self.tree.len()).rev() {
+                    for rule in &rules {
+                        changed |= rule.apply(self, node);
+                    }
+                }
+            }
+        }
+    }
 
     impl ReduceLanguageEquivalently for ProcessTree {
         fn reduce_language_equivalently(&mut self) {
@@ -18,6 +44,7 @@ mod tree {
                 Box::new(Associativity),
                 Box::new(Tau),
                 Box::new(ImplicitConcurrent),
+                Box::new(IntroduceORs),
             ];
             let mut changed = true;
             while changed {
@@ -81,7 +108,7 @@ mod tree {
                             return true;
                         }
                     }
-                    return false;
+                    false
                 }
                 Node::Operator(Operator::Loop, number_of_children) => {
                     for (c, child) in tree.get_children(node).enumerate() {
@@ -105,7 +132,7 @@ mod tree {
                             }
                         }
                     }
-                    return false;
+                    false
                 }
             }
         }
@@ -142,7 +169,7 @@ mod tree {
                             return true;
                         }
                     }
-                    return false;
+                    false
                 }
                 Node::Operator(Operator::Or, number_of_children) if number_of_children > 1 => {
                     //option 1: diect tau
@@ -184,7 +211,7 @@ mod tree {
                             }
                         }
                     }
-                    return false;
+                    false
                 }
                 Node::Operator(Operator::Xor, number_of_children) if number_of_children > 1 => {
                     if let Some(tau_child) = tree
@@ -204,7 +231,7 @@ mod tree {
                             return true;
                         }
                     }
-                    return false;
+                    false
                 }
                 Node::Operator(Operator::Loop, number_of_children) if number_of_children > 1 => {
                     if let Some(tau_child) = tree
@@ -245,7 +272,7 @@ mod tree {
                         return true;
                     }
 
-                    return false;
+                    false
                 }
                 _ => false,
             }
@@ -262,7 +289,8 @@ mod tree {
                 Node::Operator(Operator::Sequence, _)
                 | Node::Operator(Operator::Loop, _)
                 | Node::Operator(Operator::Xor, _)
-                | Node::Operator(Operator::Or, _) => false,
+                | Node::Operator(Operator::Or, _)
+                | Node::Operator(Operator::Concurrent, _) => false,
                 Node::Operator(Operator::Interleaved, number_of_children) => {
                     if tree
                         .get_children(node)
@@ -273,40 +301,55 @@ mod tree {
                     }
                     false
                 }
+            }
+        }
+    }
+
+    struct IntroduceORs;
+
+    impl TreeRule for IntroduceORs {
+        fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool {
+            match tree.tree[node] {
+                Node::Tau => false,
+                Node::Activity(_) => false,
+                Node::Operator(Operator::Sequence, _)
+                | Node::Operator(Operator::Loop, _)
+                | Node::Operator(Operator::Xor, _)
+                | Node::Operator(Operator::Or, _)
+                | Node::Operator(Operator::Interleaved, _) => false,
                 Node::Operator(Operator::Concurrent, number_of_children) => {
                     if let Some((i, child1)) = tree
                         .get_children(node)
                         .enumerate()
                         .find(|(_, child)| has_empty_traces_node(tree, *child))
-                    {
-                        if let Some(child2) = tree
+                        && let Some(child2) = tree
                             .get_children(node)
                             .skip(i + 1)
                             .find(|child| has_empty_traces_node(tree, *child))
-                        {
-                            //remove child2
-                            let end2 = tree.traverse(child2);
-                            let tchild2 = tree.tree.drain(child2..end2).collect::<Vec<_>>();
+                    {
+                        //remove child2
+                        let end2 = tree.traverse(child2);
+                        let tchild2 = tree.tree.drain(child2..end2).collect::<Vec<_>>();
 
-                            //remove child1
-                            let end1 = tree.traverse(child1);
-                            let tchild1 = tree.tree.drain(child1..end1).collect::<Vec<_>>();
+                        //remove child1
+                        let end1 = tree.traverse(child1);
+                        let tchild1 = tree.tree.drain(child1..end1).collect::<Vec<_>>();
 
-                            //insert child2
-                            tree.tree.splice((node + 1)..(node + 1), tchild2);
+                        //insert child2
+                        tree.tree.splice((node + 1)..(node + 1), tchild2);
 
-                            //insert child1
-                            tree.tree.splice((node + 1)..(node + 1), tchild1);
+                        //insert child1
+                        tree.tree.splice((node + 1)..(node + 1), tchild1);
 
-                            //insert or
-                            tree.tree.insert(node + 1, Node::Operator(Operator::Or, 2));
+                        //insert or
+                        tree.tree.insert(node + 1, Node::Operator(Operator::Or, 2));
 
-                            //change number of children
-                            _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+                        //change number of children
+                        _ = tree.tree[node].set_number_of_children(number_of_children - 1);
 
-                            return true;
-                        }
+                        return true;
                     }
+
                     false
                 }
             }
@@ -347,8 +390,8 @@ mod tree {
 }
 
 mod labelled_petri_net {
-    use crate::techniques::reduce::{ReduceLanguageEquivalently, single_unit_arc};
-    use ebi_objects::{LabelledPetriNet, ebi_objects::labelled_petri_net::TransitionIndex};
+    use crate::techniques::reduce::{single_unit_arc, ReduceLanguageEquivalently};
+    use ebi_objects::{ebi_objects::labelled_petri_net::TransitionIndex, LabelledPetriNet};
 
     impl ReduceLanguageEquivalently for LabelledPetriNet {
         fn reduce_language_equivalently(&mut self) {
@@ -448,10 +491,10 @@ mod labelled_petri_net {
             let transition_2 = single_unit_arc(lpn.get_outgoing_transitions(place))?;
 
             //place is not marked
-            if let Some(marking) = &lpn.initial_marking {
-                if marking.get(place) != 0 {
-                    return None;
-                }
+            if let Some(marking) = &lpn.initial_marking
+                && marking.get(place) != 0
+            {
+                return None;
             }
 
             //transition 2 must be silent
@@ -627,8 +670,16 @@ mod labelled_petri_net {
 
     impl LpnTransitionRule for FusionOfParallelPlaces {
         fn apply(&self, lpn: &mut LabelledPetriNet, transition: TransitionIndex) -> Option<()> {
-            for (place_1, _) in lpn.get_outgoing_places(transition).unwrap().collect::<Vec<_>>() {
-                for (place_2, _) in lpn.get_outgoing_places(transition).unwrap().collect::<Vec<_>>() {
+            for (place_1, _) in lpn
+                .get_outgoing_places(transition)
+                .unwrap()
+                .collect::<Vec<_>>()
+            {
+                for (place_2, _) in lpn
+                    .get_outgoing_places(transition)
+                    .unwrap()
+                    .collect::<Vec<_>>()
+                {
                     //check pairs only twice
                     if place_1 <= place_2 {
                         continue;
@@ -709,9 +760,9 @@ pub fn single_unit_arc(it: Option<impl Iterator<Item = (usize, u64)>>) -> Option
 mod tests {
     use crate::techniques::reduce::ReduceLanguageEquivalently;
     use ebi_objects::{
-        ActivityKey, ActivityKeyTranslator, ProcessTree, activity, con,
+        activity, con,
         ebi_objects::process_tree::{Node, Operator},
-        int, or, seq, tau, tloop, xor,
+        int, or, seq, tau, tloop, xor, ActivityKey, ActivityKeyTranslator, ProcessTree,
     };
 
     #[test]

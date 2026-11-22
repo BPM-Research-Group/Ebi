@@ -9,6 +9,7 @@ use ebi_objects::{
     ebi_objects::process_tree::Node,
 };
 use ebi_optimisation::anyhow::Result;
+use fnv::FnvBuildHasher;
 use std::collections::HashMap;
 
 pub trait OccurrencesStochasticMinerBPMN {
@@ -40,8 +41,8 @@ impl OccurrencesStochasticMinerBPMN for BusinessProcessModelAndNotation {
         let translator =
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
-        let mut model_activity2frequency = HashMap::new();
-        for activity in self.activity_key().get_activities() {
+        let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
+        for activity in self.activity_key().activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
         for (trace, probability) in language.iter_traces_probabilities() {
@@ -92,8 +93,8 @@ impl OccurrencesStochasticMinerLPN for LabelledPetriNet {
         let translator =
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
-        let mut model_activity2frequency = HashMap::new();
-        for activity in self.activity_key().get_activities() {
+        let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
+        for activity in self.activity_key().activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
         for (trace, probability) in language.iter_traces_probabilities() {
@@ -133,8 +134,8 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
         let translator =
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
-        let mut model_activity2frequency = HashMap::new();
-        for activity in self.activity_key().get_activities() {
+        let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
+        for activity in self.activity_key().activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
         for (trace, probability) in language.iter_traces_probabilities() {
@@ -153,7 +154,7 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
                     //labelled transition
                     weights.push(
                         model_activity2frequency
-                            .get(&model_activity)
+                            .get(model_activity)
                             .unwrap()
                             .clone(),
                     );

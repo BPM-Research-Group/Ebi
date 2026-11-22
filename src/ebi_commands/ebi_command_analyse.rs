@@ -80,9 +80,9 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
                 ));
             }
         };
-        return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(
+        Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(
             result,
-        )));
+        )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage),
 };
@@ -139,7 +139,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
 
         let result = log.to_multiset().estimate_completeness();
 
-        return Ok(EbiOutput::Fraction(result));
+        Ok(EbiOutput::Fraction(result))
     },
     output_type: &EbiOutputType::Fraction,
 };
@@ -173,7 +173,7 @@ The computation may not terminate if the model has non-decreasing livelocks, or 
             },
             _ => return Err(anyhow!("Unsupported object {:?} provided.", model.get_type()))
         };
-        return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
+        Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
@@ -290,7 +290,7 @@ The computation may not terminate if the model is unbounded and this unboundedne
         let semantics = objects.remove(0).to_type::<EbiTraitStochasticDeterministicSemantics>()?;
         let at_least = objects.remove(0).to_type::<Fraction>()?;
         let result = semantics.analyse_minimum_probability(&at_least)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
+        Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
@@ -324,7 +324,7 @@ Computation is more efficient for an object with a finite stochastic language.")
             },
             _ => return Err(anyhow!("Unsupported object {:?} provided.", object.get_type()))
         };
-        return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
+        Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
@@ -348,7 +348,7 @@ If there are more than one such trace, an arbitrary one is returned."),
         let language = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let number_of_traces = objects.remove(0).to_type::<usize>()?;
         let result = medoid::medoid(language.as_ref(), &number_of_traces)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+        Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
 };
@@ -381,7 +381,7 @@ Computation is more efficient for a model with a finite stochastic language."),
             },
             object => return Err(anyhow!("Unsupported object {:?} provided.", object.get_type()))
         };
-        return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
+        Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
@@ -404,7 +404,7 @@ pub const EBI_ANALYSE_VARIETY: EbiCommand = EbiCommand::Command {
 
         let result = log.rao_stirling_diversity();
 
-        return Ok(EbiOutput::Fraction(result));
+        Ok(EbiOutput::Fraction(result))
     },
     output_type: &EbiOutputType::Fraction,
 };

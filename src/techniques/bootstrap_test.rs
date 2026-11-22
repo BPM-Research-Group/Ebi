@@ -136,7 +136,7 @@ impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLogTraceAttrib
                 // log::debug!("sample done\n   average distance with knowledge of attribute {} \naverage distance without knowledge of attribute {}", &sum_a / count_a, &sum_r / count_r);
                 if let Ok(a) = average_a.average() {
                     let r = average_r.average().unwrap();
-                    if &a < &r {
+                    if a < r {
                         // log::debug!("a wins -- average a {}, average r {} -- sample {:?}", a, r, sample);
                         1
                     } else {
@@ -180,7 +180,7 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
         let base_conformance = Arc::new(
             self_other_distances
                 .earth_movers_stochastic_conformance()
-                .with_context(|| format!("computing base earth movers' stochastic conformance"))?,
+                .with_context(|| "computing base earth movers' stochastic conformance".to_string())?,
         );
 
         log::info!("Compute the trace distances");
@@ -219,7 +219,7 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
 
                 if let Ok(d) = sample_conformance {
                     //Here, the paper says "<=", however that does not match intuition.
-                    if &d < &base_conformance { 1 } else { 0 }
+                    if &d < base_conformance { 1 } else { 0 }
                 } else {
                     err.fetch_add(1, Ordering::Relaxed);
                     0

@@ -9,7 +9,7 @@ pub const EBI_PORTABLE_DOCUMENT_FORMAT: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "pdf",
     is_binary: true,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: FORMAT_SPECIFICATION,
     validator: None,
     trait_importers: &[],
     object_importers: &[],

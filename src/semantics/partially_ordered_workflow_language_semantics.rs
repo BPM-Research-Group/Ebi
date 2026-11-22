@@ -1,12 +1,12 @@
-use crate::semantics::semantics::Semantics;
+use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
-    Activity,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
         partially_ordered_workflow_language::{PartiallyOrderedWorkflowLanguage, PowlNode},
         process_tree::{NodeState, TreeMarking},
     },
+    Activity,
 };
 use strum_macros::EnumIs;
 
@@ -31,7 +31,7 @@ impl Semantics for PartiallyOrderedWorkflowLanguage {
     }
 
     /// Strategy: do not perform any checking and just update the current node as requested.
-    /// However, do not 
+    /// However, do not
     fn execute_transition(
         &self,
         state: &mut <Self as Semantics>::SemState,
@@ -54,7 +54,7 @@ impl Semantics for PartiallyOrderedWorkflowLanguage {
                 state[node_index] = NodeState::Started;
             }
             TransitionType::Execute => {
-                state[node_index] = NodeState::Executed;
+                state[node_index] = NodeState::NotYetExecuted;
                 //reset all children
                 if !node_type.is_activity() {
                     for child in (node_index + 1)..self.traverse(node_index) {
@@ -256,7 +256,7 @@ fn enabled_transitions(
             PowlNode::Activity {
                 repeatable: false, ..
             },
-            NodeState::Executed,
+            NodeState::NotYetExecuted,
         ) => {
             //once or zero-or-once activity
             vec![t_close]
@@ -265,7 +265,7 @@ fn enabled_transitions(
             PowlNode::Activity {
                 repeatable: true, ..
             },
-            NodeState::Executed,
+            NodeState::NotYetExecuted,
         ) => {
             //zero-or-more or one-or-more activity
             vec![t_execute, t_close]
@@ -279,7 +279,7 @@ fn enabled_transitions(
                 edges,
                 ..
             },
-            NodeState::Executed,
+            NodeState::NotYetExecuted,
         ) => {
             //zero-or-one or zero-or-more
             enabled_transitions_partial_order_execute(
@@ -301,7 +301,7 @@ fn enabled_transitions(
                 end_children,
                 ..
             },
-            NodeState::Executed,
+            NodeState::NotYetExecuted,
         ) => {
             //zero-or-one or zero-or-more
             enabled_transitions_choice_graph_execute(
@@ -333,7 +333,7 @@ fn enabled_transitions_choice_graph_execute(
     //if any child has started execution, allow it to continue (there can only be one such child in a choice graph)
     for child_index in powl.get_children(node_index) {
         if state.states[child_index] == NodeState::Started
-            || state.states[child_index] == NodeState::Executed
+            || state.states[child_index] == NodeState::NotYetExecuted
         {
             return enabled_transitions(powl, state, child_index);
         }
@@ -429,10 +429,10 @@ fn enabled_transitions_partial_order_execute(
 #[cfg(test)]
 
 mod tests {
-    use crate::semantics::semantics::Semantics;
+    use crate::semantics::semantics_trait::Semantics;
     use ebi_objects::{
-        HasActivityKey,
         ebi_objects::partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
+        HasActivityKey,
     };
     use std::fs;
 
@@ -442,7 +442,7 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
+        let a = Some(powl.activity_key().try_process_activity("a").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -471,7 +471,7 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
+        let a = Some(powl.activity_key().try_process_activity("a").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -500,7 +500,7 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+        let b = Some(powl.activity_key().try_process_activity("b").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -554,8 +554,8 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
-        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+        let a = Some(powl.activity_key().try_process_activity("a").unwrap());
+        let b = Some(powl.activity_key().try_process_activity("b").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -628,8 +628,8 @@ mod tests {
         let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
 
         let mut state = powl.get_initial_state().unwrap();
-        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
-        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+        let a = Some(powl.activity_key().try_process_activity("a").unwrap());
+        let b = Some(powl.activity_key().try_process_activity("b").unwrap());
 
         assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
         assert!(powl.is_transition_silent(0, &state));
@@ -692,6 +692,5 @@ mod tests {
 
         //execute a
         powl.execute_transition(&mut state, 3).unwrap();
-
     }
 }

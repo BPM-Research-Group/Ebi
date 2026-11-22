@@ -13,11 +13,11 @@ use crate::{
         },
         validate::Validate,
     },
-    prom::java_object_handler::JavaObjectHandler,
+    surfaces::java::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, Importable, ProcessTree,
-    anyhow::{Result, anyhow},
 };
 
 pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
@@ -83,7 +83,7 @@ impl FromEbiTraitObject for ProcessTree {
         match object {
             EbiInput::Object(EbiObject::ProcessTree(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a process tree",
+                "Cannot read {} {} as a process tree.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

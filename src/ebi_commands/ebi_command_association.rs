@@ -108,8 +108,8 @@ pub const EBI_ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
                     f,
                     "Trace atribute `{}` has an association of approximately {}. Exact value: {:?}",
                     attribute,
-                    &y.approximate(),
-                    &y
+                    y.approximate(),
+                    y
                 )?,
                 Err(e) => writeln!(f, "Trace atribute `{}` has no association, as {:?}.", attribute, e)?,
             }

@@ -32,7 +32,7 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
         }
 
         //start activities
-        for activity in self.activity_key.get_activities() {
+        for activity in self.activity_key.activities() {
             let start1 = &self.start_activity_weight(*activity);
             let start2 = &other.start_activity_weight(*activity);
 
@@ -42,7 +42,7 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
             if p1 != p2 {
                 log::debug!(
                     "start presence different: {} first={} second={}",
-                    self.activity_key.get_activity_label(activity),
+                    self.activity_key.activity_to_label(activity),
                     p1,
                     p2
                 );
@@ -51,7 +51,7 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
         }
 
         //end activities
-        for activity in self.activity_key.get_activities() {
+        for activity in self.activity_key.activities() {
             let end1 = &self.end_activity_weight(*activity);
             let end2 = &other.end_activity_weight(*activity);
 
@@ -61,7 +61,7 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
             if p1 != p2 {
                 log::debug!(
                     "end presence different: {} first={} second={}",
-                    self.activity_key.get_activity_label(activity),
+                    self.activity_key.activity_to_label(activity),
                     p1,
                     p2
                 );
@@ -70,21 +70,21 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
         }
 
         //edges
-        let activities = self.activity_key.get_activities().to_vec();
+        let activities = self.activity_key.activities().to_vec();
 
         for &a in &activities {
             for &b in &activities {
                 let e1 = self.edge_weight(*a, *b);
                 let e2 = other.edge_weight(*a, *b);
 
-                let p1 = is_present(&e1);
-                let p2 = is_present(&e2);
+                let p1 = is_present(e1);
+                let p2 = is_present(e2);
 
                 if p1 != p2 {
                     log::debug!(
                         "edge presence different: {}->{} first={} second={}",
-                        self.activity_key.get_activity_label(a),
-                        self.activity_key.get_activity_label(b),
+                        self.activity_key.activity_to_label(a),
+                        self.activity_key.activity_to_label(b),
                         p1,
                         p2,
                     );

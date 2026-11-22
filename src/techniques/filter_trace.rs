@@ -1,14 +1,16 @@
 use crate::{
-    ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject}, ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
+    ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
 };
 use ebi_objects::{
-    Activity, EventLog, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
-    FiniteStochasticLanguage,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_derive::EbiInputEnum,
     ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+    Activity, EventLog, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
+    FiniteStochasticLanguage,
 };
 
 pub trait FilterTrace {
@@ -18,7 +20,7 @@ pub trait FilterTrace {
     /// keep all non-empty traces
     fn remove_traces_empty(&mut self);
 
-    /// remove all traces that have [event_selector] [activity]
+    /// remove all traces that have `event_selector` `activity`
     fn remove_traces_event_activity(&mut self, event_selector: EventSelector, activity: Activity);
 }
 
@@ -66,7 +68,7 @@ pub enum EventSelector {
 }
 
 impl EventSelector {
-    pub fn apply<F>(&self, trace: &Vec<Activity>, f: F) -> bool
+    pub fn apply<F>(&self, trace: &[Activity], f: F) -> bool
     where
         F: Fn(&Activity) -> bool,
     {

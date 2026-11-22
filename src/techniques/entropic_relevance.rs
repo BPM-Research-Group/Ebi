@@ -3,14 +3,14 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
-    follower_semantics::FollowerSemantics,
+    semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
-    Activity, ActivityKeyTranslator,
     anyhow::{Context, Result},
     ebi_arithmetic::{
-        Fraction, Log, One, Signed, Zero, log_polynomial::log_polynomial::LogPolynomial,
+        log_polynomial::log_polynomial_struct::LogPolynomial, Fraction, Log, One, Signed, Zero,
     },
+    Activity, ActivityKeyTranslator,
 };
 use std::collections::HashSet;
 
@@ -61,7 +61,7 @@ impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
 
         let mut result = sum_j;
         result -= h(&rho)?;
-        return Ok(result);
+        Ok(result)
     }
 }
 
@@ -75,7 +75,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
         let mut sum_j = LogPolynomial::zero();
 
         for (trace, probability_log) in self.iter_traces_probabilities() {
-            let translated_trace = translator.translate_trace(&trace);
+            let translated_trace = translator.translate_trace(trace);
             let probability_model =
                 model.get_probability(&FollowerSemantics::Trace(&translated_trace))?;
             if probability_model.is_zero() {
@@ -107,7 +107,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-fn bits(trace: &Vec<Activity>, number_of_activities_in_log: usize) -> Result<LogPolynomial> {
+fn bits(trace: &[Activity], number_of_activities_in_log: usize) -> Result<LogPolynomial> {
     let mut result = (number_of_activities_in_log + 1).log()?;
     result *= trace.len() + 1;
     Ok(result)
@@ -125,7 +125,7 @@ fn h(x: &Fraction) -> Result<LogPolynomial> {
 
     let mut result = xlogx;
     result += nlogn;
-    return Ok(result);
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -137,7 +137,7 @@ mod tests {
         },
         techniques::entropic_relevance::EntropicRelvance,
     };
-    use ebi_objects::{EventLog, FiniteStochasticLanguage, ebi_arithmetic::ebi_number::One};
+    use ebi_objects::{ebi_arithmetic::ebi_number::One, EventLog, FiniteStochasticLanguage};
     use std::fs;
 
     #[test]

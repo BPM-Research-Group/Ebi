@@ -1,6 +1,6 @@
 [package]
 name = "ebi"
-version = "0.3.14-alpha.1"
+version = "0.0.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 keywords = ["stochastic-processes", "process-mining", "business-processes"]
@@ -11,19 +11,27 @@ repository = "https://github.com/BPM-Research-Group/Ebi"
 readme = "README.md"
 exclude = ["/testfiles", "/manual", ".github/", ".*", "/website"]
 
+
 [lib]
 name = "ebi"
 crate-type = ["cdylib", "lib"]
 
+
 [features]
+## By default, Ebi does not need any features.
 default = [ ]
-test_generation = ["dep:syn"]
-eexactarithmetic = []
+
+#! Arithmetic features
+
+## The exactarithmetic feature compiles Ebi in exact arithmetic mode only, which is generally faster than mixed mode.
 exactarithmetic = [
     "eexactarithmetic",
     "ebi_objects/exactarithmetic",
     "ebi_optimisation/exactarithmetic",
 ]
+eexactarithmetic = []
+
+## The approximatearithmietc feature compiles Ebi in approximate mode only, which is generally faster than mixed mode.
 approximatearithmetic = [
     "eapproximatearithmetic",
     "ebi_objects/approximatearithmetic",
@@ -31,22 +39,43 @@ approximatearithmetic = [
 ]
 eapproximatearithmetic = []
 testactivities = ["ebi_objects/testactivities"]
+
+## Use this feature to enable generating tests; this reads the source code of Ebi and is disabled in normal runs.
+test_generation = [ "dep:syn" ]
+
+## generate surface-related files
+surface_generation = [ "dep:syn" ] 
+
+## Enable the compilation of a Python library.
 python = [
-    "java",
     "dep:pyo3",
     "dep:polars",
     "dep:num-traits",
     "dep:syn",
     "dep:num-bigint",
 ]
-java = ["dep:jni"]
-javascript = ["dep:wasm-bindgen", "dep:syn", "dep:js-sys", "dep:console_error_panic_hook" ]
+
+## Enable the compilation of a Java library.
+java = [
+    "dep:jni", 
+    "dep:syn", 
+    "dep:jni-macros" 
+]
+
+ ## Enable the compilation of a Javascript library.
+javascript = [ 
+    "dep:wasm-bindgen", 
+    "dep:console_error_panic_hook", 
+    "dep:js-sys" 
+]
 extension-module = ["pyo3/extension-module"]
+
+
 
 [dependencies]
 ebi_optimisation = { git = "https://github.com/BPM-Research-Group/Ebi_optimisation.git", version = "0.3.10" }
-ebi_objects = { git = "https://github.com/BPM-Research-Group/Ebi_objects.git", version = "0.3.192" }
-ebi_derive = "0.2.11"
+ebi_objects = { git = "https://github.com/BPM-Research-Group/Ebi_objects.git", version = "0.3.199" }
+ebi_derive = "0.2.13"
 bitvec = "1.0.1"
 clap = { version = "4.6.6", features = ["derive", "cargo", "string"] }
 clap-verbosity-flag = "3.0.3"
@@ -58,8 +87,8 @@ priority-queue = "2.6.0"
 process_mining = { version = "0.6.2", features = ["graphviz-export"] }
 rand = "0.10.1"
 rand_chacha = "0.10.0"
-chrono = "0.4.44"
-flate2 = "1.1.10"
+chrono = "0.4.45"
+flate2 = "1.1.11"
 rayon = "1.10.0"
 strsim = "0.11.1"
 Inflector = "0.11.4"
@@ -73,7 +102,7 @@ itertools = "0.15.0"
 serde = "1.0.228"
 logging_timer = "1.1.1"
 svg2pdf = "0.13.0"
-uuid = "1.26.0"
+uuid = "1.29.2"
 cfg-if = "1.0.4"
 ntest = "0.10.0"
 regex = "1.12.3"
@@ -81,7 +110,7 @@ quick-xml = { version = "0.42.0", features = ["serialize"] }
 pastey = "0.2.0"
 intmap = "3.1.3"
 rustc-hash = "2.1.2"
-const_format = "0.2.36"
+const_format = "0.2.37"
 bit-set = "0.11.1"
 pyo3 = { version = "0.27.1", features = [
     "abi3-py37",
@@ -90,12 +119,14 @@ pyo3 = { version = "0.27.1", features = [
 ], optional = true }
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
 num-traits = { version = "0.2", optional = true }
-syn = { version = "3.0.3", features = ["parsing", "full"], optional = true }
-jni = { version = "0.21.1", optional = true }
+syn = { version = "3.0.10", features = ["parsing", "full"], optional = true }
+jni = { version = "0.22.4", optional = true }
+jni-macros = { version = "0.22.4", optional = true }
 num-bigint = { version = "0.4.6", optional = true }
 wasm-bindgen = { version = "0.2.127", optional = true }
 js-sys = { version = "0.3.104", optional = true }
 console_error_panic_hook = { version = "0.1.7", optional = true }
+document-features = { version = "0.2.12" }
 
 [profile.release]
 debug = false

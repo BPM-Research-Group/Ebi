@@ -1,8 +1,8 @@
-use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
+use crate::{ebi_framework::displayable::Displayable, semantics::semantics_trait::Semantics};
 use bitvec::{bitvec, prelude::Lsb0, vec::BitVec};
 use ebi_objects::{
-    Activity, FiniteStochasticPartiallyOrderedLanguage, anyhow::Result,
-    ebi_objects::labelled_petri_net::TransitionIndex,
+    anyhow::Result, ebi_objects::labelled_petri_net::TransitionIndex, Activity,
+    FiniteStochasticPartiallyOrderedLanguage,
 };
 use std::fmt::{Debug, Display};
 
@@ -36,7 +36,7 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
-        if let Some(_) = state.trace {
+        if state.trace.is_some() {
             state.event_2_executed.all()
         } else {
             true
@@ -56,11 +56,9 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
         transition: TransitionIndex,
         state: &<Self as Semantics>::SemState,
     ) -> Option<Activity> {
-        if let Some(trace) = state.trace {
-            Some(self.traces[trace].event_2_activity[transition])
-        } else {
-            None
-        }
+        state
+            .trace
+            .map(|trace| self.traces[trace].event_2_activity[transition])
     }
 
     fn get_enabled_transitions(

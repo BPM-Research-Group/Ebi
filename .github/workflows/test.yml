@@ -1,23 +1,55 @@
 name: Test Ebi
 
 on:
+  push:
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test:
+  test_clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Clippy test
+        run: cargo clippy -- --A warnings
+        
+  test_exact_arithmetic:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: generate tests and links
         run: |
               > src/tests/tests_autogen.rs
-              > src/javascript/javascript_autogen.rs
-              cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
-              cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
+              cargo run --features test_generation -- itself tests -o src/tests/tests_autogen.rs 
+
+      - name: Run tests exact mode
+        run: cargo test --verbose --features exactarithmetic
+        
+  test_approximate_arithmetic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: generate tests and links
+        run: |
+              > src/tests/tests_autogen.rs
+              cargo run --features test_generation -- itself tests -o src/tests/tests_autogen.rs 
+
+      - name: Run tests approximate mode
+        run: cargo test --verbose --features approximatearithmetic
+        
+  test_mixed_arithmetic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: generate tests and links
+        run: |
+              > src/tests/tests_autogen.rs
+              cargo run --features test_generation -- itself tests -o src/tests/tests_autogen.rs 
 
       - name: Run tests mixed mode 1
         run: cargo test --verbose
@@ -25,11 +57,28 @@ jobs:
       - name: Run tests mixed mode 2
         run: cargo test --verbose --features exactarithmetic,approximatearithmetic
 
-      - name: Run tests exact mode
-        run: cargo test --verbose --features exactarithmetic
-
-      - name: Run tests approximate mode
-        run: cargo test --verbose --features approximatearithmetic
+  test_surface_java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: generate tests and links
+        run: |
+              > src/tests/tests_autogen.rs
+              cargo run --features test_generation -- itself tests -o src/tests/tests_autogen.rs 
 
       - name: Run tests java
         run: cargo test --verbose --features java
+  
+  test_surface_javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: generate tests and links
+        run: |
+              > src/tests/tests_autogen.rs
+              > src/surfaces/javascript/javascript_autogen.rs
+              cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
+              cargo run --features "surface_generation test_generation" -- itself surface javascript -o src/surfaces/javascript/javascript_autogen.rs
+
+      - name: Run tests javascript
+        run: cargo test --verbose --features javascript

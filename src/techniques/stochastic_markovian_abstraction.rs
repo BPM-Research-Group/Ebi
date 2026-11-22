@@ -1,18 +1,20 @@
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics,
+        stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
+    },
     techniques::tau_removal::TauRemoval,
 };
 use ebi_objects::{
-    Activity, ActivityKey, AutomatonState, HasActivityKey,
-    StochasticNondeterministicFiniteAutomaton,
-    anyhow::{Ok, Result, anyhow},
-    ebi_arithmetic::{Fraction, One, Recip, ebi_number::Zero},
+    anyhow::{anyhow, Ok, Result},
+    ebi_arithmetic::{ebi_number::Zero, Fraction, One, Recip},
     ebi_objects::{
         finite_stochastic_language::FiniteStochasticLanguage,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
     },
+    Activity, ActivityKey, AutomatonState, HasActivityKey,
+    StochasticNondeterministicFiniteAutomaton,
 };
 use itertools::Itertools;
 use rayon::prelude::*;
@@ -52,20 +54,20 @@ impl MarkovianAbstraction {
         {
             let max_len_start = max(
                 self.activity_key
-                    .get_activity_label(&self.start_activity)
+                    .activity_to_label(&self.start_activity)
                     .len(),
                 other
                     .activity_key
-                    .get_activity_label(&other.start_activity)
+                    .activity_to_label(&other.start_activity)
                     .len(),
             );
             //self
             {
                 let self_name = self
                     .activity_key
-                    .get_activity_label(&self.start_activity)
+                    .activity_to_label(&self.start_activity)
                     .to_string();
-                let self_id = self.activity_key.get_id_from_activity(self.start_activity);
+                let self_id = self.activity_key.activity_to_id(self.start_activity);
                 self.activity_key.name2activity.remove(&self_name);
                 self.activity_key
                     .name2activity
@@ -77,11 +79,9 @@ impl MarkovianAbstraction {
             {
                 let other_name = other
                     .activity_key
-                    .get_activity_label(&other.start_activity)
+                    .activity_to_label(&other.start_activity)
                     .to_string();
-                let other_id = other
-                    .activity_key
-                    .get_id_from_activity(other.start_activity);
+                let other_id = other.activity_key.activity_to_id(other.start_activity);
                 other.activity_key.name2activity.remove(&other_name);
                 other
                     .activity_key
@@ -94,20 +94,20 @@ impl MarkovianAbstraction {
         {
             let max_len_end = max(
                 self.activity_key
-                    .get_activity_label(&self.end_activity)
+                    .activity_to_label(&self.end_activity)
                     .len(),
                 other
                     .activity_key
-                    .get_activity_label(&other.end_activity)
+                    .activity_to_label(&other.end_activity)
                     .len(),
             );
             //self
             {
                 let self_name = self
                     .activity_key
-                    .get_activity_label(&self.end_activity)
+                    .activity_to_label(&self.end_activity)
                     .to_string();
-                let self_id = self.activity_key.get_id_from_activity(self.end_activity);
+                let self_id = self.activity_key.activity_to_id(self.end_activity);
                 self.activity_key.name2activity.remove(&self_name);
                 self.activity_key
                     .name2activity
@@ -119,9 +119,9 @@ impl MarkovianAbstraction {
             {
                 let other_name = other
                     .activity_key
-                    .get_activity_label(&other.end_activity)
+                    .activity_to_label(&other.end_activity)
                     .to_string();
-                let other_id = other.activity_key.get_id_from_activity(other.end_activity);
+                let other_id = other.activity_key.activity_to_id(other.end_activity);
                 other.activity_key.name2activity.remove(&other_name);
                 other
                     .activity_key
@@ -219,7 +219,7 @@ impl AbstractMarkovian for StochasticNondeterministicFiniteAutomaton {
         // 3 Build matrix and solve for x
         let n = self.termination_probabilities.len();
         // Build sparse A = (I - Delta)^T
-        let delta = build_delta(&self);
+        let delta = build_delta(self);
 
         // println!("delta {:?}", delta);
 
@@ -255,7 +255,7 @@ impl AbstractMarkovian for StochasticNondeterministicFiniteAutomaton {
 
         // 4 Compute phi for each state
         // Compute phi on ID space then translate back to Strings using the shared ActivityKey
-        let phi_ids = compute_phi_ids(&self, order, start_activity, end_activity);
+        let phi_ids = compute_phi_ids(self, order, start_activity, end_activity);
 
         // println!("phi ids {:?}", phi_ids);
 
@@ -263,7 +263,7 @@ impl AbstractMarkovian for StochasticNondeterministicFiniteAutomaton {
         let translate = |ids: &Vec<usize>| -> Vec<Activity> {
             let mut vec: Vec<Activity> = Vec::with_capacity(ids.len());
             for id in ids.iter() {
-                vec.push(self.activity_key.get_activity_by_id(*id));
+                vec.push(self.activity_key.id_to_activity(*id));
             }
             vec
         };
@@ -323,7 +323,7 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
         for (trace, probability) in self.iter_traces_probabilities() {
             // Compute M_σ^k for this trace (k-th order multiset Markovian abstraction)
             let m_sigma_k = compute_multiset_abstraction_for_trace_with_key(
-                &trace,
+                trace,
                 order,
                 start_activity,
                 end_activity,
@@ -442,8 +442,10 @@ pub fn build_embedded_snfa(
     net: &StochasticLabelledPetriNet,
 ) -> Result<StochasticNondeterministicFiniteAutomaton> {
     // Create a new SNFA without the default initial state
-    let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
-    snfa.activity_key = net.activity_key().clone();
+    let mut snfa = StochasticNondeterministicFiniteAutomaton {
+        activity_key: net.activity_key().clone(),
+        ..Default::default()
+    };
 
     // Reachability exploration queue
     let mut state2snfa_state: FxHashMap<LPNMarking, AutomatonState> = FxHashMap::default();
@@ -643,7 +645,7 @@ fn solve_sparse_linear_system_optimized(
     for i in 0..n {
         // 1. Pivot search (find first row r >= i with non zero col i)
         let pivot = (i..n)
-            .find(|&r| find_col(&a[r], i).map_or(false, |idx| !a[r][idx].1.is_zero()))
+            .find(|&r| find_col(&a[r], i).is_some_and(|idx| !a[r][idx].1.is_zero()))
             .ok_or_else(|| anyhow!("Matrix is singular"))?;
 
         if pivot != i {
@@ -673,18 +675,16 @@ fn solve_sparse_linear_system_optimized(
             left.par_iter_mut()
                 .enumerate()
                 .filter_map(|(r, row)| {
-                    find_col(row, i)
-                        .map(|idx| {
-                            let factor = row[idx].1.clone();
-                            row[idx].1 = Fraction::zero(); // lazy zeroing avoids shift
-                            if factor.is_zero() {
-                                None
-                            } else {
-                                saxpy_row(row, i, pivot_ref, &factor);
-                                Some((r, factor))
-                            }
-                        })
-                        .flatten()
+                    find_col(row, i).and_then(|idx| {
+                        let factor = row[idx].1.clone();
+                        row[idx].1 = Fraction::zero(); // lazy zeroing avoids shift
+                        if factor.is_zero() {
+                            None
+                        } else {
+                            saxpy_row(row, i, pivot_ref, &factor);
+                            Some((r, factor))
+                        }
+                    })
                 })
                 .collect::<Vec<_>>(),
         );
@@ -696,18 +696,16 @@ fn solve_sparse_linear_system_optimized(
                 .enumerate()
                 .filter_map(|(off, row)| {
                     let r = i + 1 + off;
-                    find_col(row, i)
-                        .map(|idx| {
-                            let factor = row[idx].1.clone();
-                            row[idx].1 = Fraction::zero();
-                            if factor.is_zero() {
-                                None
-                            } else {
-                                saxpy_row(row, i, pivot_ref, &factor);
-                                Some((r, factor))
-                            }
-                        })
-                        .flatten()
+                    find_col(row, i).and_then(|idx| {
+                        let factor = row[idx].1.clone();
+                        row[idx].1 = Fraction::zero();
+                        if factor.is_zero() {
+                            None
+                        } else {
+                            saxpy_row(row, i, pivot_ref, &factor);
+                            Some((r, factor))
+                        }
+                    })
                 })
                 .collect::<Vec<_>>(),
         );
@@ -731,7 +729,7 @@ fn solve_sparse_linear_system(
     for i in 0..n {
         // Find pivot
         let mut pivot = i;
-        while pivot < n && a[pivot].get(&i).map_or(true, |v| v.is_zero()) {
+        while pivot < n && a[pivot].get(&i).is_none_or(|v| v.is_zero()) {
             pivot += 1;
         }
         if pivot == n {
@@ -757,21 +755,21 @@ fn solve_sparse_linear_system(
             if r == i {
                 continue;
             }
-            if let Some(factor_val) = a[r].get(&i).cloned() {
-                if !factor_val.is_zero() {
-                    // subtract factor * row_i from row_r
-                    let keys: Vec<(usize, Fraction)> =
-                        a[i].iter().map(|(k, v)| (*k, v.clone())).collect();
-                    for (c, val_i) in keys {
-                        let product = &factor_val * &val_i;
-                        let entry = a[r].entry(c).or_insert_with(Fraction::zero);
-                        *entry = &*entry - &product;
-                        if entry.is_zero() {
-                            a[r].remove(&c);
-                        }
+            if let Some(factor_val) = a[r].get(&i).cloned()
+                && !factor_val.is_zero()
+            {
+                // subtract factor * row_i from row_r
+                let keys: Vec<(usize, Fraction)> =
+                    a[i].iter().map(|(k, v)| (*k, v.clone())).collect();
+                for (c, val_i) in keys {
+                    let product = &factor_val * &val_i;
+                    let entry = a[r].entry(c).or_insert_with(Fraction::zero);
+                    *entry = &*entry - &product;
+                    if entry.is_zero() {
+                        a[r].remove(&c);
                     }
-                    b[r] -= &factor_val * &pivot_b;
                 }
+                b[r] -= &factor_val * &pivot_b;
             }
         }
     }
@@ -788,8 +786,8 @@ fn compute_phi_ids(
 ) -> Vec<FxHashMap<Vec<usize>, Fraction>> {
     let n = snfa.termination_probabilities.len();
     // Compute numeric IDs for "+" and "-" for quick comparisons
-    let id_plus = snfa.activity_key().get_id_from_activity(start_activity);
-    let id_minus = snfa.activity_key().get_id_from_activity(end_activity);
+    let id_plus = snfa.activity_key().activity_to_id(start_activity);
+    let id_minus = snfa.activity_key().activity_to_id(end_activity);
     let mut phi: Vec<FxHashMap<Vec<usize>, Fraction>> = vec![FxHashMap::default(); n];
 
     // println!("\tstart act {}", id_plus);
@@ -809,7 +807,6 @@ fn compute_phi_ids(
         state_idx: AutomatonState,
         remaining: usize,
         snfa: &StochasticNondeterministicFiniteAutomaton,
-        start_activity: Activity,
         end_activity: Activity,
         cache: &mut FxHashMap<(AutomatonState, usize), SuffixMap>,
     ) -> SuffixMap {
@@ -827,26 +824,20 @@ fn compute_phi_ids(
             for (_, target, label, probability) in snfa.outgoing_edges(state_idx) {
                 if label == &Some(end_activity) {
                     // End marker -> stop exploring beyond this symbol
-                    let arc = vec![snfa.activity_key().get_id_from_activity(end_activity)];
+                    let arc = vec![snfa.activity_key().activity_to_id(end_activity)];
                     result
                         .entry(arc)
                         .and_modify(|v| *v += probability)
                         .or_insert_with(|| probability.clone());
                 } else {
                     // Recurse to target with one fewer remaining symbol
-                    let child_map = collect_suffixes(
-                        *target,
-                        remaining - 1,
-                        snfa,
-                        start_activity,
-                        end_activity,
-                        cache,
-                    );
+                    let child_map =
+                        collect_suffixes(*target, remaining - 1, snfa, end_activity, cache);
                     for (suf, w) in &child_map {
                         let mut vec = Vec::with_capacity(1 + suf.len());
                         //at this point, every label should have a transition
                         let label = label.unwrap();
-                        vec.push(snfa.activity_key().get_id_from_activity(label));
+                        vec.push(snfa.activity_key().activity_to_id(label));
                         vec.extend_from_slice(&suf[..]);
                         let weight = probability * w;
                         result
@@ -864,14 +855,8 @@ fn compute_phi_ids(
 
     // Build phi for every potential start state
     for state in 0..n {
-        let suffixes = collect_suffixes(
-            AutomatonState::of(state),
-            k,
-            snfa,
-            start_activity,
-            end_activity,
-            &mut cache,
-        );
+        let suffixes =
+            collect_suffixes(AutomatonState::of(state), k, snfa, end_activity, &mut cache);
 
         // println!("\tstate {}, suffixes {:?}", state, suffixes);
 
@@ -902,12 +887,12 @@ mod tests {
         },
     };
     use ebi_objects::{
-        ActivityKeyTranslator, HasActivityKey, IntoRefTraceProbabilityIterator,
-        TranslateActivityKey,
         ebi_objects::{
             event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage,
             stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         },
+        ActivityKeyTranslator, HasActivityKey, IntoRefTraceProbabilityIterator,
+        TranslateActivityKey,
     };
     use std::fs;
 

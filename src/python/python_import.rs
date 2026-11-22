@@ -423,7 +423,7 @@ impl ImportableFromPM4Py for LabelledPetriNet {
         };
 
         // Build labels vector for transitions.
-        let mut activity_key = ActivityKey::new();
+        let mut activity_key = ActivityKey::default();
         let mut labels = Vec::with_capacity(num_transitions);
         for trans in transitions.iter() {
             if let Ok(label_obj) = trans.getattr("label") {

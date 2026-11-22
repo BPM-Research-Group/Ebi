@@ -43,7 +43,7 @@ impl FilterStochasticTraces for FiniteStochasticLanguage {
         );
 
         let mut x = a
-            .into_iter()
+            .iter_mut()
             .map(|(trace, probability)| (trace.clone(), probability.clone()))
             .collect::<HashMap<_, _, FnvBuildHasher>>();
 
@@ -71,7 +71,7 @@ impl FilterStochasticTraces for FiniteStochasticLanguage {
         );
 
         let mut x = a
-            .into_iter()
+            .iter_mut()
             .map(|(trace, probability)| (trace.clone(), probability.clone()))
             .collect::<HashMap<_, _, FnvBuildHasher>>();
 
@@ -104,7 +104,7 @@ impl FilterStochasticTraces for dyn EbiTraitFiniteStochasticLanguage {
         );
 
         let mut x = a
-            .into_iter()
+            .iter_mut()
             .map(|(trace, probability)| (trace.clone(), probability.clone()))
             .collect::<HashMap<_, _, FnvBuildHasher>>();
 
@@ -137,7 +137,7 @@ impl FilterStochasticTraces for dyn EbiTraitFiniteStochasticLanguage {
         );
 
         let mut x = a
-            .into_iter()
+            .iter_mut()
             .map(|(trace, probability)| (trace.clone(), probability.clone()))
             .collect::<HashMap<_, _, FnvBuildHasher>>();
 

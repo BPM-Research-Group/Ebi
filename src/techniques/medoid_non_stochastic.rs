@@ -3,9 +3,9 @@ use crate::{
     math::distances::TriangularDistanceMatrix,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
+    ebi_arithmetic::{f, Fraction, One, Signed, Zero},
     FiniteLanguage,
-    anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, One, Signed, Zero, f},
 };
 use std::sync::Arc;
 
@@ -30,12 +30,7 @@ where
 
         if number_of_traces.is_one() {
             if let Some(trace_number) = medoid_single(self, &distances) {
-                result.insert(
-                    self.iter_traces()
-                        .nth(trace_number)
-                        .unwrap()
-                        .to_owned(),
-                );
+                result.insert(self.iter_traces().nth(trace_number).unwrap().to_owned());
                 return Ok((activity_key, result).into());
             } else {
                 return Err(anyhow!(
@@ -95,7 +90,7 @@ where
                 number_of_clusters
             ));
         }
-        if number_of_clusters <= 0 {
+        if number_of_clusters == 0 {
             return Err(anyhow!("No clusters were requested"));
         }
 
@@ -129,7 +124,7 @@ where
 {
     let sum_distance = sum_distances(log, distances);
 
-    if distances.len() == 0 {
+    if distances.is_empty() {
         return None;
     }
 
@@ -141,7 +136,7 @@ where
         }
     }
 
-    return Some(min_pos);
+    Some(min_pos)
 }
 
 pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fraction>
@@ -159,7 +154,7 @@ where
 }
 
 /**
- * All functions below are GPL-3, and adapted from https://github.com/kno10/rust-kmedoids/tree/main.
+ * All functions below are GPL-3, and adapted from <https://github.com/kno10/rust-kmedoids/tree/main>.
  *
 /// ## Example
 /// Given a dissimilarity matrix of size 4 x 4, use:
@@ -172,7 +167,7 @@ where
  */
 pub fn fasterpam(
     distances: &TriangularDistanceMatrix,
-    medoids: &mut Vec<usize>,
+    medoids: &mut [usize],
     maxiter: usize,
 ) -> (Fraction, Vec<usize>, usize, usize) {
     let (n, k) = (distances.len(), medoids.len());
@@ -226,7 +221,6 @@ pub(crate) fn initial_assignment(
     medoids: &[usize],
 ) -> (Fraction, Vec<Rec>) {
     let (n, k) = (distances.len(), medoids.len());
-    assert!(n <= usize::MAX, "N is too large");
     assert!(k > 0 && k < usize::MAX, "invalid N");
     assert!(k <= n, "k must be at most N");
     let mut data = vec![Rec::empty(); distances.len()];
@@ -295,7 +289,7 @@ pub(crate) fn find_best_swap(
 }
 
 /// Update the loss when removing each medoid
-pub(crate) fn update_removal_loss(data: &[Rec], loss: &mut Vec<Fraction>) {
+pub(crate) fn update_removal_loss(data: &[Rec], loss: &mut [Fraction]) {
     loss.fill(Fraction::zero()); // stable since 1.50
     for rec in data.iter() {
         loss[rec.near.index] += rec.seco.distance.as_ref();
@@ -332,8 +326,8 @@ pub(crate) fn update_second_nearest(
 #[inline]
 pub(crate) fn do_swap(
     distances: &TriangularDistanceMatrix,
-    medoids: &mut Vec<usize>,
-    data: &mut Vec<Rec>,
+    medoids: &mut [usize],
+    data: &mut [Rec],
     b: usize,
     j: usize,
 ) -> Fraction {
@@ -502,14 +496,14 @@ pub(crate) fn debug_assert_assignment(
 
 /// Find the minimum (index and value)
 #[inline]
-pub(crate) fn find_min<'a, I: 'a>(a: &mut I) -> (usize, &'a Fraction)
+pub(crate) fn find_min<'a, I>(a: &mut I) -> (usize, &'a Fraction)
 where
-    I: std::iter::Iterator<Item = &'a Fraction>,
+    I: std::iter::Iterator<Item = &'a Fraction> + 'a,
 {
     let mut a = a.enumerate();
     let mut best = (0, a.next().unwrap().1);
     for (ik, iv) in a {
-        if iv < &best.1 {
+        if iv < best.1 {
             best = (ik, iv);
         }
     }

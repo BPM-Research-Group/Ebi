@@ -13,18 +13,17 @@ use crate::{
         ebi_command_probability, ebi_command_reduce, ebi_command_sample, ebi_command_test,
         ebi_command_validate, ebi_command_visualise,
     },
-    ebi_framework::{ebi_importer_parameters, ebi_output},
-    prom::java_object_handler::get_possible_inputs_with_java,
+    ebi_framework::{ebi_importer_parameters, ebi_input::attempt_parse, ebi_output},
+    multiple_reader::MultipleReader,
     text::Joiner,
 };
-use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
+use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use ebi_objects::{
+    anyhow::{anyhow, Context, Result},
+    ebi_arithmetic::{exact::set_exact_globally, parsing::FractionNotParsedYet, Fraction},
     EbiObjectType,
-    anyhow::{Context, Result, anyhow},
-    ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotParsedYet},
 };
 use indicatif::{ProgressBar, ProgressStyle};
-use itertools::Itertools;
 use log::Level;
 use logging_timer::timer;
 use std::{
@@ -261,7 +260,7 @@ impl EbiCommand {
                 }
             }
         };
-        return command;
+        command
     }
 
     pub fn short_name(&self) -> &str {
@@ -279,7 +278,7 @@ impl EbiCommand {
                 ..
             } => match name_long {
                 Some(x) => x,
-                None => &name_short,
+                None => name_short,
             },
             EbiCommand::Command {
                 name_short,
@@ -287,7 +286,7 @@ impl EbiCommand {
                 ..
             } => match name_long {
                 Some(x) => x,
-                None => &name_short,
+                None => name_short,
             },
         }
     }
@@ -296,11 +295,11 @@ impl EbiCommand {
         match self {
             EbiCommand::Group {
                 explanation_short, ..
-            } => &explanation_short,
+            } => explanation_short,
 
             EbiCommand::Command {
                 explanation_short, ..
-            } => &explanation_short,
+            } => explanation_short,
         }
     }
 
@@ -312,7 +311,7 @@ impl EbiCommand {
                 ..
             } => match explanation_long {
                 Some(x) => x,
-                None => &explanation_short,
+                None => explanation_short,
             },
             EbiCommand::Command {
                 explanation_short,
@@ -320,7 +319,7 @@ impl EbiCommand {
                 ..
             } => match explanation_long {
                 Some(x) => x,
-                None => &explanation_short,
+                None => explanation_short,
             },
         }
     }
@@ -328,7 +327,7 @@ impl EbiCommand {
     pub fn get_progress_bar_ticks(total_ticks: usize) -> ProgressBar {
         let pb = ProgressBar::new(total_ticks.try_into().unwrap());
         pb.set_style(
-            ProgressStyle::with_template(&("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}".to_owned()))
+            ProgressStyle::with_template("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}")
                 .unwrap()
                 .progress_chars("#>-"),
         );
@@ -338,7 +337,7 @@ impl EbiCommand {
 
     pub fn get_progress_bar_message(message: String) -> ProgressBar {
         let pb = ProgressBar::new_spinner();
-        pb.set_style(ProgressStyle::with_template(&("{spinner} {wide_msg}")).unwrap());
+        pb.set_style(ProgressStyle::with_template("{spinner} {wide_msg}").unwrap());
         pb.enable_steady_tick(Duration::from_millis(100));
         pb.set_message(message);
         pb.tick();
@@ -435,6 +434,67 @@ impl EbiCommand {
         Err(anyhow!("command not recognised"))
     }
 
+    /**
+     * Execute a command (given as a string) with inputs (given as strings).
+     */
+    pub fn execute_command_strings(
+        command_name: &str,
+        string_inputs: Vec<String>,
+    ) -> Result<EbiOutput> {
+        let binding = EBI_COMMANDS
+            .find_command_with_string(command_name)
+            .ok_or(anyhow!("Command `{command_name}` not found"))?;
+        let command = binding
+            .last()
+            .ok_or(anyhow!("Command not found as binding not found."))?;
+
+        if let EbiCommand::Command {
+            execute,
+            input_types: input_typess,
+            input_names,
+            output_type,
+            ..
+        } = command
+        {
+            //read the inputs
+            let mut inputs = vec![];
+            for ((input_types, input_name), string_input) in input_typess
+                .iter()
+                .zip(input_names.iter())
+                .zip(string_inputs)
+            {
+                //read input
+                let input = attempt_parse(input_types, MultipleReader::String(string_input))
+                    .with_context(|| format!("Reading parameter {}.", input_name))?;
+                inputs.push(input);
+            }
+
+            //call the command
+            let result = (execute)(inputs, None)?;
+
+            if &&result.get_type() != output_type {
+                return Err(anyhow!(
+                    "Output type {} does not match the declared output of {}.",
+                    result.get_type(),
+                    output_type
+                ));
+            }
+
+            Ok(result)
+        } else {
+            Err(anyhow!("Command not found"))
+        }
+    }
+
+    pub fn execute_command_strings_string(
+        command_name: &str,
+        output_format_extension: &str,
+        string_inputs: Vec<String>,
+    ) -> Result<String> {
+        Self::execute_command_strings(command_name, string_inputs)?
+            .attempt_export_as_string(output_format_extension)
+    }
+
     pub fn select_exporter(
         output_type: &EbiOutputType,
         to_file: Option<&PathBuf>,
@@ -465,28 +525,25 @@ impl EbiCommand {
                 //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
                 {
                     let mut exporters = exporters.clone();
-                    exporters.sort_by(|a, b| a.get_extension().len().cmp(&b.get_extension().len()));
+                    exporters.sort_by_key(|a| a.get_extension().len());
 
                     //see whether an output extension matches the requested file
                     for exporter in exporters {
-                        if let EbiExporter::Object(_, file_handler) = exporter {
-                            if file
+                        if let EbiExporter::Object(_, file_handler) = exporter
+                            && file
                                 .display()
                                 .to_string()
                                 .ends_with(&(".".to_string() + file_handler.file_extension))
-                            {
-                                return Ok(exporter);
-                            }
+                        {
+                            return Ok(exporter);
                         }
                     }
                 }
 
                 //otherwise, take the default one
-                return Ok(output_type.get_default_exporter());
+                Ok(output_type.get_default_exporter())
             }
-            None => {
-                return Ok(output_type.get_default_exporter());
-            }
+            None => Ok(output_type.get_default_exporter()),
         }
     }
 
@@ -562,51 +619,51 @@ impl EbiCommand {
                     }
                 }
                 EbiInputType::FileHandler => {
-                    if let Some(value) = cli_matches.get_one::<EbiFileHandler>(&cli_id) {
+                    if let Some(value) = cli_matches.get_one::<EbiFileHandler>(cli_id) {
                         return Ok(EbiInput::FileHandler(value.clone()));
                     }
                 }
                 EbiInputType::String(None, _) => {
-                    if let Some(value) = cli_matches.get_one::<String>(&cli_id) {
-                        return Ok(EbiInput::String(value.clone(), &input_type));
+                    if let Some(value) = cli_matches.get_one::<String>(cli_id) {
+                        return Ok(EbiInput::String(value.clone(), input_type));
                     }
                 }
                 EbiInputType::String(Some(allowed_values), _) => {
-                    if let Some(value) = cli_matches.get_one::<String>(&cli_id) {
+                    if let Some(value) = cli_matches.get_one::<String>(cli_id) {
                         if allowed_values.contains(&value.as_str()) {
-                            return Ok(EbiInput::String(value.clone(), &input_type));
+                            return Ok(EbiInput::String(value.clone(), input_type));
                         } else {
                             error = Some(anyhow!("value should be one of {:?}", allowed_values));
                         }
                     }
                 }
                 EbiInputType::Usize(min, max, _) => {
-                    if let Some(value) = cli_matches.get_one::<usize>(&cli_id) {
+                    if let Some(value) = cli_matches.get_one::<usize>(cli_id) {
                         match (min, max) {
                             (Some(min), Some(max)) => {
                                 if value < min || value > max {
                                     error =
                                         Some(anyhow!("Value must be between {} and {}.", min, max))
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                    return Ok(EbiInput::Usize(*value, input_type));
                                 }
                             }
                             (Some(min), None) => {
                                 if value < min {
                                     error = Some(anyhow!("Value must be below {}.", min))
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                    return Ok(EbiInput::Usize(*value, input_type));
                                 }
                             }
                             (None, Some(max)) => {
                                 if value > max {
                                     error = Some(anyhow!("Value must be above {}.", max))
                                 } else {
-                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                    return Ok(EbiInput::Usize(*value, input_type));
                                 }
                             }
                             (None, None) => {
-                                return Ok(EbiInput::Usize(value.clone(), input_type));
+                                return Ok(EbiInput::Usize(*value, input_type));
                             }
                         }
                     }
@@ -617,7 +674,7 @@ impl EbiCommand {
                     }
                 }
                 EbiInputType::Fraction(min, max, _) => {
-                    if let Some(value) = cli_matches.get_one::<FractionNotParsedYet>(&cli_id) {
+                    if let Some(value) = cli_matches.get_one::<FractionNotParsedYet>(cli_id) {
                         let value: Fraction = value.try_into()?;
 
                         match (min, max) {
@@ -668,13 +725,10 @@ impl EbiCommand {
         result.join(" ")
     }
 
-    pub fn find_command_with_string(&self, name: &String) -> Option<Vec<&EbiCommand>> {
-        for path in self.get_command_paths() {
-            if Self::path_to_string(&path) == *name {
-                return Some(path);
-            }
-        }
-        None
+    pub fn find_command_with_string(&self, name: &str) -> Option<Vec<&EbiCommand>> {
+        self.get_command_paths()
+            .into_iter()
+            .find(|path| Self::path_to_string(path) == *name)
     }
 
     pub fn get_command_paths(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
@@ -733,28 +787,12 @@ impl EbiCommand {
     pub fn is_in_java(&self) -> bool {
         if let EbiCommand::Command {
             cli_command,
-            output_type,
-            input_types: input_typess,
+            input_types,
             ..
         } = &self
         {
-            if cli_command.is_some() {
-                return false;
-            }
-            for exporter in output_type.get_exporters() {
-                for output_java_object_handler in exporter.get_java_object_handlers() {
-                    if let Some(_) = output_java_object_handler.translator_ebi_to_java {
-                        let input_typesss = input_typess
-                            .iter()
-                            .map(|arr| get_possible_inputs_with_java(arr))
-                            .collect::<Vec<_>>();
-                        for _ in input_typesss.iter().multi_cartesian_product() {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            //Java gives each argument as one text, which cannot carry a list of texts
+            cli_command.is_none() && !input_types.is_empty() && !takes_a_string_list(input_types)
         } else {
             false
         }
@@ -767,7 +805,7 @@ impl EbiCommand {
             ..
         } = &self
         {
-            return cli_command.is_none() && !input_types.is_empty();
+            cli_command.is_none() && !input_types.is_empty()
         } else {
             false
         }
@@ -781,14 +819,18 @@ impl EbiCommand {
         } = &self
         {
             //JavascriptInput carries only text or bytes, so it cannot carry a list of texts
-            let has_list = input_types
-                .iter()
-                .any(|alternatives| alternatives.contains(&&EbiInputType::StringList));
-            return cli_command.is_none() && !input_types.is_empty() && !has_list;
+            cli_command.is_none() && !input_types.is_empty() && !takes_a_string_list(input_types)
         } else {
             false
         }
     }
+}
+
+/// Whether a command takes a list of texts. A surface that cannot carry a list does not offer such a command.
+fn takes_a_string_list(input_types: &[&[&EbiInputType]]) -> bool {
+    input_types
+        .iter()
+        .any(|alternatives| alternatives.contains(&&EbiInputType::StringList))
 }
 
 impl Ord for EbiCommand {
@@ -799,7 +841,7 @@ impl Ord for EbiCommand {
 
 impl PartialOrd for EbiCommand {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.long_name().partial_cmp(other.long_name())
+        Some(self.cmp(other))
     }
 }
 
@@ -932,7 +974,7 @@ pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'st
     result
 }
 
-#[cfg(any(feature = "python", feature = "test_generation"))]
+#[cfg(any(feature = "surface_generation", feature = "test_generation"))]
 pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<String> {
     //start the search from the EBI_COMMANDS const
     let mut path = path.clone();
@@ -954,7 +996,7 @@ pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<
     ))
 }
 
-#[cfg(any(feature = "python", feature = "test_generation"))]
+#[cfg(any(feature = "surface_generation", feature = "test_generation"))]
 fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     let file = "src/ebi_framework/ebi_command.rs";
     let contents = std::fs::read_to_string(file)?;
@@ -975,7 +1017,7 @@ fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     return Err(anyhow!("source file not found"));
 }
 
-#[cfg(any(feature = "python", feature = "test_generation"))]
+#[cfg(any(feature = "surface_generation", feature = "test_generation"))]
 fn search_child(
     parent_declaration: &syn::ItemConst,
     child_command: &EbiCommand,
@@ -1038,7 +1080,7 @@ fn search_child(
     return Err(anyhow!("todo file not found {}", child_command));
 }
 
-#[cfg(any(feature = "python", feature = "test_generation"))]
+#[cfg(any(feature = "surface_generation", feature = "test_generation"))]
 fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
     if let syn::Expr::Struct(x) = &*const_item.expr {
         for field in &x.fields {
@@ -1082,7 +1124,7 @@ fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::{EBI_COMMANDS, EbiCommand, EbiInputType};
+    use super::{EbiCommand, EbiInputType, EBI_COMMANDS};
     use std::collections::HashSet;
 
     /// A StringList takes all remaining values on the command line, so it can only be the last input.

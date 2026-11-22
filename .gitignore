@@ -51,3 +51,7 @@ venv/
 /python/ebi/*.pyd
 /python/ebi/*.so
 /python/ebi/*.pdb
+
+*.class
+src/surfaces/java/target
+pkg

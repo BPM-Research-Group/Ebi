@@ -167,7 +167,7 @@ pub const EBI_DISCOVER_ALIGNMENTS_SLPN: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_CIBDO: EbiCommand = EbiCommand::Command {
     name_short: "cibdo",
     name_long: Some("can-it-be-done-optimally"),
-    explanation_short: "Given an event log and an LPN, construct a stochastic labeled Petri net directly from the log by optimizing the uEMSC of the work.",
+    explanation_short: "Given an event log and a labelled Petri net, assign weights to the transitions in the net, such that the uEMSC score of the net and the log is optimised.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/caise/LeemansLMP24}"),
     cli_command: None,
@@ -176,7 +176,7 @@ pub const EBI_DISCOVER_CIBDO: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "LPN"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
         "A labelled Petri net with the control flow.",

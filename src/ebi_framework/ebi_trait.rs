@@ -1,6 +1,6 @@
 use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+    ebi_command::{EbiCommand, EBI_COMMANDS},
+    ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
     ebi_input::{EbiInput, EbiInputType},
 };
 use crate::ebi_traits::{
@@ -10,7 +10,7 @@ use crate::ebi_traits::{
     ebi_trait_stochastic_semantics,
 };
 use ebi_objects::{
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::Fraction,
 };
 use std::{
@@ -96,7 +96,7 @@ impl EbiTrait {
             if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
                 for input_typess in input_types.iter() {
                     for input_typesss in input_typess.iter() {
-                        if input_typesss == &&EbiInputType::Trait(self.clone()) {
+                        if input_typesss == &&EbiInputType::Trait(*self) {
                             return true;
                         }
                     }
@@ -153,9 +153,7 @@ impl Ord for EbiTrait {
 
 impl PartialOrd for EbiTrait {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.to_string()
-            .to_lowercase()
-            .partial_cmp(&other.to_string().to_lowercase())
+        Some(self.cmp(other))
     }
 }
 
@@ -174,7 +172,7 @@ impl FromEbiTraitObject for Fraction {
         match object {
             EbiInput::Fraction(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a fraction",
+                "Cannot read {} {} as a fraction.",
                 object.get_type().get_article(),
                 object.get_type()
             )),
@@ -187,7 +185,7 @@ impl FromEbiTraitObject for usize {
         match object {
             EbiInput::Usize(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as an integer",
+                "Cannot read {} {} as an integer.",
                 object.get_type().get_article(),
                 object.get_type()
             )),
@@ -227,7 +225,7 @@ mod tests {
 
     use crate::{
         ebi_framework::ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE},
-        prom::java_object_handler::JavaObjectHandlerQueryImport,
+        surfaces::java::java_object_handler::JavaObjectHandlerQueryImport,
     };
 
     use super::{EbiTrait, FromEbiTraitObject};

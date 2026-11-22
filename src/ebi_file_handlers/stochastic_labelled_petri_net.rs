@@ -14,11 +14,11 @@ use crate::{
         },
         validate::Validate,
     },
-    prom::java_object_handler::JavaObjectHandler,
+    surfaces::java::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, Importable, StochasticLabelledPetriNet,
-    anyhow::{Result, anyhow},
 };
 
 pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
@@ -102,7 +102,7 @@ impl FromEbiTraitObject for StochasticLabelledPetriNet {
         match object {
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a stochastic labelled Petri net",
+                "Cannot read {} {} as a stochastic labelled Petri net.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

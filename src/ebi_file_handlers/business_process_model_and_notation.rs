@@ -81,7 +81,7 @@ impl FromEbiTraitObject for BusinessProcessModelAndNotation {
         match object {
             EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a Business Process Model and Notation",
+                "Cannot read {} {} as a Business Process Model and Notation.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

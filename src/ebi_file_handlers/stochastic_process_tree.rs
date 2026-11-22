@@ -84,7 +84,7 @@ impl FromEbiTraitObject for StochasticProcessTree {
         match object {
             EbiInput::Object(EbiObject::StochasticProcessTree(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a stochastic process tree",
+                "Cannot read {} {} as a stochastic process tree.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

@@ -1,0 +1,48 @@
+name: Release Npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Update version number
+        id: version
+        run: |
+          cargo install cargo-edit
+          VERS=${{ github.ref_name }}
+          VERS="${VERS:1}"
+          cargo set-version "$VERS"
+
+      - name: Build NPM package
+        run: |
+          cargo run --features surface_generation -- itself surface javascript -o src/surfaces/javascript/javascript_autogen.rs
+          wasm-pack build -- --features javascript
+          sed -i 's/"name": "ebi"/"name": "ebi_pm"/' pkg/package.json
+          wasm-pack pack
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      
+      - name: Publish to NPM
+        run: |
+          cd pkg
+          npm publish

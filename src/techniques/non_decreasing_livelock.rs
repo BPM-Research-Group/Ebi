@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::displayable::Displayable,
-    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics},
 };
 use ebi_objects::{
     AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet,

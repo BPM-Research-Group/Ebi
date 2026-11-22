@@ -46,7 +46,7 @@ impl FromEbiTraitObject for StochasticLanguageOfAlignments {
         match object {
             EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a finite language",
+                "Cannot read {} {} as a finite language.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

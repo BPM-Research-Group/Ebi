@@ -1,8 +1,8 @@
 use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
-    Activity,
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::finite_stochastic_partially_ordered_language::PartiallyOrderedTrace,
+    Activity,
 };
 use itertools::Itertools;
 use pathfinding::prelude::astar;
@@ -48,12 +48,11 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
                 }
 
                 //synchronous move
-                if let Some(po_activity) = other.event_2_activity.get(event) {
-                    if let Some(activity) = self.get(*trace_index)
-                        && po_activity == activity
-                    {
-                        result.push(((trace_index + 1, new_state), 0));
-                    }
+                if let Some(po_activity) = other.event_2_activity.get(event)
+                    && let Some(activity) = self.get(*trace_index)
+                    && po_activity == activity
+                {
+                    result.push(((trace_index + 1, new_state), 0));
                 }
             }
             result
@@ -122,7 +121,7 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
             for ((new_marking_self, activity_self), (new_marking_other, activity_other)) in
                 successors_self
                     .into_iter()
-                    .cartesian_product(successors_other.into_iter())
+                    .cartesian_product(successors_other)
             {
                 if activity_self == activity_other {
                     //synchronous move
@@ -174,10 +173,9 @@ struct PartiallyOrderedTraceMarking {
 
 impl PartiallyOrderedTraceMarking {
     pub fn from_trace(po_trace: &PartiallyOrderedTrace) -> Self {
-        let result = Self {
+        Self {
             event_2_executed: bitvec!(0; po_trace.number_of_events()),
-        };
-        result
+        }
     }
 
     pub fn enabled_events(&self, po_trace: &PartiallyOrderedTrace) -> impl Iterator<Item = usize> {
@@ -215,8 +213,8 @@ impl Display for PartiallyOrderedTraceMarking {
 mod tests {
     use crate::techniques::partially_ordered_trace_distance::PartiallyOrderedTraceDistance;
     use ebi_objects::{
-        FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
         ebi_arithmetic::{Fraction, One, Zero},
+        FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
     };
     use std::fs;
 
@@ -232,11 +230,11 @@ mod tests {
 
         let ac0 = spolang
             .activity_key()
-            .process_activity_attempt("Register claim\n(2min)")
+            .try_process_activity("Register claim\n(2min)")
             .unwrap();
         let ac1 = spolang
             .activity_key()
-            .process_activity_attempt("Check easy claim\n(5 min)")
+            .try_process_activity("Check easy claim\n(5 min)")
             .unwrap();
 
         let trace = vec![ac0, ac1];

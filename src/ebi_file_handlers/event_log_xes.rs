@@ -20,10 +20,12 @@ use crate::{
         },
         validate::Validate,
     },
-    prom::java_object_handler::JavaObjectHandler,
+    surfaces::java::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
-    EbiObject, EventLog, EventLogCsv, EventLogTraceAttributes, EventLogXes, Exportable, Importable, anyhow::{Result, anyhow}, ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+    anyhow::{anyhow, Result},
+    ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+    EbiObject, EventLog, EventLogCsv, EventLogTraceAttributes, EventLogXes, Exportable, Importable,
 };
 
 pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
@@ -225,7 +227,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let mut log = fin.parse::<EventLog>().unwrap();
 
-        let mut activity_key = ActivityKey::new();
+        let mut activity_key = ActivityKey::default();
         log.translate_using_activity_key(&mut activity_key);
     }
 

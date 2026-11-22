@@ -26,7 +26,7 @@ use crate::{
     },
     ebi_validate,
     multiple_reader::MultipleReader,
-    surfaces::website::website_generation::FILE_HANDLERS_PAGE,
+    surfaces::website::website_link::FILE_HANDLERS_PAGE,
     text::Joiner,
 };
 use clap::{builder::ValueParser, value_parser, ArgMatches};
@@ -45,6 +45,7 @@ use std::{
 };
 use strum_macros::{EnumIs, EnumIter, IntoStaticStr};
 
+#[allow(clippy::large_enum_variant)]
 pub enum EbiInput {
     Trait(EbiTraitObject, &'static EbiFileHandler),
     Object(EbiObject, &'static EbiFileHandler),
@@ -92,6 +93,13 @@ macro_rules! EbiInputTypeEnum {
     };
 }
 
+#[macro_export]
+macro_rules! EbiInputTypeEnumDefault {
+    ($t:ident, $d:expr) => {
+        EbiInputType::String(Some($t::VARIANTS), Some($d.into_str()))
+    };
+}
+
 #[derive(PartialEq, Eq, EnumIter, Clone, Debug, EnumIs)]
 pub enum EbiInputType {
     Trait(EbiTrait),
@@ -125,18 +133,13 @@ impl EbiInputType {
             EbiInputType::Object(_) => None,
             EbiInputType::AnyObject => None,
             EbiInputType::FileHandler => None,
-            EbiInputType::String(_, string) => match string {
-                Some(string) => Some(string.to_string()),
-                None => None,
-            },
-            EbiInputType::Usize(_, _, integer) => match integer {
-                Some(integer) => Some(integer.to_string()),
-                None => None,
-            },
-            EbiInputType::Fraction(_, _, default) => match default {
-                Some(fraction) => Some(fraction.to_string()),
-                None => None,
-            },
+            EbiInputType::String(_, string) => string.as_ref().map(|string| string.to_string()),
+            EbiInputType::Usize(_, _, integer) => {
+                integer.as_ref().map(|integer| integer.to_string())
+            }
+            EbiInputType::Fraction(_, _, default) => {
+                default.as_ref().map(|fraction| fraction.to_string())
+            }
             EbiInputType::StringList => None,
         }
     }
@@ -159,7 +162,7 @@ impl EbiInputType {
             EbiInputType::Trait(_) => value_parser!(PathBuf),
             EbiInputType::Object(_) => value_parser!(PathBuf),
             EbiInputType::AnyObject => value_parser!(PathBuf),
-            EbiInputType::String(_, _) => value_parser!(String).into(),
+            EbiInputType::String(_, _) => value_parser!(String),
             EbiInputType::Usize(_, _, _) => value_parser!(usize).into(),
             EbiInputType::FileHandler => value_parser!(EbiFileHandler).into(),
             EbiInputType::Fraction(_, _, _) => value_parser!(FractionNotParsedYet).into(),
@@ -779,7 +782,7 @@ impl EbiTraitImporter {
     }
 
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
-        let mut result = ImporterParameterValues::new();
+        let mut result = ImporterParameterValues::default();
         for parameter in self.parameters() {
             result.insert(*parameter, (parameter.default(), false));
         }
@@ -840,7 +843,7 @@ impl EbiTraitImporter {
 
 impl Display for EbiTraitImporter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.get_trait().to_string())
+        write!(f, "{}", self.get_trait())
     }
 }
 
@@ -1042,7 +1045,7 @@ impl EbiObjectImporter {
     }
 
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
-        let mut result = ImporterParameterValues::new();
+        let mut result = ImporterParameterValues::default();
         for parameter in self.parameters() {
             result.insert(*parameter, (parameter.default(), false));
         }
@@ -1274,7 +1277,7 @@ impl EbiObjectImporterFallible {
     }
 
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
-        let mut result = ImporterParameterValues::new();
+        let mut result = ImporterParameterValues::default();
         for parameter in self.parameters() {
             result.insert(*parameter, (parameter.default(), false));
         }
@@ -1331,27 +1334,27 @@ impl Display for EbiObjectImporterFallible {
 
 pub fn get_reader_file(from_file: &PathBuf) -> Result<MultipleReader> {
     if from_file.as_os_str() == "-" {
-        return MultipleReader::from_stdin();
+        MultipleReader::from_stdin()
     } else {
         let file = File::open(from_file)
             .with_context(|| format!("Could not read file `{}`.", from_file.display()))?;
-        return Ok(MultipleReader::from_file(file));
+        Ok(MultipleReader::from_file(file))
     }
 }
 
 pub fn get_reader(cli_matches: &ArgMatches, cli_id: &str) -> Result<MultipleReader> {
     if let Some(from_file) = cli_matches.try_get_one::<PathBuf>(cli_id)? {
         if from_file.as_os_str() == "-" {
-            return MultipleReader::from_stdin();
+            MultipleReader::from_stdin()
         } else {
             let file = File::open(from_file)
                 .with_context(|| format!("Could not read file `{}`.", from_file.display()))?;
-            return Ok(MultipleReader::from_file(file));
+            Ok(MultipleReader::from_file(file))
         }
     } else {
-        return Err(anyhow!(
+        Err(anyhow!(
             "No argument given, or it could not be parsed as a path."
-        ));
+        ))
     }
 }
 
@@ -1430,35 +1433,31 @@ pub fn read_as_object_with_file_handler(
     file_handler: &'static EbiFileHandler,
 ) -> Result<EbiObject> {
     for importer in file_handler.object_importers {
-        if &importer.get_type() == etype {
-            //attempt to import
-            match ebi_importer_parameters::extract_parameter_values(
+        //attempt to import
+        if &importer.get_type() == etype
+            && let Ok(importer_parameter_values) = ebi_importer_parameters::extract_parameter_values(
                 cli_matches,
                 importer.parameters(),
                 input_index,
-            ) {
-                Ok(importer_parameter_values) => {
-                    if let Ok(object) = (importer.get_importer())(
-                        reader.get().context("Could not obtain reader.")?.as_mut(),
-                        &importer_parameter_values,
-                    ) {
-                        //object parsed; return it
-                        return Ok(object);
-                    }
-                }
-                Err(_) => {}
-            }
+            )
+            && let Ok(object) = (importer.get_importer())(
+                reader.get().context("Could not obtain reader.")?.as_mut(),
+                &importer_parameter_values,
+            )
+        {
+            //object parsed; return it
+            return Ok(object);
         }
     }
     for importer in file_handler.object_importers_fallible {
         if &importer.get_type() == etype {
             //attempt to import
-            match ebi_importer_parameters::extract_parameter_values(
+            if let Ok(importer_parameter_values) = ebi_importer_parameters::extract_parameter_values(
                 cli_matches,
                 importer.parameters(),
                 input_index,
             ) {
-                Ok(importer_parameter_values) => {
+                {
                     match (importer.get_importer())(
                         reader.get().context("Could not obtain reader.")?.as_mut(),
                         &importer_parameter_values,
@@ -1470,7 +1469,6 @@ pub fn read_as_object_with_file_handler(
                         Err(FallibleImporterError::ImporterError(_)) => {}
                     }
                 }
-                Err(_) => {}
             }
         }
     }
@@ -1485,21 +1483,16 @@ pub fn read_as_any_object(
     for file_handler in EBI_FILE_HANDLERS {
         //attempt to import
         for importer in file_handler.object_importers {
-            match ebi_importer_parameters::extract_parameter_values(
+            if let Ok(importer_parameter_values) = ebi_importer_parameters::extract_parameter_values(
                 cli_matches,
                 importer.parameters(),
                 input_index,
+            ) && let Ok(object) = (importer.get_importer())(
+                reader.get().context("Could not obtain reader.")?.as_mut(),
+                &importer_parameter_values,
             ) {
-                Ok(importer_parameter_values) => {
-                    if let Ok(object) = (importer.get_importer())(
-                        reader.get().context("Could not obtain reader.")?.as_mut(),
-                        &importer_parameter_values,
-                    ) {
-                        //object parsed; return it
-                        return Ok((object, file_handler));
-                    }
-                }
-                Err(_) => {}
+                //object parsed; return it
+                return Ok((object, file_handler));
             }
         }
     }
@@ -1547,15 +1540,15 @@ pub fn attempt_parse(
                 }
             }
             EbiInputType::FileHandler => {
-                if let MultipleReader::String(string) = &reader {
-                    if let Ok(value) = string.parse::<EbiFileHandler>() {
-                        return Ok(EbiInput::FileHandler(value));
-                    }
+                if let MultipleReader::String(string) = &reader
+                    && let Ok(value) = string.parse::<EbiFileHandler>()
+                {
+                    return Ok(EbiInput::FileHandler(value));
                 };
             }
             EbiInputType::String(None, _) => {
                 if let MultipleReader::String(string) = &reader {
-                    return Ok(EbiInput::String(string.clone(), &input_type));
+                    return Ok(EbiInput::String(string.clone(), input_type));
                 } else {
                     return Err(anyhow!(
                         "Cannot get a string from a non-string multireader."
@@ -1565,7 +1558,7 @@ pub fn attempt_parse(
             EbiInputType::String(Some(allowed_values), _) => {
                 if let MultipleReader::String(string) = &reader {
                     if allowed_values.contains(&string.as_str()) {
-                        return Ok(EbiInput::String(string.clone(), &input_type));
+                        return Ok(EbiInput::String(string.clone(), input_type));
                     } else {
                         error = Some(anyhow!("value should be one of {:?}", allowed_values));
                     }
@@ -1576,92 +1569,79 @@ pub fn attempt_parse(
                 }
             }
             EbiInputType::Usize(min, max, _) => {
-                if let MultipleReader::String(string) = &reader {
-                    if let Ok(value) = string.parse::<usize>() {
-                        match (min, max) {
-                            (None, None) => {
-                                return Ok(EbiInput::Usize(value.clone(), &input_type));
+                if let MultipleReader::String(string) = &reader
+                    && let Ok(value) = string.parse::<usize>()
+                {
+                    match (min, max) {
+                        (None, None) => {
+                            return Ok(EbiInput::Usize(value, input_type));
+                        }
+                        (None, Some(max)) => {
+                            if max < &value {
+                                error = Some(anyhow!("value should be at most {}", max));
+                            } else {
+                                return Ok(EbiInput::Usize(value, input_type));
                             }
-                            (None, Some(max)) => {
-                                if max < &value {
-                                    error = Some(anyhow!("value should be at most {}", max));
-                                } else {
-                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
-                                }
+                        }
+                        (Some(min), None) => {
+                            if min > &value {
+                                error = Some(anyhow!("value should be at least {}", min));
+                            } else {
+                                return Ok(EbiInput::Usize(value, input_type));
                             }
-                            (Some(min), None) => {
-                                if min > &value {
-                                    error = Some(anyhow!("value should be at least {}", min));
-                                } else {
-                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
-                                }
-                            }
-                            (Some(min), Some(max)) => {
-                                if min > &value || max < &value {
-                                    error = Some(anyhow!(
-                                        "value should be between {} and {}",
-                                        min,
-                                        max
-                                    ));
-                                } else {
-                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
-                                }
+                        }
+                        (Some(min), Some(max)) => {
+                            if min > &value || max < &value {
+                                error =
+                                    Some(anyhow!("value should be between {} and {}", min, max));
+                            } else {
+                                return Ok(EbiInput::Usize(value, input_type));
                             }
                         }
                     }
                 }
             }
             EbiInputType::Fraction(min, max, _) => {
-                if let MultipleReader::String(string) = &reader {
-                    if let Ok(value) = &string.parse::<FractionNotParsedYet>() {
-                        let value: Fraction = value.try_into()?;
+                if let MultipleReader::String(string) = &reader
+                    && let Ok(value) = &string.parse::<FractionNotParsedYet>()
+                {
+                    let value: Fraction = value.try_into()?;
 
-                        match (min, max) {
-                            (None, None) => {
-                                return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                    match (min, max) {
+                        (None, None) => {
+                            return Ok(EbiInput::Fraction(value.clone(), input_type));
+                        }
+                        (None, Some(max)) => {
+                            if max < &value {
+                                error = Some(anyhow!("value should be at most {}", max));
+                            } else {
+                                return Ok(EbiInput::Fraction(value.clone(), input_type));
                             }
-                            (None, Some(max)) => {
-                                if max < &value {
-                                    error = Some(anyhow!("value should be at most {}", max));
-                                } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
-                                }
+                        }
+                        (Some(min), None) => {
+                            if min > &value {
+                                error = Some(anyhow!("value should be at least {}", min));
+                            } else {
+                                return Ok(EbiInput::Fraction(value.clone(), input_type));
                             }
-                            (Some(min), None) => {
-                                if min > &value {
-                                    error = Some(anyhow!("value should be at least {}", min));
-                                } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
-                                }
-                            }
-                            (Some(min), Some(max)) => {
-                                if min > &value || max < &value {
-                                    error = Some(anyhow!(
-                                        "value should be between {} and {}",
-                                        min,
-                                        max
-                                    ));
-                                } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
-                                }
+                        }
+                        (Some(min), Some(max)) => {
+                            if min > &value || max < &value {
+                                error =
+                                    Some(anyhow!("value should be between {} and {}", min, max));
+                            } else {
+                                return Ok(EbiInput::Fraction(value.clone(), input_type));
                             }
                         }
                     }
                 }
             }
             EbiInputType::StringList => {
-                //text form for a surface that can only send text: one text per line, so texts may contain spaces.
-                //No surface uses it today: commands with a StringList are not offered in JavaScript (see is_in_javascript).
-                if let MultipleReader::String(string) = &reader {
-                    return Ok(EbiInput::StringList(
-                        string.lines().map(str::to_string).collect(),
-                        &input_type,
-                    ));
-                } else {
-                    return Err(anyhow!(
-                        "Cannot get a list of texts from a non-string multireader."
-                    ));
-                }
+                //A list has no text form. A surface that cannot carry a list does not offer the command
+                //(see is_in_java and is_in_javascript), and must not guess a convention such as one text per line.
+                error = Some(anyhow!(
+                    "A list of texts cannot be given as text; give each text separately."
+                ));
             }
         }
     }
@@ -1677,13 +1657,12 @@ pub fn validate_object_of(
     file_handler: &EbiFileHandler,
 ) -> Result<()> {
     if let Some(validator) = file_handler.validator {
-        let result = (validator)(reader.get()?.as_mut());
-        return result;
+        (validator)(reader.get()?.as_mut())
     } else {
-        return Err(anyhow!(
+        Err(anyhow!(
             "file hanlder {} does not have a validator",
             file_handler
-        ));
+        ))
     }
 }
 
@@ -1730,6 +1709,15 @@ mod tests {
             EbiInputType::get_possible_inputs_with_latex(&list);
             EbiInputType::possible_inputs_as_strings_with_articles(&list, "xyz");
         }
+    }
+
+    #[test]
+    fn a_list_of_texts_cannot_be_given_as_one_text() {
+        //A surface that cannot carry a list does not offer the command, and
+        //must not guess a convention (such as one text per line) either.
+        let wanted: &[&'static EbiInputType] = &[&EbiInputType::StringList];
+        let text = MultipleReader::String("a\nb".to_string());
+        assert!(ebi_input::attempt_parse(wanted, text).is_err());
     }
 
     #[test]

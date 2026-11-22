@@ -1,21 +1,21 @@
 use ebi_objects::{
-    Infoable,
-    anyhow::{Error, Result, anyhow},
+    anyhow::{anyhow, Error, Result},
     ebi_arithmetic::{
-        Recip, Signed,
         ebi_number::{One, Zero},
-        exact::{MaybeExact, is_exact_globally},
-        fraction::{fraction::APPROX_DIGITS, fraction_enum::FractionEnum},
+        exact::{is_exact_globally, MaybeExact},
+        fraction::{fraction_struct::APPROX_DIGITS, fraction_enum::FractionEnum},
         malachite::{
-            Natural,
             base::num::{
                 arithmetic::traits::{Parity, Pow},
                 basic::traits::Two,
                 logic::traits::{BitAccess, SignificantBits},
             },
             rational::Rational,
+            Natural,
         },
+        Recip, Signed,
     },
+    Infoable,
 };
 use ebi_optimisation::ebi_arithmetic::{
     fraction::approximate::Approximate, log_polynomial::log_polynomial_enum::LogPolynomialEnum,
@@ -43,22 +43,20 @@ impl LogDivEnum {
      * Returns whether the two given logdivs are either both exact or both approximate
      */
     pub(crate) fn matches(&self, rhs: &Self) -> bool {
-        match (self, rhs) {
-            (Self::Exact(_), Self::Exact(_)) => true,
-            (Self::Approx(_), Self::Approx(_)) => true,
-            _ => false,
-        }
+        matches!(
+            (self, rhs),
+            (Self::Exact(_), Self::Exact(_)) | (Self::Approx(_), Self::Approx(_))
+        )
     }
 
     /**
      * Returns whether the two given logdivs are either both exact or both approximate
      */
     pub(crate) fn matches_f(&self, rhs: &FractionEnum) -> bool {
-        match (self, rhs.is_exact()) {
-            (Self::Exact(_), true) => true,
-            (Self::Approx(_), false) => true,
-            _ => false,
-        }
+        matches!(
+            (self, rhs.is_exact()),
+            (Self::Exact(_), true) | (Self::Approx(_), false)
+        )
     }
 
     pub fn log2_div(log_of: FractionEnum, divide_by: u64) -> Result<Self> {
@@ -280,9 +278,9 @@ impl One for LogDivEnum {
                         };
 
                         //the number of bits necessary (= the highest bit) must be zeroes + 1, i.e.a is not too high
-                        return a.significant_bits() == c + Natural::one();
+                        a.significant_bits() == c + Natural::one()
                     }
-                    None => return false,
+                    None => false,
                 }
             }
             LogDivEnum::Approx(f) => One::is_one(f),
@@ -408,8 +406,8 @@ impl AddAssign for LogDivEnum {
                     LogDivEnum::Exact((ab_log, c_denom)),
                     LogDivEnum::Exact((rhs_ab_log, rhs_c_denom)),
                 ) => {
-                    *ab_log = Self::power_f_u(&ab_log, &rhs_c_denom)
-                        * Self::power_f_u(&rhs_ab_log, &c_denom);
+                    *ab_log = Self::power_f_u(ab_log, &rhs_c_denom)
+                        * Self::power_f_u(&rhs_ab_log, c_denom);
                     *c_denom *= &rhs_c_denom;
                 }
                 (LogDivEnum::Approx(f), LogDivEnum::Approx(g)) => f.add_assign(g),
@@ -447,8 +445,8 @@ impl SubAssign for LogDivEnum {
                     LogDivEnum::Exact((ab_log, c_denom)),
                     LogDivEnum::Exact((rhs_ab_log, rhs_c_denom)),
                 ) => {
-                    *ab_log = Self::power_f_u(&ab_log, &rhs_c_denom)
-                        / Self::power_f_u(&rhs_ab_log, &c_denom);
+                    *ab_log = Self::power_f_u(ab_log, &rhs_c_denom)
+                        / Self::power_f_u(&rhs_ab_log, c_denom);
                     *c_denom *= &rhs_c_denom;
                 }
                 (LogDivEnum::Approx(f), LogDivEnum::Approx(g)) => f.sub_assign(g),
@@ -473,7 +471,7 @@ impl MulAssign<FractionEnum> for LogDivEnum {
         } else {
             match (self, rhs) {
                 (LogDivEnum::Exact((ab_log, c)), FractionEnum::Exact(f)) => {
-                    *ab_log = Self::power_f_u(&ab_log, f.numerator_ref());
+                    *ab_log = Self::power_f_u(ab_log, f.numerator_ref());
                     *c *= f.denominator_ref();
                 }
                 (LogDivEnum::Approx(f), FractionEnum::Approx(g)) => *f *= g,
@@ -490,7 +488,7 @@ impl MulAssign<&FractionEnum> for LogDivEnum {
         }
         match (self, rhs) {
             (LogDivEnum::Exact((ab_log, c)), FractionEnum::Exact(f)) => {
-                *ab_log = Self::power_f_u(&ab_log, f.numerator_ref());
+                *ab_log = Self::power_f_u(ab_log, f.numerator_ref());
                 *c *= f.denominator_ref();
             }
             (LogDivEnum::Approx(f), FractionEnum::Approx(g)) => *f *= g,
@@ -503,7 +501,7 @@ impl MulAssign<usize> for LogDivEnum {
     fn mul_assign(&mut self, rhs: usize) {
         match self {
             LogDivEnum::Exact((ab_log, _)) => {
-                *ab_log = Self::power_f_u(&ab_log, &Natural::from(rhs))
+                *ab_log = Self::power_f_u(ab_log, &Natural::from(rhs))
             }
             LogDivEnum::Approx(f) => *f *= rhs as f64,
             _ => {}
@@ -515,7 +513,7 @@ impl MulAssign<u64> for LogDivEnum {
     fn mul_assign(&mut self, rhs: u64) {
         match self {
             LogDivEnum::Exact((ab_log, _)) => {
-                *ab_log = Self::power_f_u(&ab_log, &Natural::from(rhs))
+                *ab_log = Self::power_f_u(ab_log, &Natural::from(rhs))
             }
             LogDivEnum::Approx(f) => *f *= rhs as f64,
             _ => {}
@@ -595,7 +593,7 @@ impl TryFrom<LogPolynomialEnum> for LogDivEnum {
 
     fn try_from(value: LogPolynomialEnum) -> Result<Self> {
         match value {
-            LogPolynomialEnum::Approx(f) => Ok(LogDivEnum::Approx(f.approximate()?.into())),
+            LogPolynomialEnum::Approx(f) => Ok(LogDivEnum::Approx(f.approximate()?)),
             LogPolynomialEnum::Exact(_) => Err(anyhow!(
                 "Cannot transform an exact log polynomial into an exact log div."
             )),

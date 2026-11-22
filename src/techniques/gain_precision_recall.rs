@@ -3,18 +3,18 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
-    follower_semantics::FollowerSemantics,
-    techniques::entropy::{Entropy, number_of_average_visits_per_state_approximate},
+    semantics::follower_semantics::FollowerSemantics,
+    techniques::entropy::{number_of_average_visits_per_state_approximate, Entropy},
 };
 use ebi_objects::{
-    StochasticDeterministicFiniteAutomaton,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{
-        ConstFraction, Fraction, Log, MaybeExact, One, OneMinus, Signed, Zero,
         fraction::approximate::Approximate,
         is_exact_globally,
-        log_polynomial::{log_polynomial::LogPolynomial, log_polynomial_f64::LogPolynomialF64},
+        log_polynomial::{log_polynomial_struct::LogPolynomial, log_polynomial_f64::LogPolynomialF64},
+        ConstFraction, Fraction, Log, MaybeExact, One, OneMinus, Signed, Zero,
     },
+    StochasticDeterministicFiniteAutomaton,
 };
 
 pub const DEFAULT_LAMBDA_HIGHER_THAN_ZERO: ConstFraction = ConstFraction::of(1, 1_000_000);
@@ -23,14 +23,14 @@ pub trait PotentialGainRecallPrecision {
     /// Recall(L, M, λ) = Numerator(L, M, λ) / H(L, λ)
     fn potential_gain_recall(
         &self,
-        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        slang: &dyn EbiTraitFiniteStochasticLanguage,
         lambda: &Fraction,
     ) -> Result<LogPolynomial>;
 
     /// Precision(L, M, λ) = Numerator(L, M, λ) / H(M, λ)
     fn potential_gain_precision(
         &self,
-        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        slang: &dyn EbiTraitFiniteStochasticLanguage,
         lambda: &Fraction,
     ) -> Result<LogPolynomial>;
 }
@@ -38,7 +38,7 @@ pub trait PotentialGainRecallPrecision {
 impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
     fn potential_gain_recall(
         &self,
-        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        slang: &dyn EbiTraitFiniteStochasticLanguage,
         lambda: &Fraction,
     ) -> Result<LogPolynomial> {
         if is_exact_globally() {
@@ -61,7 +61,7 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
 
     fn potential_gain_precision(
         &self,
-        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        slang: &dyn EbiTraitFiniteStochasticLanguage,
         lambda: &Fraction,
     ) -> Result<LogPolynomial> {
         if is_exact_globally() {
@@ -70,8 +70,8 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
             ));
         }
 
-        let numerator = gain_numerator_lambda(&slang, self, lambda)?;
-        let denominator = entropy_sdfa_with_lambda(&self, lambda)?;
+        let numerator = gain_numerator_lambda(slang, self, lambda)?;
+        let denominator = entropy_sdfa_with_lambda(self, lambda)?;
 
         if denominator.is_zero() {
             return Err(anyhow!(
@@ -105,7 +105,7 @@ fn entropy_term(p: &Fraction) -> Result<LogPolynomial> {
 /// Entropy of the event log with lambda.
 /// If lambda = 0, this becomes the normal entropy.
 fn entropy_eventlog_with_lambda(
-    fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+    fsl: &dyn EbiTraitFiniteStochasticLanguage,
     lambda: &Fraction,
 ) -> Result<LogPolynomial> {
     if lambda.is_zero() {
@@ -133,7 +133,7 @@ fn log_div_min(left: LogPolynomial, right: LogPolynomial) -> Result<LogPolynomia
 /// Only traces that exist in both the event log and the model are counted.
 /// For each trace, use min(-pL log pL, -pM log pM).
 fn gain_numerator_lambda(
-    fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+    fsl: &dyn EbiTraitFiniteStochasticLanguage,
     sdfa: &StochasticDeterministicFiniteAutomaton,
     lambda: &Fraction,
 ) -> Result<LogPolynomial> {
@@ -242,7 +242,7 @@ fn ratio(num: LogPolynomial, denom: LogPolynomial) -> Result<LogPolynomial> {
     test
 ))]
 mod tests {
-    use crate::semantics::semantics::Semantics;
+    use crate::semantics::semantics_trait::Semantics;
 
     use super::*;
     use ebi_objects::anyhow::Result;
@@ -254,11 +254,11 @@ mod tests {
         use super::*;
         use ebi_objects::anyhow::Result;
         use ebi_objects::ebi_arithmetic::f;
-        use ebi_objects::{AutomatonState, StochasticDeterministicFiniteAutomaton, a};
+        use ebi_objects::{a, AutomatonState, StochasticDeterministicFiniteAutomaton};
 
         /// Figure (c): 2-state SDFA with a self-loop.
         pub fn build_fig_c_loop() -> Result<StochasticDeterministicFiniteAutomaton> {
-            let mut sdfa = StochasticDeterministicFiniteAutomaton::new();
+            let mut sdfa = StochasticDeterministicFiniteAutomaton::default();
             sdfa.set_initial_state(Some(AutomatonState::zero()));
 
             let a = sdfa.activity_key.process_activity("a");
@@ -275,8 +275,7 @@ mod tests {
     fn test_entropy_eventlog() -> Result<()> {
         let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
         let log = fin.parse::<EventLog>().unwrap();
-        let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(FiniteStochasticLanguage::from(log));
+        let slang = FiniteStochasticLanguage::from(log);
         let entropy = entropy_eventlog_with_lambda(&slang, &f0!())?;
         println!("entropy ≈ {:.12}", entropy.approximate().unwrap());
 
@@ -304,8 +303,7 @@ mod tests {
     fn test_gain_numerator() -> Result<()> {
         let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
         let log = fin.parse::<EventLog>().unwrap();
-        let fsl: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(FiniteStochasticLanguage::from(log));
+        let fsl = FiniteStochasticLanguage::from(log);
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
         let lambda = Fraction::zero();
 
@@ -319,8 +317,7 @@ mod tests {
     fn test_gain() -> Result<()> {
         let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
         let log = fin.parse::<EventLog>().unwrap();
-        let fsl: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(FiniteStochasticLanguage::from(log));
+        let fsl = FiniteStochasticLanguage::from(log);
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
 
         let lambda: Fraction = f!(1i64, 1_000_000i64);

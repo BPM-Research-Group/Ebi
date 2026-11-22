@@ -1,7 +1,8 @@
-use crate::surfaces::website::website_generation::FILE_HANDLERS_PAGE;
 use const_format::concatcp;
 use regex::{Captures, Regex};
 use std::fmt::Display;
+
+use crate::surfaces::website::website_link::FILE_HANDLERS_PAGE;
 
 pub trait Rank {
     fn rank(&self) -> String;
@@ -51,7 +52,7 @@ where
     T: Display,
 {
     fn join_with(&self, sep: &str, last_sep: &str) -> String {
-        if self.len() == 0 {
+        if self.is_empty() {
             return String::new();
         }
         if self.len() == 1 {
@@ -178,7 +179,7 @@ where
 
         let regex_enumerate =
             Regex::new("(?m)(?s)(((^1\\.[^\\n]*\\n)+(\\n|(    |\\t)[^\\n]*\\n)*)+)").unwrap();
-        let base = regex_enumerate.replace_all(&base, |caps: &Captures| {
+        let base = regex_enumerate.replace_all(base, |caps: &Captures| {
             let regex_item = Regex::new("(?m)^1\\.").unwrap();
             let x = caps[1].to_string();
             let x = regex_item.replace_all(&x, "<li>\n");

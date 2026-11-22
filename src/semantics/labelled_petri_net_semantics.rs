@@ -1,4 +1,4 @@
-use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
+use crate::{ebi_framework::displayable::Displayable, semantics::semantics_trait::Semantics};
 use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
     Activity, LabelledPetriNet, anyhow::Context, anyhow::Result,
@@ -96,7 +96,7 @@ impl Semantics for LabelledPetriNet {
 
     fn get_enabled_transitions(&self, state: &LPNMarking) -> Vec<TransitionIndex> {
         let mut result = Vec::new();
-        result.reserve_exact(state.number_of_enabled_transitions as usize);
+        result.reserve_exact(state.number_of_enabled_transitions);
         for index in state.enabled_transitions.iter_ones() {
             result.push(index);
         }
@@ -170,7 +170,7 @@ impl Debug for LPNMarking {
 
 #[cfg(test)]
 mod tests {
-    use crate::semantics::semantics::Semantics;
+    use crate::semantics::semantics_trait::Semantics;
     use ebi_objects::LabelledPetriNet;
     use std::fs;
 

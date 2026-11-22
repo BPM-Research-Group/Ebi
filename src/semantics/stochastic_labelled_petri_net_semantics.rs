@@ -1,10 +1,10 @@
-use crate::semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics};
+use crate::semantics::{labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics};
 use bitvec::bitvec;
 use ebi_objects::{
-    Activity, StochasticLabelledPetriNet,
     anyhow::{Context, Result},
     ebi_arithmetic::Signed,
     ebi_objects::labelled_petri_net::TransitionIndex,
+    Activity, StochasticLabelledPetriNet,
 };
 
 fn compute_enabled_transition(
@@ -102,7 +102,7 @@ impl Semantics for StochasticLabelledPetriNet {
 
     fn get_enabled_transitions(&self, state: &LPNMarking) -> Vec<usize> {
         let mut result = Vec::new();
-        result.reserve_exact(state.number_of_enabled_transitions as usize);
+        result.reserve_exact(state.number_of_enabled_transitions);
         for index in state.enabled_transitions.iter_ones() {
             result.push(index);
         }
@@ -132,7 +132,7 @@ mod tests {
 
     use ebi_objects::StochasticLabelledPetriNet;
 
-    use crate::semantics::semantics::Semantics;
+    use crate::semantics::semantics_trait::Semantics;
 
     #[test]
     fn slpn_empty() {

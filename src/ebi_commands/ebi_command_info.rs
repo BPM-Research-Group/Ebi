@@ -74,7 +74,7 @@ pub const EBI_INFO: EbiCommand = EbiCommand::Command {
             return Ok(EbiOutput::String(String::from_utf8(f).unwrap()));
         }
 
-        return Err(anyhow!("Unsupported object provided."));
+        Err(anyhow!("Unsupported object provided."))
     },
     output_type: &EbiOutputType::String,
 };

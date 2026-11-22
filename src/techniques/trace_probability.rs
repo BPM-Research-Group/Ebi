@@ -1,15 +1,17 @@
 use crate::{
     ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    follower_semantics::FollowerSemantics,
-    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    semantics::follower_semantics::FollowerSemantics,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics,
+        stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
+    },
 };
 use ebi_objects::{
-    AutomatonState, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero},
     ebi_objects::process_tree::TreeMarking,
+    AutomatonState, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
 };
 use std::{
     collections::{HashMap, HashSet},
@@ -24,7 +26,7 @@ macro_rules! default_trace_probability {
     ($t:ident, $s:ident) => {
         impl EbiTraitQueriableStochasticLanguage for $t {
             fn get_probability(&self, follower_b: &FollowerSemantics) -> Result<Fraction> {
-                let mut result = CrossProductResultImpl::new();
+                let mut result = CrossProductResultImpl::default();
                 let mut z: Z<$s> = Z {
                     seen: HashMap::<Rc<ABState<$s>>, usize>::new(),
                     worklist: Vec::<Rc<ABState<$s>>>::new(),
@@ -172,7 +174,7 @@ impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutoma
 
                     for activity in trace.iter() {
                         let (found, pos) = self
-                            .binary_search(state, self.activity_key.get_id_from_activity(activity));
+                            .binary_search(state, self.activity_key.activity_to_id(activity));
                         if !found {
                             return Ok(Fraction::zero());
                         }
@@ -191,6 +193,7 @@ impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutoma
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn process_new_state<T: StochasticSemantics<StoSemState = A>, A: Eq + Hash + Clone + Display>(
     semantics: &T,
     z: &mut Z<A>,
@@ -207,20 +210,20 @@ fn process_new_state<T: StochasticSemantics<StoSemState = A>, A: Eq + Hash + Clo
     };
     let new_state_indexx = z.seen.get(&new_state_ab);
     let new_state_index: usize;
-    if new_state_indexx.is_some() {
-        new_state_index = *new_state_indexx.unwrap();
+    if let Some(nsi) = new_state_indexx {
+        new_state_index = *nsi;
     } else {
         //newStateAB was not encountered before
         let new_state_ab_rc = Rc::new(new_state_ab);
         z.worklist.push(new_state_ab_rc.clone());
         z.seen.insert(new_state_ab_rc, z.state_counter);
-        new_state_index = z.state_counter.clone();
+        new_state_index = z.state_counter;
         z.state_counter += 1;
     }
 
     y.outgoing_states.push(new_state_index);
     y.outgoing_state_probabilities
-        .push(semantics.get_transition_weight(&state_a, transition)? / total_weight);
+        .push(semantics.get_transition_weight(state_a, transition)? / total_weight);
     Ok(())
 }
 
@@ -282,8 +285,8 @@ pub struct CrossProductResultImpl {
     de_duplication_cache: HashSet<usize>,
 }
 
-impl CrossProductResultImpl {
-    pub fn new() -> Self {
+impl Default for CrossProductResultImpl {
+    fn default() -> Self {
         Self {
             initial_state: usize::MAX,
             dead_state: usize::MAX,
@@ -464,12 +467,12 @@ struct Y {
 mod tests {
     use crate::{
         ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-        follower_semantics::FollowerSemantics,
+        semantics::follower_semantics::FollowerSemantics,
     };
     use ebi_objects::{
+        ebi_arithmetic::{Fraction, Zero},
         FiniteLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
         StochasticLabelledPetriNet, StochasticProcessTree,
-        ebi_arithmetic::{Fraction, Zero},
     };
     use std::fs;
 

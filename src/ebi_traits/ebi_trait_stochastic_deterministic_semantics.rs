@@ -3,22 +3,24 @@ use crate::{
         displayable::Displayable, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
         ebi_trait_object::EbiTraitObject, trait_importers::ToStochasticDeterministicSemanticsTrait,
     },
-    semantics::labelled_petri_net_semantics::LPNMarking,
-    stochastic_deterministic_semantics::deterministic_semantics_for_stochastic_semantics::PMarking,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking,
+        stochastic_deterministic_semantics::deterministic_semantics_for_stochastic_semantics::PMarking,
+    },
     techniques::infinitely_many_traces::InfinitelyManyTraces,
     trait_definition_finalisation,
 };
 use ebi_objects::{
-    Activity, AutomatonState, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel,
-    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::Fraction,
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv, process_tree::TreeMarking,
     },
+    Activity, AutomatonState, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel,
+    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
 };
 
 pub const TRAIT_DEFINITION_LATEX: &str = concat!(
@@ -31,17 +33,17 @@ pub enum EbiTraitStochasticDeterministicSemantics {
     AutomatonState(
         Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = AutomatonState,
-                    LivState = AutomatonState,
-                >,
+                DetState = AutomatonState,
+                LivState = AutomatonState,
+            >,
         >,
     ),
     AutomatonStateDistribution(
         Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<AutomatonState>,
-                    LivState = AutomatonState,
-                >,
+                DetState = PMarking<AutomatonState>,
+                LivState = AutomatonState,
+            >,
         >,
     ),
     UsizeDistribution(
@@ -50,17 +52,17 @@ pub enum EbiTraitStochasticDeterministicSemantics {
     LPNMarkingDistribution(
         Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         >,
     ),
     TreeMarkingDistribution(
         Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<TreeMarking>,
-                    LivState = TreeMarking,
-                >,
+                DetState = PMarking<TreeMarking>,
+                LivState = TreeMarking,
+            >,
         >,
     ),
 }

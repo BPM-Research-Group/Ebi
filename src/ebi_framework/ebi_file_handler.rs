@@ -1,5 +1,5 @@
 use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_command::{EbiCommand, EBI_COMMANDS},
     ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     ebi_output::{EbiObjectExporter, EbiOutputType},
     ebi_trait::FromEbiTraitObject,
@@ -37,11 +37,11 @@ use crate::{
         ebi_command::get_applicable_commands, ebi_input::EbiObjectImporterFallible,
         ebi_trait::EbiTrait,
     },
-    prom::java_object_handler::JavaObjectHandler,
+    surfaces::java::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Error, Result},
     EbiObjectType,
-    anyhow::{Error, Result, anyhow},
 };
 use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
 
@@ -49,7 +49,7 @@ use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::Fro
  * The order of this list is important: for the "any object" input type and for trait importers,
  * they are attempted in order. Thus, the more restrictive formats should come first.
  */
-pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
+pub const EBI_FILE_HANDLERS: &[EbiFileHandler] = &[
     EBI_COMPRESSED_EVENT_LOG,
     EBI_DIRECTLY_FOLLOWS_GRAPH,
     EBI_DETERMINISTIC_FINITE_AUTOMATON,
@@ -149,12 +149,11 @@ impl EbiFileHandler {
         //get commands that can output any of the objects
         let mut result = BTreeSet::new();
         for command_path in EBI_COMMANDS.get_command_paths() {
-            if let Some(EbiCommand::Command { output_type, .. }) = command_path.last() {
-                if let EbiOutputType::ObjectType(x) = output_type {
-                    if objects.contains(x) {
-                        result.insert(command_path);
-                    }
-                }
+            if let Some(EbiCommand::Command { output_type, .. }) = command_path.last()
+                && let EbiOutputType::ObjectType(x) = output_type
+                && objects.contains(x)
+            {
+                result.insert(command_path);
             }
         }
 
@@ -172,7 +171,7 @@ impl EbiFileHandler {
                 return Tri::Fallible;
             }
         }
-        return Tri::No;
+        Tri::No
     }
 
     pub fn can_import_as_trait(&self, trait_type: &EbiTrait) -> bool {
@@ -181,7 +180,7 @@ impl EbiFileHandler {
                 return true;
             }
         }
-        return false;
+        false
     }
 
     pub fn can_export_as_object(&self, object_type: &EbiObjectType) -> Tri {
@@ -195,7 +194,7 @@ impl EbiFileHandler {
                 return Tri::Fallible;
             }
         }
-        return Tri::No;
+        Tri::No
     }
 }
 
@@ -210,7 +209,7 @@ impl FromStr for EbiFileHandler {
                 return Ok(file_handler.clone());
             }
         }
-        return Err(anyhow!("{} is not an Ebi file handler.", s));
+        Err(anyhow!("{} is not an Ebi file handler.", s))
     }
 }
 
@@ -225,7 +224,7 @@ impl FromStr for &'static EbiFileHandler {
                 return Ok(file_handler);
             }
         }
-        return Err(anyhow!("{} is not an Ebi file handler.", s));
+        Err(anyhow!("{} is not an Ebi file handler.", s))
     }
 }
 
@@ -234,7 +233,7 @@ impl FromEbiTraitObject for EbiFileHandler {
         match object {
             EbiInput::FileHandler(e) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as an file handler",
+                "Cannot read {} {} as a file handler.",
                 object.get_type().get_article(),
                 object.get_type()
             )),
@@ -252,9 +251,7 @@ impl PartialEq for EbiFileHandler {
 
 impl PartialOrd for EbiFileHandler {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.name
-            .to_lowercase()
-            .partial_cmp(&other.name.to_lowercase())
+        Some(self.cmp(other))
     }
 }
 
@@ -344,11 +341,9 @@ mod tests {
         EbiFileHandler::get_producing_commands(&EBI_PROCESS_TREE);
         EbiFileHandler::get_producing_commands(&EBI_STOCHASTIC_LABELLED_PETRI_NET);
 
-        assert!(
-            EBI_PROCESS_TREE
-                .cmp(&EBI_STOCHASTIC_LABELLED_PETRI_NET)
-                .is_lt()
-        );
+        assert!(EBI_PROCESS_TREE
+            .cmp(&EBI_STOCHASTIC_LABELLED_PETRI_NET)
+            .is_lt());
 
         EbiFileHandler::from_trait_object(EbiInput::FileHandler(EBI_EXECUTIONS)).unwrap();
     }

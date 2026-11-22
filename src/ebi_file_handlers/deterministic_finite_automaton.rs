@@ -80,14 +80,14 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
 mod tests {
     use crate::{
         ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::ebi_trait_semantics::EbiTraitSemantics, semantics::semantics::Semantics,
+        ebi_traits::ebi_trait_semantics::EbiTraitSemantics, semantics::semantics_trait::Semantics,
     };
     use ebi_objects::{DeterministicFiniteAutomaton, HasActivityKey};
     use std::fs;
 
     #[test]
     fn insert_wrong_edge() {
-        let mut dfa = DeterministicFiniteAutomaton::new();
+        let mut dfa = DeterministicFiniteAutomaton::default();
         let state = dfa.get_initial_state().unwrap();
         let activity = dfa.activity_key_mut().process_activity("a");
 

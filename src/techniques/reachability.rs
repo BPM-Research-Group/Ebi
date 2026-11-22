@@ -1,4 +1,4 @@
-use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
+use crate::{ebi_framework::displayable::Displayable, semantics::semantics_trait::Semantics};
 use ebi_objects::{
     AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticNondeterministicFiniteAutomaton, anyhow::Result
 };

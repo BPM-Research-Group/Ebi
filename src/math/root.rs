@@ -1,7 +1,7 @@
 use ebi_objects::{
-    Infoable,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero},
+    Infoable,
 };
 use std::{
     fmt::{Debug, Display},
@@ -20,14 +20,14 @@ pub struct ContainsRoot {
 impl ContainsRoot {
     pub fn of(root: Root) -> Self {
         Self {
-            root: root,
+            root,
             one_minus: false,
         }
     }
 
     pub fn one_minus(root: Root) -> Self {
         Self {
-            root: root,
+            root,
             one_minus: true,
         }
     }
@@ -57,7 +57,7 @@ impl Infoable for ContainsRoot {
         }
         write!(f, "√")?;
         self.root.r.info(f)?;
-        Ok(writeln!(f, "")?)
+        Ok(writeln!(f)?)
     }
 }
 
@@ -92,7 +92,7 @@ impl Root {
         }
         Ok(Self {
             sign: Sign::Plus,
-            r: r,
+            r,
         })
     }
 
