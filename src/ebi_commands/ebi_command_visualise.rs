@@ -103,6 +103,12 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
                     object.get_type()
                 ));
             }
+            EbiInput::StringList(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
         };
         Ok(EbiOutput::String(result))
     },
