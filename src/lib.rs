@@ -320,6 +320,8 @@ pub mod techniques {
 
 /// Ebi generates its some of its own tests, for which generation code is found in this module.
 pub mod tests {
+    #[cfg(test)]
+    pub mod cli_test_support;
     #[cfg(feature = "test_generation")]
     pub mod fallible_test;
     #[cfg(feature = "test_generation")]

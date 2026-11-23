@@ -52,17 +52,25 @@ impl TestInput {
         }
     }
 
-    // #[cfg(test)]
-    // pub(crate) fn get_input_type(&self) -> Option<&'static EbiInputType> {
-    //     match self {
-    //         TestInput::Trait(_, _) => None,
-    //         TestInput::Object(_, _, _) => None,
-    //         TestInput::String(_, ebi_input_type) => Some(ebi_input_type),
-    //         TestInput::Usize(_, ebi_input_type) => Some(ebi_input_type),
-    //         TestInput::FileHandler(_) => None,
-    //         TestInput::Fraction(_, ebi_input_type) => Some(ebi_input_type),
-    //     }
-    // }
+    /// The positional argument that gives this input on a command line.
+    ///
+    /// A file handler is given by its extension. Returns None for a file
+    /// handler that the command line cannot name, as it has no validator.
+    pub fn to_cli_argument(&self) -> Option<String> {
+        match self {
+            TestInput::Trait(_, path_buf) | TestInput::Object(_, _, path_buf) => {
+                Some(path_buf.to_str().unwrap().to_string())
+            }
+            TestInput::String(s, _) => Some(s.clone()),
+            TestInput::Usize(u, _) => Some(u.to_string()),
+            TestInput::FileHandler(file_handler) => file_handler
+                .validator
+                .is_some()
+                .then(|| file_handler.file_extension.to_string()),
+            TestInput::Fraction(f, _) => Some(f.to_string()),
+            TestInput::StringList(l, _) => Some(l.join(" ")),
+        }
+    }
 
     pub fn to_unique_string(&self) -> String {
         match self {
@@ -83,78 +91,6 @@ impl TestInput {
             TestInput::StringList(l, _) => format!("stringlist {l:?}"),
         }
     }
-
-    // pub fn from_unique_string(string: &str, input_types: &[&'static EbiInputType]) -> Result<Self> {
-    //     let (variant, value) = string
-    //         .split_once(' ')
-    //         .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
-    //     match variant {
-    //         "trait" => {
-    //             let (trait_name, path) = value
-    //                 .split_once('#')
-    //                 .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
-    //             let path_buf = path.parse::<PathBuf>()?;
-    //             let ebi_trait = trait_name.parse::<EbiTrait>()?;
-    //             Ok(Self::Trait(ebi_trait, path_buf))
-    //         }
-    //         "object" => {
-    //             let (_object_name, path) = value
-    //                 .split_once('#')
-    //                 .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
-    //             let path_buf = path.parse::<PathBuf>()?;
-    //             let reader = MultipleReader::File(File::open(path)?);
-    //             if let Ok(EbiInput::Object(ebi_object, file_handler)) =
-    //                 attempt_parse(input_types, reader)
-    //             {
-    //                 Ok(Self::Object(ebi_object, file_handler, path_buf))
-    //             } else {
-    //                 Err(anyhow!("not a valid testinput {}", string))
-    //             }
-    //         }
-    //         "string" => {
-    //             for input_type in input_types {
-    //                 if let EbiInputType::String(allowed_values, _) = input_type {
-    //                     if let Some(allowed_values) = allowed_values
-    //                         && allowed_values.contains(&value)
-    //                     {
-    //                         return Ok(TestInput::String(value.to_string(), input_type));
-    //                     } else if allowed_values.is_none() {
-    //                         return Ok(TestInput::String(value.to_string(), input_type));
-    //                     }
-    //                 }
-    //             }
-    //             Err(anyhow!("not a valid testinput {}", string))
-    //         }
-    //         "usize" => {
-    //             let reader = MultipleReader::String(value.to_string());
-    //             if let Ok(EbiInput::Usize(val, file_handler)) = attempt_parse(input_types, reader) {
-    //                 Ok(Self::Usize(val, file_handler))
-    //             } else {
-    //                 Err(anyhow!("not a valid testinput {}", string))
-    //             }
-    //         }
-    //         "filehandler" => {
-    //             let reader = MultipleReader::String(value.to_string());
-    //             if let Ok(EbiInput::FileHandler(file_handler)) = attempt_parse(input_types, reader)
-    //             {
-    //                 Ok(Self::FileHandler(file_handler))
-    //             } else {
-    //                 Err(anyhow!("not a valid testinput {}", string))
-    //             }
-    //         }
-    //         "fraction" => {
-    //             let reader = MultipleReader::String(value.to_string());
-    //             if let Ok(EbiInput::Fraction(val, file_handler)) =
-    //                 attempt_parse(input_types, reader)
-    //             {
-    //                 Ok(Self::Fraction(val, file_handler))
-    //             } else {
-    //                 Err(anyhow!("not a valid testinput {}", string))
-    //             }
-    //         }
-    //         _ => Err(anyhow!("not a valid testinput {}", string)),
-    //     }
-    // }
 
     pub(crate) fn find_inputs(input_typess: &[&[&'static EbiInputType]]) -> Vec<Vec<TestInput>> {
         let mut it = input_typess.iter();
@@ -257,8 +193,8 @@ impl TestInput {
                                 .unwrap()
                                 .contains("irregular")
                         {
-                            let mut reader =
-                                MultipleReader::from_file(File::open(file.path()).unwrap());
+                            let path = test_file_path(&file.file_name().into_string().unwrap());
+                            let mut reader = MultipleReader::from_file(File::open(&path).unwrap());
 
                             match input_type {
                                 EbiInputType::Trait(etrait) => {
@@ -266,7 +202,7 @@ impl TestInput {
 
                                     match ebi_input::read_as_trait(etrait, &mut reader, None, 0) {
                                         Ok((_, _)) => {
-                                            result.push(TestInput::Trait(*etrait, file.path()));
+                                            result.push(TestInput::Trait(*etrait, path));
                                         }
                                         Err(_) => {}
                                     }
@@ -278,7 +214,7 @@ impl TestInput {
                                             result.push(TestInput::Object(
                                                 object,
                                                 file_handler,
-                                                file.path(),
+                                                path,
                                             ));
                                         }
                                         Err(_) => {}
@@ -290,7 +226,7 @@ impl TestInput {
                                             result.push(TestInput::Object(
                                                 object,
                                                 file_handler,
-                                                file.path(),
+                                                path,
                                             ));
                                         }
                                         Err(_) => {}
@@ -306,6 +242,21 @@ impl TestInput {
 
         result
     }
+}
+
+/// The directory that the test files live in, relative to the crate root.
+const TEST_FILES_DIRECTORY: &str = "./testfiles";
+
+/// The path of a file in the test files directory.
+///
+/// The path is built with forward slashes on every platform, rather than
+/// with `Path::join` or `DirEntry::path`, which use the platform separator
+/// and so yield `./testfiles\x.xes` on Windows. The path is written into
+/// generated Rust string literals, where a backslash is an escape character,
+/// and into the keys of the fallible test list, which must be identical on
+/// every platform. Windows opens forward-slash paths without trouble.
+pub(crate) fn test_file_path(file_name: &str) -> PathBuf {
+    PathBuf::from(format!("{TEST_FILES_DIRECTORY}/{file_name}"))
 }
 
 impl Debug for TestInput {
@@ -346,6 +297,55 @@ impl PartialEq for TestInput {
             (Self::FileHandler(l0), Self::FileHandler(r0)) => l0 == r0,
             (Self::Fraction(l0, l1), Self::Fraction(r0, r1)) => l0 == r0 && l1 == r1,
             _ => false,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{TEST_FILES_DIRECTORY, TestInput, test_file_path};
+    use crate::ebi_framework::ebi_file_handler::{
+        EBI_FILE_HANDLERS, EbiFileHandler,
+    };
+    use std::{
+        fs::{self, File},
+        str::FromStr,
+    };
+
+    #[test]
+    fn file_handler_cli_argument_round_trips() {
+        for file_handler in EBI_FILE_HANDLERS {
+            let argument =
+                TestInput::FileHandler(file_handler.clone()).to_cli_argument();
+            match argument {
+                //the command line can name the handler: it must read back
+                Some(text) => assert_eq!(
+                    &EbiFileHandler::from_str(&text).unwrap(),
+                    file_handler
+                ),
+                //otherwise the command line must be unable to name it
+                None => assert!(file_handler.validator.is_none()),
+            }
+        }
+    }
+
+    #[test]
+    fn test_file_path_uses_forward_slashes() {
+        let path = test_file_path("a-b.xes");
+        assert_eq!(path.to_str().unwrap(), "./testfiles/a-b.xes");
+    }
+
+    #[test]
+    fn test_file_paths_open_and_are_portable() {
+        for entry in fs::read_dir(TEST_FILES_DIRECTORY).unwrap() {
+            let name = entry.unwrap().file_name().into_string().unwrap();
+            let path = test_file_path(&name);
+            let text = path.to_str().unwrap();
+
+            // The text ends up inside generated string literals and
+            // fallible-list keys, so it must not depend on the platform.
+            assert!(!text.contains('\\'), "backslash in {text}");
+            assert!(File::open(&path).is_ok(), "cannot open {text}");
         }
     }
 }
