@@ -669,7 +669,7 @@ impl EbiCommand {
                     }
                 }
                 EbiInputType::StringList => {
-                    if let Some(values) = cli_matches.get_many::<String>(&cli_id) {
+                    if let Some(values) = cli_matches.get_many::<String>(cli_id) {
                         return Ok(EbiInput::StringList(values.cloned().collect(), input_type));
                     }
                 }

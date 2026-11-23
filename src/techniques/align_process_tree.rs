@@ -114,7 +114,7 @@ impl Align for ProcessTreeAligner<'_> {
         &mut self,
         log: Box<dyn EbiTraitFiniteLanguage>,
     ) -> Result<LanguageOfAlignments> {
-        align_language_with(&self.tree.activity_key(), log, |trace| {
+        align_language_with(self.tree.activity_key(), log, |trace| {
             self.align_trace(trace)
         })
     }
@@ -123,7 +123,7 @@ impl Align for ProcessTreeAligner<'_> {
         &mut self,
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLanguageOfAlignments> {
-        align_stochastic_language_with(&self.tree.activity_key(), log, |trace| {
+        align_stochastic_language_with(self.tree.activity_key(), log, |trace| {
             self.align_trace(trace)
         })
     }
