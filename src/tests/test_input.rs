@@ -68,7 +68,7 @@ impl TestInput {
                 .is_some()
                 .then(|| file_handler.file_extension.to_string()),
             TestInput::Fraction(f, _) => Some(f.to_string()),
-            TestInput::StringList(_, _) => None,
+            TestInput::StringList(l, _) => Some(l.join(" ")),
         }
     }
 
