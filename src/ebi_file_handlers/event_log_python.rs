@@ -97,10 +97,6 @@ pub const EBI_EVENT_LOG_PYTHON: EbiFileHandler = EbiFileHandler {
             EventLogPython::import_as_stochastic_nondeterministic_finite_automaton_object,
             EventLogPython::IMPORTER_PARAMETERS,
         ),
-        EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
-            EventLogPython::import_as_stochastic_nondeterministic_finite_automaton_object,
-            EventLogPython::IMPORTER_PARAMETERS,
-        ),
     ],
     object_importers_fallible: &[],
     object_exporters: &[

@@ -53,6 +53,7 @@ pub enum EbiInput {
     Usize(usize, &'static EbiInputType),
     FileHandler(EbiFileHandler),
     Fraction(Fraction, &'static EbiInputType),
+    StringList(Vec<String>, &'static EbiInputType),
 }
 
 impl EbiInput {
@@ -68,6 +69,7 @@ impl EbiInput {
             EbiInput::Usize(_, input_type) => (*input_type).clone(),
             EbiInput::FileHandler(_) => EbiInputType::FileHandler,
             EbiInput::Fraction(_, input_type) => (*input_type).clone(),
+            EbiInput::StringList(_, input_type) => (*input_type).clone(),
         }
     }
 
@@ -79,6 +81,7 @@ impl EbiInput {
             EbiInput::Usize(_, _) => None,
             EbiInput::FileHandler(_) => None,
             EbiInput::Fraction(_, _) => None,
+            EbiInput::StringList(_, _) => None,
         }
     }
 }
@@ -117,6 +120,10 @@ pub enum EbiInputType {
         Option<ConstFraction>,
         Option<ConstFraction>,
     ),
+
+    /// A list of texts, such as the activity labels of a trace.
+    /// On the command line it is the last argument and takes all remaining values; a command can have at most one.
+    StringList,
 }
 
 impl EbiInputType {
@@ -133,6 +140,7 @@ impl EbiInputType {
             EbiInputType::Fraction(_, _, default) => {
                 default.as_ref().map(|fraction| fraction.to_string())
             }
+            EbiInputType::StringList => None,
         }
     }
 
@@ -145,6 +153,7 @@ impl EbiInputType {
             EbiInputType::Usize(_, _, _) => "an",
             EbiInputType::FileHandler => "a",
             EbiInputType::Fraction(_, _, _) => "a",
+            EbiInputType::StringList => "a",
         }
     }
 
@@ -157,6 +166,7 @@ impl EbiInputType {
             EbiInputType::Usize(_, _, _) => value_parser!(usize).into(),
             EbiInputType::FileHandler => value_parser!(EbiFileHandler).into(),
             EbiInputType::Fraction(_, _, _) => value_parser!(FractionNotParsedYet).into(),
+            EbiInputType::StringList => value_parser!(String).into(),
         }
     }
 
@@ -221,6 +231,9 @@ impl EbiInputType {
                 }
                 EbiInputType::Fraction(None, None, _) => {
                     result.insert("fraction".to_string());
+                }
+                EbiInputType::StringList => {
+                    result.insert("list of text".to_string());
                 }
             };
         }
@@ -302,6 +315,9 @@ impl EbiInputType {
                 EbiInputType::Fraction(_, _, _) => {
                     result.insert("fraction".to_string());
                 }
+                EbiInputType::StringList => {
+                    result.insert("list of text".to_string());
+                }
             };
         }
 
@@ -378,6 +394,9 @@ impl EbiInputType {
                 }
                 EbiInputType::Fraction(_, _, _) => {
                     result.insert("fraction".to_string());
+                }
+                EbiInputType::StringList => {
+                    result.insert("list of text".to_string());
                 }
             };
         }
@@ -492,6 +511,9 @@ impl EbiInputType {
                 }
                 EbiInputType::Fraction(_, _, _) => {
                     result.insert("fraction".to_string());
+                }
+                EbiInputType::StringList => {
+                    result.insert("list of text".to_string());
                 }
             };
         }
@@ -616,6 +638,7 @@ impl Display for EbiInputType {
             EbiInputType::Fraction(None, None, _) => {
                 write!(f, "fraction")
             }
+            EbiInputType::StringList => write!(f, "list of text"),
         }
     }
 }
@@ -1613,6 +1636,13 @@ pub fn attempt_parse(
                     }
                 }
             }
+            EbiInputType::StringList => {
+                //A list has no text form. A surface that cannot carry a list does not offer the command
+                //(see is_in_java and is_in_javascript), and must not guess a convention such as one text per line.
+                error = Some(anyhow!(
+                    "A list of texts cannot be given as text; give each text separately."
+                ));
+            }
         }
     }
 
@@ -1637,6 +1667,7 @@ pub fn validate_object_of(
 }
 
 pub const TEST_INPUT_TYPE_FRACTION: EbiInputType = EbiInputType::Fraction(None, None, None);
+pub const TEST_INPUT_TYPE_STRING_LIST: EbiInputType = EbiInputType::StringList;
 pub const TEST_INPUT_TYPE_USIZE: EbiInputType = EbiInputType::Usize(None, None, None);
 pub const TEST_INPUT_TYPE_STRING: EbiInputType = EbiInputType::String(None, None);
 
@@ -1678,6 +1709,15 @@ mod tests {
             EbiInputType::get_possible_inputs_with_latex(&list);
             EbiInputType::possible_inputs_as_strings_with_articles(&list, "xyz");
         }
+    }
+
+    #[test]
+    fn a_list_of_texts_cannot_be_given_as_one_text() {
+        //A surface that cannot carry a list does not offer the command, and
+        //must not guess a convention (such as one text per line) either.
+        let wanted: &[&'static EbiInputType] = &[&EbiInputType::StringList];
+        let text = MultipleReader::String("a\nb".to_string());
+        assert!(ebi_input::attempt_parse(wanted, text).is_err());
     }
 
     #[test]

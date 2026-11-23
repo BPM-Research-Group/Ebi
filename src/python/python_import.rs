@@ -9,12 +9,16 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
         object_importers::{
-            ToDeterministicFiniteAutomatonObject, ToEventLogObject, ToEventLogXesObject,
+            ToBusinessProcessModelAndNotationObject, ToDeterministicFiniteAutomatonObject,
+            ToEventLogEventAttributesObject, ToEventLogObject, ToEventLogXesObject,
             ToFiniteLanguageObject, ToFiniteStochasticLanguageObject, ToLabelledPetriNetObject,
-            ToProcessTreeObject, ToStochasticDeterministicFiniteAutomatonObject,
+            ToPartiallyOrderedWorkflowLanguageObject, ToProcessTreeObject,
+            ToStochasticDeterministicFiniteAutomatonObject,
+            ToStochasticNondeterministicFiniteAutomatonObject,
         },
         trait_importers::{
-            ToActivitiesTrait, ToEventLogTrait, ToFiniteLanguageTrait,
+            ToActivitiesTrait, ToEventLogEventAttributesTrait, ToEventLogTraceAttributesTrait,
+            ToEventLogTrait, ToFiniteLanguageTrait,
             ToFiniteStochasticLanguageTrait, ToGraphableTrait, ToIterableLanguageTrait,
             ToIterableStochasticLanguageTrait, ToQueriableStochasticLanguageTrait,
             ToSemanticsTrait, ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
@@ -48,6 +52,7 @@ type PyImporter = fn(&Bound<'_, PyAny>, &[&'static EbiInputType]) -> PyResult<Eb
 pub const PYTHON_IMPORTERS: &[PyImporter] = &[
     usize::py_import,
     Fraction::py_import,
+    Vec::<String>::py_import,
     EventLogPython::py_import,
     LabelledPetriNet::py_import,
     ProcessTree::py_import,
@@ -135,6 +140,29 @@ impl ImportableFromPM4Py for Fraction {
     }
 }
 
+impl ImportableFromPM4Py for Vec<String> {
+    const PY_FILE_HANDLER: Option<&'static EbiFileHandler> = None;
+
+    fn py_extract_object(py_object: &Bound<'_, PyAny>) -> PyResult<Self> {
+        //a bare string is rejected by PyO3 here, so a text is never taken for a list of characters
+        py_object.extract().map_err(|_| {
+            PyValueError::new_err("Expected a Python sequence of strings")
+        })
+    }
+
+    fn py_object_to_ebi_input(self, input_types: &[&'static EbiInputType]) -> Option<EbiInput> {
+        for &itype in input_types {
+            match itype {
+                EbiInputType::StringList => {
+                    return Some(EbiInput::StringList(self, itype));
+                }
+                _ => {}
+            }
+        }
+        None
+    }
+}
+
 impl ImportableFromPM4Py for EventLogPython {
     const PY_FILE_HANDLER: Option<&'static EbiFileHandler> = Some(&EBI_EVENT_LOG_PYTHON);
 
@@ -207,8 +235,37 @@ impl ImportableFromPM4Py for EventLogPython {
                         &Self::PY_FILE_HANDLER.unwrap(),
                     ));
                 }
+                EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton) => {
+                    return Some(EbiInput::Object(
+                        self.to_stochastic_nondeterministic_finite_automaton_object(),
+                        &Self::PY_FILE_HANDLER.unwrap(),
+                    ));
+                }
+                EbiInputType::Object(EbiObjectType::EventLogEventAttributes) => {
+                    return Some(EbiInput::Object(
+                        self.to_event_log_event_attributes_object(),
+                        &Self::PY_FILE_HANDLER.unwrap(),
+                    ));
+                }
                 EbiInputType::Trait(etrait) => {
                     match etrait {
+                        EbiTrait::EventLogEventAttributes => {
+                            return Some(EbiInput::Trait(
+                                self.to_event_log_event_attributes_ebi_trait_object(),
+                                &Self::PY_FILE_HANDLER.unwrap(),
+                            ));
+                        }
+                        EbiTrait::EventLogTraceAttributes => {
+                            return match self.to_event_log_xes_object() {
+                                EbiObject::EventLogXes(log) => Some(EbiInput::Trait(
+                                    EbiTraitObject::EventLogTraceAttributes(
+                                        log.to_event_log_trace_attributes_trait(),
+                                    ),
+                                    &Self::PY_FILE_HANDLER.unwrap(),
+                                )),
+                                _ => None,
+                            };
+                        }
                         EbiTrait::Activities => {
                             return Some(EbiInput::Trait(
                                 self.to_activities_ebi_trait_object(),
@@ -519,6 +576,18 @@ impl ImportableFromPM4Py for ProcessTree {
                 EbiInputType::Object(EbiObjectType::LabelledPetriNet) => {
                     return Some(EbiInput::Object(
                         self.to_labelled_petri_net_object(),
+                        &Self::PY_FILE_HANDLER.unwrap(),
+                    ));
+                }
+                EbiInputType::Object(EbiObjectType::BusinessProcessModelAndNotation) => {
+                    return Some(EbiInput::Object(
+                        self.to_business_process_model_and_notation_object(),
+                        &Self::PY_FILE_HANDLER.unwrap(),
+                    ));
+                }
+                EbiInputType::Object(EbiObjectType::PartiallyOrderedWorkflowLanguage) => {
+                    return Some(EbiInput::Object(
+                        self.to_partially_ordered_workflow_language_object(),
                         &Self::PY_FILE_HANDLER.unwrap(),
                     ));
                 }
