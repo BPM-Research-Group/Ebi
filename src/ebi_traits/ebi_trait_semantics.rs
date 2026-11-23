@@ -10,15 +10,7 @@ use crate::{
     },
 };
 use ebi_objects::{
-    ActivityKey, AutomatonState, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
-    DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes,
-    EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    FiniteStochasticPartiallyOrderedLanguage, HasActivityKey, LabelledPetriNet, LolaNet,
-    PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage,
-    StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_bpmn::BPMNMarking,
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
@@ -27,6 +19,14 @@ use ebi_objects::{
         partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
         process_tree::TreeMarking,
     },
+    ActivityKey, AutomatonState, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
+    DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes,
+    EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
+    FiniteStochasticPartiallyOrderedLanguage, HasActivityKey, LabelledPetriNet, LolaNet,
+    PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage,
+    StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
 };
 
 #[macro_export]

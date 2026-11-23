@@ -5,9 +5,8 @@ use crate::{
     semantics::semantics_trait::Semantics,
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, HasActivityKey, ProcessTree,
-    anyhow::{Result, anyhow},
-    ebi_objects::process_tree::{Node, Operator},
+    anyhow::{anyhow, Result},
+    DeterministicFiniteAutomaton, HasActivityKey, ProcessTree, TreeNode, TreeOperator,
 };
 use std::collections::HashSet;
 
@@ -30,13 +29,13 @@ impl FlowerMinerTree for dyn EbiTraitFiniteLanguage {
         }
 
         let mut tree = vec![
-            Node::Operator(Operator::Loop, activities.len() + 1),
-            Node::Tau,
+            TreeNode::Operator(TreeOperator::Loop, activities.len() + 1),
+            TreeNode::Tau,
         ];
         tree.append(
             &mut activities
                 .iter()
-                .map(|a| Node::Activity(**a))
+                .map(|a| TreeNode::Activity(**a))
                 .collect::<Vec<_>>(),
         );
 
@@ -105,13 +104,13 @@ impl FlowerMinerTree for EbiTraitSemantics {
             .collect::<Vec<_>>();
 
         let mut tree = vec![
-            Node::Operator(Operator::Loop, activities.len() + 1),
-            Node::Tau,
+            TreeNode::Operator(TreeOperator::Loop, activities.len() + 1),
+            TreeNode::Tau,
         ];
         tree.append(
             &mut activities
                 .iter()
-                .map(|a| Node::Activity(*a))
+                .map(|a| TreeNode::Activity(*a))
                 .collect::<Vec<_>>(),
         );
 
@@ -155,13 +154,13 @@ impl FlowerMinerTree for dyn HasActivityKey {
             .collect::<Vec<_>>();
 
         let mut tree = vec![
-            Node::Operator(Operator::Loop, activities.len() + 1),
-            Node::Tau,
+            TreeNode::Operator(TreeOperator::Loop, activities.len() + 1),
+            TreeNode::Tau,
         ];
         tree.append(
             &mut activities
                 .iter()
-                .map(|a| Node::Activity(*a))
+                .map(|a| TreeNode::Activity(*a))
                 .collect::<Vec<_>>(),
         );
 

@@ -4,19 +4,20 @@ use crate::{
     techniques::{livelock::IsPartOfLivelock, reachability::IsReachable},
 };
 use ebi_objects::{
+    anyhow::Result,
+    ebi_objects::partially_ordered_workflow_language::{
+        PartiallyOrderedWorkflowLanguage, PowlNode,
+    },
+    strongly_connected_components::StronglyConnectedComponents,
     AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
     DirectlyFollowsModel, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
     ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::Result,
-    ebi_objects::{
-        partially_ordered_workflow_language::{PartiallyOrderedWorkflowLanguage, PowlNode},
-        process_tree::{Node, Operator, TreeMarking},
-    },
-    strongly_connected_components::StronglyConnectedComponents,
+    TreeMarking,
 };
+use fnv::FnvBuildHasher;
 use std::{
-    collections::{HashMap, HashSet, hash_map::Entry},
+    collections::{hash_map::Entry, HashMap, HashSet},
     fmt::Display,
 };
 
@@ -35,11 +36,11 @@ macro_rules! tree {
             type LivState = TreeMarking;
 
             fn infinitely_many_traces(&self) -> Result<bool> {
-                for node in 0..self.get_number_of_nodes() {
-                    if let Some(Node::Operator(Operator::Loop, _)) = self.get_node(node) {
+                for node in 0..self.len() {
+                    if let Some(ebi_objects::TreeNode::Operator(ebi_objects::TreeOperator::Loop, _)) = self.get(node) {
                         //see whether at least one leaf in the loop is an activity
                         for child in self.get_descendants(node) {
-                            if let Node::Activity(_) = child {
+                            if let ebi_objects::TreeNode::Activity(_) = child {
                                 return Ok(true);
                             }
                         }
@@ -167,7 +168,7 @@ macro_rules! lpn {
 struct CycleGraph {
     //edges are stored reversely to allow easy backward search
     index2state: Vec<LPNMarking>,
-    state2index: HashMap<LPNMarking, usize>,
+    state2index: HashMap<LPNMarking, usize, FnvBuildHasher>,
     edges: Vec<Vec<usize>>,         //target, vec<source>
     is_edge_silent: Vec<Vec<bool>>, //target, vec<source>
 }
@@ -176,7 +177,7 @@ impl CycleGraph {
     fn new() -> Self {
         Self {
             index2state: vec![],
-            state2index: HashMap::new(),
+            state2index: HashMap::default(),
             edges: vec![],
             is_edge_silent: vec![],
         }

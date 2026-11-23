@@ -21,8 +21,7 @@ use crate::{
 };
 use ebi_objects::{
     ebi_arithmetic::{Fraction, One, Signed, Zero},
-    ebi_objects::process_tree::{Node, Operator},
-    FiniteLanguage, FiniteStochasticLanguage, ProcessTree,
+    FiniteLanguage, FiniteStochasticLanguage, ProcessTree, TreeNode, TreeOperator,
 };
 use intmap::IntMap;
 use std::fmt::Display;
@@ -110,7 +109,7 @@ pub struct InductiveMinerParameters {
         info: &LogInfo,
         parameters: &InductiveMinerParameters,
         recursion_depth: usize,
-    ) -> Option<Vec<Node>>,
+    ) -> Option<Vec<TreeNode>>,
     cut_finders: fn(
         log: &dyn EbiTraitFiniteStochasticLanguage,
         info: &LogInfo,
@@ -122,7 +121,7 @@ pub struct InductiveMinerParameters {
         info: &LogInfo,
         parameters: &InductiveMinerParameters,
         recursion_depth: usize,
-    ) -> Vec<Node>,
+    ) -> Vec<TreeNode>,
 }
 
 impl Default for InductiveMinerParameters {
@@ -151,7 +150,7 @@ fn inductive_miner_recursion(
     log: &dyn EbiTraitFiniteStochasticLanguage,
     parameters: &InductiveMinerParameters,
     recursion_depth: usize,
-) -> Vec<Node> {
+) -> Vec<TreeNode> {
     let info = log.compute_log_info();
 
     if let Some(tree) = (parameters.base_cases)(log, &info, parameters, recursion_depth) {
@@ -181,8 +180,8 @@ fn debug<S: AsRef<str> + Display>(message: S, recursion_depth: usize) {
     }
 }
 
-fn build_operator_node(operator: Operator, subtrees: Vec<Vec<Node>>) -> Vec<Node> {
-    let mut nodes = vec![Node::Operator(operator, subtrees.len())];
+fn build_operator_node(operator: TreeOperator, subtrees: Vec<Vec<TreeNode>>) -> Vec<TreeNode> {
+    let mut nodes = vec![TreeNode::Operator(operator, subtrees.len())];
     for subtree in subtrees {
         nodes.extend(subtree);
     }
@@ -193,10 +192,13 @@ mod find_base_cases {
     use crate::techniques::inductive_miner::{debug, log_info::LogInfo, InductiveMinerParameters};
     use ebi_objects::{
         ebi_arithmetic::{f, Fraction, Signed, Zero},
-        ebi_objects::process_tree::Node,
+        TreeNode,
     };
 
-    pub(super) fn base_case_empty_log(info: &LogInfo, recursion_depth: usize) -> Option<Vec<Node>> {
+    pub(super) fn base_case_empty_log(
+        info: &LogInfo,
+        recursion_depth: usize,
+    ) -> Option<Vec<TreeNode>> {
         if info.total_traces.is_zero() {
             debug("empty log", recursion_depth);
             return Some(vec![]);
@@ -207,7 +209,7 @@ mod find_base_cases {
     pub(super) fn base_case_single_activity(
         info: &LogInfo,
         recursion_depth: usize,
-    ) -> Option<Vec<Node>> {
+    ) -> Option<Vec<TreeNode>> {
         if info.activities.len() == 1
             && !info.dfg.empty_traces_weight.is_positive()
             && info.activity_instances == info.total_traces
@@ -217,7 +219,7 @@ mod find_base_cases {
                 format!("single activity {}", only_activity),
                 recursion_depth,
             );
-            return Some(vec![Node::Activity(only_activity)]);
+            return Some(vec![TreeNode::Activity(only_activity)]);
         }
         None
     }
@@ -226,7 +228,7 @@ mod find_base_cases {
         info: &LogInfo,
         parameters: &InductiveMinerParameters,
         recursion_depth: usize,
-    ) -> Option<Vec<Node>> {
+    ) -> Option<Vec<TreeNode>> {
         if info.activities.len() != 1 {
             return None;
         }
@@ -239,7 +241,7 @@ mod find_base_cases {
                 recursion_depth,
             );
 
-            return Some(vec![Node::Activity(only_activity)]);
+            return Some(vec![TreeNode::Activity(only_activity)]);
         }
         None
     }
@@ -502,11 +504,7 @@ mod cut_finding {
         math::components::Components,
         techniques::inductive_miner::{build_operator_node, log_info::LogInfo},
     };
-    use ebi_objects::{
-        ebi_arithmetic::Signed,
-        ebi_objects::process_tree::{Node, Operator},
-        Activity,
-    };
+    use ebi_objects::{ebi_arithmetic::Signed, Activity, TreeNode, TreeOperator};
     use std::collections::{HashMap, HashSet};
 
     #[derive(Debug)]
@@ -521,12 +519,12 @@ mod cut_finding {
     }
 
     impl Cut {
-        pub(super) fn build_tree(&self, subtrees: Vec<Vec<Node>>) -> Vec<Node> {
+        pub(super) fn build_tree(&self, subtrees: Vec<Vec<TreeNode>>) -> Vec<TreeNode> {
             match self {
-                Cut::ExclusiveChoice(_) => build_operator_node(Operator::Xor, subtrees),
-                Cut::Sequence(_) => build_operator_node(Operator::Sequence, subtrees),
-                Cut::Concurrent(_) => build_operator_node(Operator::Concurrent, subtrees),
-                Cut::Loop { .. } => build_operator_node(Operator::Loop, subtrees),
+                Cut::ExclusiveChoice(_) => build_operator_node(TreeOperator::Xor, subtrees),
+                Cut::Sequence(_) => build_operator_node(TreeOperator::Sequence, subtrees),
+                Cut::Concurrent(_) => build_operator_node(TreeOperator::Concurrent, subtrees),
+                Cut::Loop { .. } => build_operator_node(TreeOperator::Loop, subtrees),
             }
         }
     }
@@ -806,9 +804,8 @@ mod find_fall_throughs {
         },
     };
     use ebi_objects::{
-        ebi_arithmetic::Signed,
-        ebi_objects::process_tree::{Node, Operator},
-        Activity, FiniteStochasticLanguage, IntoRefTraceIterator,
+        ebi_arithmetic::Signed, Activity, FiniteStochasticLanguage, IntoRefTraceIterator, TreeNode,
+        TreeOperator,
     };
     use std::collections::HashSet;
 
@@ -817,7 +814,7 @@ mod find_fall_throughs {
         info: &LogInfo,
         parameters: &InductiveMinerParameters,
         recursion_depth: usize,
-    ) -> Option<Vec<Node>> {
+    ) -> Option<Vec<TreeNode>> {
         if !info.dfg.empty_traces_weight.is_positive() {
             return None;
         }
@@ -833,12 +830,15 @@ mod find_fall_throughs {
         }
 
         if filtered_log.iter_traces().next().is_none() {
-            return Some(vec![Node::Tau]);
+            return Some(vec![TreeNode::Tau]);
         }
 
         let subtree = inductive_miner_recursion(&filtered_log, parameters, recursion_depth + 1);
-        let tau_leaf = vec![Node::Tau];
-        Some(build_operator_node(Operator::Xor, vec![tau_leaf, subtree]))
+        let tau_leaf = vec![TreeNode::Tau];
+        Some(build_operator_node(
+            TreeOperator::Xor,
+            vec![tau_leaf, subtree],
+        ))
     }
 
     pub(super) fn activity_once_per_trace(
@@ -846,7 +846,7 @@ mod find_fall_throughs {
         info: &LogInfo,
         parameters: &InductiveMinerParameters,
         recursion_depth: usize,
-    ) -> Option<Vec<Node>> {
+    ) -> Option<Vec<TreeNode>> {
         let activity = *info.activities.iter().find(|&&a| {
             log.iter_traces()
                 .all(|trace| trace.iter().filter(|&&x| x == a).count() == 1)
@@ -869,9 +869,9 @@ mod find_fall_throughs {
         }
 
         let subtree = inductive_miner_recursion(&filtered_log, parameters, recursion_depth + 1);
-        let a_leaf = vec![Node::Activity(activity)];
+        let a_leaf = vec![TreeNode::Activity(activity)];
         Some(build_operator_node(
-            Operator::Concurrent,
+            TreeOperator::Concurrent,
             vec![a_leaf, subtree],
         ))
     }
@@ -881,7 +881,7 @@ mod find_fall_throughs {
         info: &LogInfo,
         parameters: &InductiveMinerParameters,
         recursion_depth: usize,
-    ) -> Option<Vec<Node>> {
+    ) -> Option<Vec<TreeNode>> {
         if info.activities.len() < 3 {
             return None;
         }
@@ -910,7 +910,7 @@ mod find_fall_throughs {
                 let subtree_2 =
                     inductive_miner_recursion(sub_log_2, parameters, recursion_depth + 1);
                 return Some(build_operator_node(
-                    Operator::Concurrent,
+                    TreeOperator::Concurrent,
                     vec![subtree_1, subtree_2],
                 ));
             }
@@ -924,7 +924,7 @@ mod find_fall_throughs {
         info: &LogInfo,
         parameters: &InductiveMinerParameters,
         recursion_depth: usize,
-    ) -> Option<Vec<Node>> {
+    ) -> Option<Vec<TreeNode>> {
         if info.activities.len() <= 1 {
             return None;
         }
@@ -957,8 +957,11 @@ mod find_fall_throughs {
         debug("strict tau loop", recursion_depth);
 
         let subtree = inductive_miner_recursion(&new_log, parameters, recursion_depth + 1);
-        let tau_leaf = vec![Node::Tau];
-        Some(build_operator_node(Operator::Loop, vec![subtree, tau_leaf]))
+        let tau_leaf = vec![TreeNode::Tau];
+        Some(build_operator_node(
+            TreeOperator::Loop,
+            vec![subtree, tau_leaf],
+        ))
     }
 
     pub(super) fn tau_loop(
@@ -966,7 +969,7 @@ mod find_fall_throughs {
         info: &LogInfo,
         parameters: &InductiveMinerParameters,
         recursion_depth: usize,
-    ) -> Option<Vec<Node>> {
+    ) -> Option<Vec<TreeNode>> {
         if info.activities.len() <= 1 {
             return None;
         }
@@ -998,31 +1001,34 @@ mod find_fall_throughs {
         debug("tau loop", recursion_depth);
 
         let subtree = inductive_miner_recursion(&new_log, parameters, recursion_depth + 1);
-        let tau_leaf = vec![Node::Tau];
-        Some(build_operator_node(Operator::Loop, vec![subtree, tau_leaf]))
+        let tau_leaf = vec![TreeNode::Tau];
+        Some(build_operator_node(
+            TreeOperator::Loop,
+            vec![subtree, tau_leaf],
+        ))
     }
 
     pub(super) fn flower_model(
         _log: &dyn EbiTraitFiniteStochasticLanguage,
         info: &LogInfo,
         recursion_depth: usize,
-    ) -> Vec<Node> {
+    ) -> Vec<TreeNode> {
         if info.activities.len() == 1 {
             let a = *info.activities.iter().next().unwrap();
-            let a_leaf = vec![Node::Activity(a)];
-            let tau_leaf = vec![Node::Tau];
-            return build_operator_node(Operator::Loop, vec![a_leaf, tau_leaf]);
+            let a_leaf = vec![TreeNode::Activity(a)];
+            let tau_leaf = vec![TreeNode::Tau];
+            return build_operator_node(TreeOperator::Loop, vec![a_leaf, tau_leaf]);
         }
 
-        let activity_trees: Vec<Vec<Node>> = info
+        let activity_trees: Vec<Vec<TreeNode>> = info
             .activities
             .iter()
-            .map(|&a| vec![Node::Activity(a)])
+            .map(|&a| vec![TreeNode::Activity(a)])
             .collect();
-        let xor_body = build_operator_node(Operator::Xor, activity_trees);
-        let tau_leaf = vec![Node::Tau];
+        let xor_body = build_operator_node(TreeOperator::Xor, activity_trees);
+        let tau_leaf = vec![TreeNode::Tau];
         debug("flower model", recursion_depth);
-        build_operator_node(Operator::Loop, vec![xor_body, tau_leaf])
+        build_operator_node(TreeOperator::Loop, vec![xor_body, tau_leaf])
     }
 }
 
@@ -1225,9 +1231,7 @@ mod tests {
     use ebi_objects::{
         activity, con,
         ebi_arithmetic::{f, Fraction, One},
-        ebi_objects::process_tree::{Node, Operator},
-        event_log, seq, trace, ActivityKey, ActivityKeyTranslator, EventLog, FiniteLanguage,
-        FiniteStochasticLanguage, ProcessTree,
+        event_log, seq, trace, ActivityKey, EventLog, FiniteLanguage, FiniteStochasticLanguage,
     };
 
     #[test]

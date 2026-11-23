@@ -12,10 +12,7 @@ mod tree {
         empty_traces::has_empty_traces_node,
         reduce::{ReduceLanguageEquivalently, ReduceLanguageEquivalentlyForPetriNets},
     };
-    use ebi_objects::{
-        ebi_objects::process_tree::{Node, Operator},
-        ProcessTree,
-    };
+    use ebi_objects::{ProcessTree, TreeNode, TreeOperator};
 
     impl ReduceLanguageEquivalentlyForPetriNets for ProcessTree {
         fn reduce_language_equivalently_for_petri_nets(&mut self) {
@@ -28,7 +25,7 @@ mod tree {
             let mut changed = true;
             while changed {
                 changed = false;
-                for node in (0..self.tree.len()).rev() {
+                for node in (0..self.len()).rev() {
                     for rule in &rules {
                         changed |= rule.apply(self, node);
                     }
@@ -49,7 +46,7 @@ mod tree {
             let mut changed = true;
             while changed {
                 changed = false;
-                for node in (0..self.tree.len()).rev() {
+                for node in (0..self.len()).rev() {
                     for rule in &rules {
                         changed |= rule.apply(self, node);
                     }
@@ -67,22 +64,22 @@ mod tree {
 
     impl TreeRule for Singularity {
         fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool {
-            match tree.tree[node] {
-                Node::Tau | Node::Activity(_) => false,
-                Node::Operator(Operator::Loop, _) => false,
-                Node::Operator(Operator::Concurrent, 1)
-                | Node::Operator(Operator::Interleaved, 1)
-                | Node::Operator(Operator::Or, 1)
-                | Node::Operator(Operator::Sequence, 1)
-                | Node::Operator(Operator::Xor, 1) => {
-                    tree.tree.remove(node);
+            match tree[node] {
+                TreeNode::Tau | TreeNode::Activity(_) => false,
+                TreeNode::Operator(TreeOperator::Loop, _) => false,
+                TreeNode::Operator(TreeOperator::Concurrent, 1)
+                | TreeNode::Operator(TreeOperator::Interleaved, 1)
+                | TreeNode::Operator(TreeOperator::Or, 1)
+                | TreeNode::Operator(TreeOperator::Sequence, 1)
+                | TreeNode::Operator(TreeOperator::Xor, 1) => {
+                    let _ = tree.remove(node);
                     true
                 }
-                Node::Operator(Operator::Concurrent, _)
-                | Node::Operator(Operator::Interleaved, _)
-                | Node::Operator(Operator::Or, _)
-                | Node::Operator(Operator::Sequence, _)
-                | Node::Operator(Operator::Xor, _) => false,
+                TreeNode::Operator(TreeOperator::Concurrent, _)
+                | TreeNode::Operator(TreeOperator::Interleaved, _)
+                | TreeNode::Operator(TreeOperator::Or, _)
+                | TreeNode::Operator(TreeOperator::Sequence, _)
+                | TreeNode::Operator(TreeOperator::Xor, _) => false,
             }
         }
     }
@@ -91,43 +88,31 @@ mod tree {
 
     impl TreeRule for Associativity {
         fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool {
-            match tree.tree[node] {
-                Node::Tau | Node::Activity(_) => false,
-                Node::Operator(Operator::Interleaved, _) => false,
-                Node::Operator(Operator::Xor, number_of_children)
-                | Node::Operator(Operator::Sequence, number_of_children)
-                | Node::Operator(Operator::Concurrent, number_of_children)
-                | Node::Operator(Operator::Or, number_of_children) => {
+            match tree[node] {
+                TreeNode::Tau | TreeNode::Activity(_) => false,
+                TreeNode::Operator(TreeOperator::Interleaved, _) => false,
+                TreeNode::Operator(TreeOperator::Xor, _)
+                | TreeNode::Operator(TreeOperator::Sequence, _)
+                | TreeNode::Operator(TreeOperator::Concurrent, _)
+                | TreeNode::Operator(TreeOperator::Or, _) => {
                     for child in tree.get_children(node) {
-                        if tree.tree[child].is_operator_and_matches(&tree.tree[node]) {
-                            let sub_number_of_children = tree.tree[child].number_of_children();
-                            tree.tree.remove(child);
-                            _ = tree.tree[node].set_number_of_children(
-                                number_of_children - 1 + sub_number_of_children,
-                            );
+                        if tree[child].is_operator_and_matches(&tree[node]) {
+                            _ = tree.remove(child);
                             return true;
                         }
                     }
                     false
                 }
-                Node::Operator(Operator::Loop, number_of_children) => {
+                TreeNode::Operator(TreeOperator::Loop, _) => {
                     for (c, child) in tree.get_children(node).enumerate() {
                         if c == 0 {
-                            if tree.tree[child].is_operator_and_matches(&tree.tree[node]) {
-                                let sub_number_of_children = tree.tree[child].number_of_children();
-                                tree.tree.remove(child);
-                                _ = tree.tree[node].set_number_of_children(
-                                    number_of_children - 1 + sub_number_of_children,
-                                );
+                            if tree[child].is_operator_and_matches(&tree[node]) {
+                                let _ = tree.remove(child);
                                 return true;
                             }
                         } else {
-                            if tree.tree[child].is_operator_xor() {
-                                let sub_number_of_children = tree.tree[child].number_of_children();
-                                tree.tree.remove(child);
-                                _ = tree.tree[node].set_number_of_children(
-                                    number_of_children - 1 + sub_number_of_children,
-                                );
+                            if tree[child].is_operator_xor() {
+                                let _ = tree.remove(child);
                                 return true;
                             }
                         }
@@ -143,47 +128,53 @@ mod tree {
     impl TreeRule for Tau {
         fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool {
             //optimisation: everything is tau
-            if !tree.tree[node].is_leaf()
-                && !tree.tree[node..tree.traverse(node)]
+            if !tree[node].is_leaf()
+                && !tree[node..tree.traverse(node)]
                     .iter()
                     .any(|child| child.is_activity())
             {
                 //subtree has no activities -> replace with tau
-                tree.tree.drain(node..tree.traverse(node));
-                tree.tree.insert(node, Node::Tau);
+                let x = tree.traverse(node);
+                tree.edit(|tree| {
+                    tree.drain(node..x);
+                    tree.insert(node, TreeNode::Tau);
+                });
                 return true;
             }
 
-            match tree.tree[node] {
-                Node::Tau | Node::Activity(_) => false,
-                Node::Operator(Operator::Concurrent, number_of_children)
-                | Node::Operator(Operator::Sequence, number_of_children)
-                | Node::Operator(Operator::Interleaved, number_of_children)
+            match tree[node] {
+                TreeNode::Tau | TreeNode::Activity(_) => false,
+                TreeNode::Operator(TreeOperator::Concurrent, number_of_children)
+                | TreeNode::Operator(TreeOperator::Sequence, number_of_children)
+                | TreeNode::Operator(TreeOperator::Interleaved, number_of_children)
                     if number_of_children > 1 =>
                 {
                     for child in tree.get_children(node) {
                         //remove tau altogether
-                        if tree.tree[child].is_tau() {
-                            _ = tree.tree[node].set_number_of_children(number_of_children - 1);
-                            tree.tree.remove(child);
+                        if tree[child].is_tau() {
+                            _ = tree.remove(child);
                             return true;
                         }
                     }
                     false
                 }
-                Node::Operator(Operator::Or, number_of_children) if number_of_children > 1 => {
+                TreeNode::Operator(TreeOperator::Or, number_of_children)
+                    if number_of_children > 1 =>
+                {
                     //option 1: diect tau
                     for child in tree.get_children(node) {
-                        if tree.tree[child].is_tau() {
+                        if tree[child].is_tau() {
                             //move tau to xor(tau) above or
 
-                            //remove tau
-                            tree.tree.remove(child);
-                            _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+                            tree.edit(|tree| {
+                                //remove tau
+                                tree.remove(child);
+                                _ = tree[node].set_number_of_children(number_of_children - 1);
 
-                            //add xor(tau)
-                            tree.tree.insert(node, Node::Tau);
-                            tree.tree.insert(node, Node::Operator(Operator::Xor, 2));
+                                //add xor(tau)
+                                tree.insert(node, TreeNode::Tau);
+                                tree.insert(node, TreeNode::Operator(TreeOperator::Xor, 2));
+                            });
 
                             return true;
                         }
@@ -193,30 +184,33 @@ mod tree {
                     for child in tree.get_children(node) {
                         if let Some(number_of_children) = tree.get_number_of_children(child)
                             && number_of_children >= 2
-                            && tree.tree[child].is_operator_xor()
+                            && tree[child].is_operator_xor()
                         {
                             //find a grandchild tau
                             if let Some(grandchild_tau) = tree
                                 .get_children(child)
-                                .find(|grandchild| tree.tree[*grandchild].is_tau())
+                                .find(|grandchild| tree[*grandchild].is_tau())
                             {
-                                //remove the grandchild
-                                tree.tree.remove(grandchild_tau);
-                                _ = tree.tree[child].set_number_of_children(number_of_children - 1);
+                                tree.edit(|tree| {
+                                    //remove the grandchild
+                                    tree.remove(grandchild_tau);
+                                    _ = tree[child].set_number_of_children(number_of_children - 1);
 
-                                //lift the or(..) to xor(tau, or(..))
-                                tree.tree.insert(node, Node::Tau);
-                                tree.tree.insert(node, Node::Operator(Operator::Xor, 2));
+                                    //lift the or(..) to xor(tau, or(..))
+                                    tree.insert(node, TreeNode::Tau);
+                                    tree.insert(node, TreeNode::Operator(TreeOperator::Xor, 2));
+                                });
                                 return true;
                             }
                         }
                     }
                     false
                 }
-                Node::Operator(Operator::Xor, number_of_children) if number_of_children > 1 => {
-                    if let Some(tau_child) = tree
-                        .get_children(node)
-                        .find(|child| tree.tree[*child].is_tau())
+                TreeNode::Operator(TreeOperator::Xor, number_of_children)
+                    if number_of_children > 1 =>
+                {
+                    if let Some(tau_child) =
+                        tree.get_children(node).find(|child| tree[*child].is_tau())
                     {
                         //there is a tau child
 
@@ -226,18 +220,20 @@ mod tree {
                         {
                             //there is another child with the empty trace
                             //remove the tau
-                            tree.tree.remove(tau_child);
-                            _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+
+                            _ = tree.remove(tau_child);
                             return true;
                         }
                     }
                     false
                 }
-                Node::Operator(Operator::Loop, number_of_children) if number_of_children > 1 => {
+                TreeNode::Operator(TreeOperator::Loop, number_of_children)
+                    if number_of_children > 1 =>
+                {
                     if let Some(tau_child) = tree
                         .get_children(node)
                         .skip(1)
-                        .find(|child| tree.tree[*child].is_tau())
+                        .find(|child| tree[*child].is_tau())
                     {
                         //there is a tau child
 
@@ -248,27 +244,35 @@ mod tree {
                         {
                             //there is another child with the empty trace
                             //remove the tau
-                            tree.tree.remove(tau_child);
-                            _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+                            _ = tree.remove(tau_child);
                             return true;
                         }
                     }
 
-                    if tree.tree[tree.get_child(node, 0)].is_tau() {
+                    if tree[tree.get_child(node, 0)].is_tau() {
                         println!("target");
                         //loop has a body tau; pull it up
                         //remove the body tau
-                        tree.tree.remove(tree.get_child(node, 0));
-                        //change the loop to an xor
-                        tree.tree[node] = Node::Operator(Operator::Xor, number_of_children - 1);
+                        let x = tree.get_child(node, 0);
+                        tree.edit(|tree| {
+                            tree.remove(x);
+                            //change the loop to an xor
+                            tree[node] =
+                                TreeNode::Operator(TreeOperator::Xor, number_of_children - 1);
+                        });
+
                         //insert redo-tau
-                        tree.tree.insert(tree.traverse(node), Node::Tau);
-                        //insert loop
-                        tree.tree.insert(node, Node::Operator(Operator::Loop, 2));
-                        //insert tau
-                        tree.tree.insert(node, Node::Tau);
-                        //insert xor
-                        tree.tree.insert(node, Node::Operator(Operator::Xor, 2));
+                        let y = tree.traverse(node);
+                        tree.edit(|tree| {
+                            tree.insert(y, TreeNode::Tau);
+                            //insert loop
+                            tree.insert(node, TreeNode::Operator(TreeOperator::Loop, 2));
+                            //insert tau
+                            tree.insert(node, TreeNode::Tau);
+                            //insert xor
+                            tree.insert(node, TreeNode::Operator(TreeOperator::Xor, 2));
+                        });
+
                         return true;
                     }
 
@@ -283,20 +287,20 @@ mod tree {
 
     impl TreeRule for ImplicitConcurrent {
         fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool {
-            match tree.tree[node] {
-                Node::Tau => false,
-                Node::Activity(_) => false,
-                Node::Operator(Operator::Sequence, _)
-                | Node::Operator(Operator::Loop, _)
-                | Node::Operator(Operator::Xor, _)
-                | Node::Operator(Operator::Or, _)
-                | Node::Operator(Operator::Concurrent, _) => false,
-                Node::Operator(Operator::Interleaved, number_of_children) => {
+            match tree[node] {
+                TreeNode::Tau => false,
+                TreeNode::Activity(_) => false,
+                TreeNode::Operator(TreeOperator::Sequence, _)
+                | TreeNode::Operator(TreeOperator::Loop, _)
+                | TreeNode::Operator(TreeOperator::Xor, _)
+                | TreeNode::Operator(TreeOperator::Or, _)
+                | TreeNode::Operator(TreeOperator::Concurrent, _) => false,
+                TreeNode::Operator(TreeOperator::Interleaved, _) => {
                     if tree
                         .get_children(node)
                         .all(|child| max_trace_length(tree, child) <= 1)
                     {
-                        tree.tree[node] = Node::Operator(Operator::Concurrent, number_of_children);
+                        tree.set_operator(node, TreeOperator::Concurrent);
                         return true;
                     }
                     false
@@ -309,15 +313,15 @@ mod tree {
 
     impl TreeRule for IntroduceORs {
         fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool {
-            match tree.tree[node] {
-                Node::Tau => false,
-                Node::Activity(_) => false,
-                Node::Operator(Operator::Sequence, _)
-                | Node::Operator(Operator::Loop, _)
-                | Node::Operator(Operator::Xor, _)
-                | Node::Operator(Operator::Or, _)
-                | Node::Operator(Operator::Interleaved, _) => false,
-                Node::Operator(Operator::Concurrent, number_of_children) => {
+            match tree[node] {
+                TreeNode::Tau => false,
+                TreeNode::Activity(_) => false,
+                TreeNode::Operator(TreeOperator::Sequence, _)
+                | TreeNode::Operator(TreeOperator::Loop, _)
+                | TreeNode::Operator(TreeOperator::Xor, _)
+                | TreeNode::Operator(TreeOperator::Or, _)
+                | TreeNode::Operator(TreeOperator::Interleaved, _) => false,
+                TreeNode::Operator(TreeOperator::Concurrent, number_of_children) => {
                     if let Some((i, child1)) = tree
                         .get_children(node)
                         .enumerate()
@@ -327,25 +331,27 @@ mod tree {
                             .skip(i + 1)
                             .find(|child| has_empty_traces_node(tree, *child))
                     {
-                        //remove child2
                         let end2 = tree.traverse(child2);
-                        let tchild2 = tree.tree.drain(child2..end2).collect::<Vec<_>>();
-
-                        //remove child1
                         let end1 = tree.traverse(child1);
-                        let tchild1 = tree.tree.drain(child1..end1).collect::<Vec<_>>();
 
-                        //insert child2
-                        tree.tree.splice((node + 1)..(node + 1), tchild2);
+                        //remove child2
+                        tree.edit(|tree| {
+                            let tchild2 = tree.drain(child2..end2).collect::<Vec<_>>();
+                            //remove child1
+                            let tchild1 = tree.drain(child1..end1).collect::<Vec<_>>();
 
-                        //insert child1
-                        tree.tree.splice((node + 1)..(node + 1), tchild1);
+                            //insert child2
+                            tree.splice((node + 1)..(node + 1), tchild2);
 
-                        //insert or
-                        tree.tree.insert(node + 1, Node::Operator(Operator::Or, 2));
+                            //insert child1
+                            tree.splice((node + 1)..(node + 1), tchild1);
 
-                        //change number of children
-                        _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+                            //insert or
+                            tree.insert(node + 1, TreeNode::Operator(TreeOperator::Or, 2));
+
+                            //change number of children
+                            _ = tree[node].set_number_of_children(number_of_children - 1);
+                        });
 
                         return true;
                     }
@@ -358,22 +364,22 @@ mod tree {
 
     /// Return the maximum trace length. Returns a value >= 100 for loops.
     fn max_trace_length(tree: &ProcessTree, node: usize) -> usize {
-        match tree.tree[node] {
-            Node::Tau => 0,
-            Node::Activity(_) => 1,
-            Node::Operator(Operator::Xor, _) => tree
+        match tree[node] {
+            TreeNode::Tau => 0,
+            TreeNode::Activity(_) => 1,
+            TreeNode::Operator(TreeOperator::Xor, _) => tree
                 .get_children(node)
                 .map(|child| max_trace_length(tree, child))
                 .max()
                 .unwrap(),
-            Node::Operator(Operator::Sequence, _)
-            | Node::Operator(Operator::Concurrent, _)
-            | Node::Operator(Operator::Interleaved, _)
-            | Node::Operator(Operator::Or, _) => tree
+            TreeNode::Operator(TreeOperator::Sequence, _)
+            | TreeNode::Operator(TreeOperator::Concurrent, _)
+            | TreeNode::Operator(TreeOperator::Interleaved, _)
+            | TreeNode::Operator(TreeOperator::Or, _) => tree
                 .get_children(node)
                 .map(|child| max_trace_length(tree, child))
                 .sum(),
-            Node::Operator(Operator::Loop, _) => {
+            TreeNode::Operator(TreeOperator::Loop, _) => {
                 if tree
                     .get_children(node)
                     .map(|child| max_trace_length(tree, child))
@@ -759,11 +765,7 @@ pub fn single_unit_arc(it: Option<impl Iterator<Item = (usize, u64)>>) -> Option
 #[cfg(test)]
 mod tests {
     use crate::techniques::reduce::ReduceLanguageEquivalently;
-    use ebi_objects::{
-        activity, con,
-        ebi_objects::process_tree::{Node, Operator},
-        int, or, seq, tau, tloop, xor, ActivityKey, ActivityKeyTranslator, ProcessTree,
-    };
+    use ebi_objects::{activity, con, int, or, seq, tau, tloop, xor};
 
     #[test]
     fn singularity_xor() {

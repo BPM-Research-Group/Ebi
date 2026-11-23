@@ -1,12 +1,6 @@
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 use ebi_objects::{
-    ActivityKeyTranslator, BusinessProcessModelAndNotation, HasActivityKey, LabelledPetriNet,
-    ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet,
-    StochasticProcessTree,
-    anyhow::anyhow,
-    ebi_arithmetic::{Fraction, One, Zero},
-    ebi_bpmn::traits::objectable::BPMNObject,
-    ebi_objects::process_tree::Node,
+    ActivityKeyTranslator, BusinessProcessModelAndNotation, HasActivityKey, LabelledPetriNet, ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet, StochasticProcessTree, TreeNode, anyhow::anyhow, ebi_arithmetic::{Fraction, One, Zero}, ebi_bpmn::traits::objectable::BPMNObject,
 };
 use ebi_optimisation::anyhow::Result;
 use fnv::FnvBuildHasher;
@@ -148,9 +142,9 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
         }
 
         let mut weights: Vec<Fraction> = vec![];
-        for node in &self.tree {
+        for node in &self {
             match node {
-                Node::Activity(model_activity) => {
+                TreeNode::Activity(model_activity) => {
                     //labelled transition
                     weights.push(
                         model_activity2frequency
@@ -159,7 +153,7 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
                             .clone(),
                     );
                 }
-                Node::Tau => {
+                TreeNode::Tau => {
                     //silent transition
                     weights.push(Fraction::one());
                 }

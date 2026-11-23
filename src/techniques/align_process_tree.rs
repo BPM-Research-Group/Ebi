@@ -8,13 +8,9 @@ use crate::{
 };
 use ebi_objects::{
     anyhow::{anyhow, ensure, Context, Result},
-    ebi_objects::{
-        labelled_petri_net::TransitionIndex,
-        language_of_alignments::Move,
-        process_tree::{Node, Operator},
-    },
-    Activity, ActivityKey, ActivityKeyTranslator, LanguageOfAlignments, ProcessTree,
-    StochasticLanguageOfAlignments,
+    ebi_objects::{labelled_petri_net::TransitionIndex, language_of_alignments::Move},
+    Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, LanguageOfAlignments,
+    ProcessTree, StochasticLanguageOfAlignments, TreeNode, TreeOperator,
 };
 use fnv::FnvBuildHasher;
 use rayon::iter::ParallelIterator;
@@ -42,21 +38,18 @@ struct NodeMetadata {
 impl<'a> ProcessTreeAligner<'a> {
     pub fn new(tree: &'a ProcessTree) -> Result<Self> {
         ensure!(
-            !tree.tree.is_empty(),
+            !tree.is_empty(),
             "Cannot align an empty process tree: its language is empty."
         );
         let mut aligner = Self {
             tree,
-            node_metadata: (0..tree.tree.len())
-                .map(|_| NodeMetadata::default())
-                .collect(),
+            node_metadata: (0..tree.len()).map(|_| NodeMetadata::default()).collect(),
         };
         let mut next_node_index = 0;
         let mut next_transition_index = 0;
         aligner.prepare_node(&mut next_node_index, &mut next_transition_index)?;
         ensure!(
-            next_node_index == tree.tree.len()
-                && next_transition_index == tree.transition2node.len(),
+            next_node_index == tree.len() && next_transition_index == tree.number_of_leaves(),
             "Invalid process tree structure or transition mapping."
         );
         Ok(aligner)
@@ -68,23 +61,23 @@ impl<'a> ProcessTreeAligner<'a> {
         next_transition_index: &mut usize,
     ) -> Result<usize> {
         let node_index = *next_node_index;
-        let Some(node) = self.tree.tree.get(node_index) else {
+        let Some(node) = self.tree.get(node_index) else {
             return Err(anyhow!("Incomplete process tree."));
         };
         *next_node_index += 1;
         match node {
-            Node::Activity(_) | Node::Tau => {
+            TreeNode::Activity(_) | TreeNode::Tau => {
                 ensure!(
-                    self.tree.transition2node.get(*next_transition_index) == Some(&node_index),
+                    self.tree.node_to_transition(*next_transition_index) == Some(node_index),
                     "Invalid transition mapping at node {node_index}."
                 );
                 self.node_metadata[node_index].transition_index = Some(*next_transition_index);
                 *next_transition_index += 1;
-                if let Node::Activity(activity) = node {
+                if let TreeNode::Activity(activity) = node {
                     self.node_metadata[node_index].alphabet.insert(*activity);
                 }
             }
-            Node::Operator(operator, child_count) => {
+            TreeNode::Operator(operator, child_count) => {
                 ensure!(
                     *child_count > 0,
                     "Operator at node {node_index} has no children."
@@ -97,18 +90,18 @@ impl<'a> ProcessTreeAligner<'a> {
                         ensure!(
                             metadata.alphabet.insert(activity),
                             "Dynamic alignments require unique activity labels; label {:?} occurs in multiple children of node {node_index}.",
-                            self.tree.activity_key.activity_to_label(&activity)
+                            self.tree.activity_key().activity_to_label(&activity)
                         );
                         metadata.activity_to_child_rank.insert(activity, child_rank);
                     }
                 }
-                metadata.redo_is_silent = *operator == Operator::Loop
+                metadata.redo_is_silent = *operator == TreeOperator::Loop
                     && metadata.child_nodes.len() > 1
                     && metadata.child_nodes[1..]
                         .iter()
                         .all(|&child| self.node_metadata[child].alphabet.is_empty());
                 metadata.is_unary_loop =
-                    *operator == Operator::Loop && metadata.child_nodes.len() == 1;
+                    *operator == TreeOperator::Loop && metadata.child_nodes.len() == 1;
                 self.node_metadata[node_index] = metadata;
             }
         }
@@ -121,7 +114,7 @@ impl Align for ProcessTreeAligner<'_> {
         &mut self,
         log: Box<dyn EbiTraitFiniteLanguage>,
     ) -> Result<LanguageOfAlignments> {
-        align_language_with(&self.tree.activity_key, log, |trace| {
+        align_language_with(&self.tree.activity_key(), log, |trace| {
             self.align_trace(trace)
         })
     }
@@ -130,7 +123,7 @@ impl Align for ProcessTreeAligner<'_> {
         &mut self,
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLanguageOfAlignments> {
-        align_stochastic_language_with(&self.tree.activity_key, log, |trace| {
+        align_stochastic_language_with(&self.tree.activity_key(), log, |trace| {
             self.align_trace(trace)
         })
     }
@@ -147,7 +140,7 @@ impl Align for ProcessTreeAligner<'_> {
         let mut moves = Vec::new();
         solver.reconstruct(root_solution, &mut moves);
         moves.push(Move::SilentMove {
-            transition: self.tree.transition2node.len(),
+            transition: self.tree.number_of_leaves(),
         });
         Ok((moves, cost))
     }
@@ -236,9 +229,9 @@ impl DynamicProgramming<'_> {
         if let Some(&result) = self.solution_cache[node_index].get(trace) {
             return result;
         }
-        let (cost, decision) = match self.tree.tree[node_index] {
-            Node::Tau => (10_000 * trace.len() + 1, Decision::Leaf),
-            Node::Activity(activity) => (
+        let (cost, decision) = match self.tree[node_index] {
+            TreeNode::Tau => (10_000 * trace.len() + 1, Decision::Leaf),
+            TreeNode::Activity(activity) => (
                 if trace.contains(&activity) {
                     10_000 * (trace.len() - 1)
                 } else {
@@ -246,16 +239,20 @@ impl DynamicProgramming<'_> {
                 },
                 Decision::Leaf,
             ),
-            Node::Operator(Operator::Sequence, _) => self.align_sequence(node_index, trace),
-            Node::Operator(Operator::Xor, _) => {
+            TreeNode::Operator(TreeOperator::Sequence, _) => self.align_sequence(node_index, trace),
+            TreeNode::Operator(TreeOperator::Xor, _) => {
                 let node_metadata = self.node_metadata;
                 let best = self.solve_choice(&node_metadata[node_index].child_nodes, trace);
                 (self.solutions[best].cost, Decision::Concatenate(vec![best]))
             }
-            Node::Operator(Operator::Concurrent, _) => self.align_shuffle(node_index, trace, false),
-            Node::Operator(Operator::Or, _) => self.align_shuffle(node_index, trace, true),
-            Node::Operator(Operator::Loop, _) => self.align_loop(node_index, trace),
-            Node::Operator(Operator::Interleaved, _) => self.align_interleaved(node_index, trace),
+            TreeNode::Operator(TreeOperator::Concurrent, _) => {
+                self.align_shuffle(node_index, trace, false)
+            }
+            TreeNode::Operator(TreeOperator::Or, _) => self.align_shuffle(node_index, trace, true),
+            TreeNode::Operator(TreeOperator::Loop, _) => self.align_loop(node_index, trace),
+            TreeNode::Operator(TreeOperator::Interleaved, _) => {
+                self.align_interleaved(node_index, trace)
+            }
         };
         let trace: Rc<[Activity]> = Rc::from(trace);
         let index = self.solutions.len();
@@ -736,9 +733,9 @@ impl DynamicProgramming<'_> {
         let transition = self.node_metadata[solution.node_index]
             .transition_index
             .unwrap();
-        let activity = match self.tree.tree[solution.node_index] {
-            Node::Activity(activity) => Some(activity),
-            Node::Tau => None,
+        let activity = match self.tree[solution.node_index] {
+            TreeNode::Activity(activity) => Some(activity),
+            TreeNode::Tau => None,
             _ => unreachable!(),
         };
         let matched_position =

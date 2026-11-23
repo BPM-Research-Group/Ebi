@@ -1,11 +1,11 @@
 use crate::{
-    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, semantics::semantics_trait::Semantics,
+    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
+    semantics::semantics_trait::Semantics,
 };
 use ebi_objects::{
-    ebi_arithmetic::ebi_number::Zero,
-    ebi_objects::process_tree::{Node, Operator},
-    DeterministicFiniteAutomaton, FiniteLanguage, NumberOfTraces, ProcessTree,
+    DeterministicFiniteAutomaton, FiniteLanguage, NumberOfTraces, ProcessTree, TreeNode, TreeOperator, ebi_arithmetic::ebi_number::Zero,
 };
+use fnv::FnvBuildHasher;
 use std::collections::HashMap;
 
 pub trait PrefixTreeMinerDFA {
@@ -56,10 +56,10 @@ impl PrefixTreeMinerTree for dyn EbiTraitFiniteLanguage {
     }
 }
 
-pub fn node_2_tree(lang: FiniteLanguage, tree: &mut Vec<Node>) {
+pub fn node_2_tree(lang: FiniteLanguage, tree: &mut Vec<TreeNode>) {
     println!("node to tree {:?}", lang);
     //split traces
-    let mut activity_2_lang = HashMap::new();
+    let mut activity_2_lang = HashMap::<_, _, FnvBuildHasher>::default();
     let mut empty_traces = false;
     for mut trace in lang {
         if trace.is_empty() {
@@ -74,26 +74,26 @@ pub fn node_2_tree(lang: FiniteLanguage, tree: &mut Vec<Node>) {
     }
 
     if empty_traces && activity_2_lang.is_empty() {
-        tree.push(Node::Tau);
+        tree.push(TreeNode::Tau);
         return;
     }
 
     if activity_2_lang.len() == 1 {
         //do nothing
     } else if empty_traces {
-        tree.push(Node::Operator(Operator::Xor, activity_2_lang.len() + 1));
-        tree.push(Node::Tau);
+        tree.push(TreeNode::Operator(TreeOperator::Xor, activity_2_lang.len() + 1));
+        tree.push(TreeNode::Tau);
     } else {
-        tree.push(Node::Operator(Operator::Xor, activity_2_lang.len()));
+        tree.push(TreeNode::Operator(TreeOperator::Xor, activity_2_lang.len()));
     }
 
     for (activity, sub_lang) in activity_2_lang {
         if sub_lang.number_of_events() == 0 {
             //only empty traces left
-            tree.push(Node::Activity(activity));
+            tree.push(TreeNode::Activity(activity));
         } else {
-            tree.push(Node::Operator(Operator::Sequence, 2));
-            tree.push(Node::Activity(activity));
+            tree.push(TreeNode::Operator(TreeOperator::Sequence, 2));
+            tree.push(TreeNode::Activity(activity));
             //recurse
             node_2_tree(sub_lang, tree);
         }
