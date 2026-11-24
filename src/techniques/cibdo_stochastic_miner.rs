@@ -1,6 +1,5 @@
 use crate::{
-    ebi_framework::displayable::Displayable,
-    ebi_traits::EbiTraitFiniteStochasticLanguage,
+    ebi_framework::displayable::Displayable, ebi_traits::EbiTraitFiniteStochasticLanguage,
     semantics::semantics_trait::Semantics,
 };
 use ebi_objects::anyhow::{anyhow, ensure, Context, Result};

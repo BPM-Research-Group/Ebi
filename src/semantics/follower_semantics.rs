@@ -32,9 +32,7 @@ impl FollowerSemantics<'_> {
 
     pub fn is_final_state(&self, state: &usize) -> bool {
         match self {
-            FollowerSemantics::Trace(trace) => {
-                *state == trace.len()
-            }
+            FollowerSemantics::Trace(trace) => *state == trace.len(),
         }
     }
 }

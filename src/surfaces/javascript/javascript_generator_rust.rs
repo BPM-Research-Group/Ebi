@@ -1,7 +1,9 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand, search_command_in_source_files}, ebi_output::EbiOutput,
-    }, surfaces::javascript::javascript_link::javascript_function_name,
+        ebi_command::{search_command_in_source_files, EbiCommand, EBI_COMMANDS},
+        ebi_output::EbiOutput,
+    },
+    surfaces::javascript::javascript_link::javascript_function_name,
 };
 use ebi_objects::anyhow::anyhow;
 use ebi_optimisation::anyhow::Result;

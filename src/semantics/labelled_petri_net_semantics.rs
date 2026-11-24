@@ -1,8 +1,8 @@
 use crate::{ebi_framework::displayable::Displayable, semantics::semantics_trait::Semantics};
 use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
-    Activity, LabelledPetriNet, anyhow::Context, anyhow::Result,
-    ebi_objects::labelled_petri_net::TransitionIndex, marking::Marking,
+    anyhow::Context, anyhow::Result, ebi_objects::labelled_petri_net::TransitionIndex,
+    marking::Marking, Activity, LabelledPetriNet,
 };
 use std::{
     fmt::{Debug, Display, Formatter},

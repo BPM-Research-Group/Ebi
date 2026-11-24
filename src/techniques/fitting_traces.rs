@@ -1,7 +1,7 @@
 use ebi_objects::{
-    StochasticLanguageOfAlignments,
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::language_of_alignments::Move,
+    StochasticLanguageOfAlignments,
 };
 
 pub trait FittingTraces {

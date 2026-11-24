@@ -8,6 +8,9 @@ use crate::ebi_framework::{
 };
 use ebi_objects::{Exportable, Importable, PetriNetMarkupLanguage};
 
+/// .pnml
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "Petri net markup language",
     article: "a",
@@ -62,8 +65,8 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_framework::trait_importers::ImportAsSemanticsTrait,
-        ebi_traits::EbiTraitSemantics, multiple_reader::MultipleReader,
+        ebi_framework::trait_importers::ImportAsSemanticsTrait, ebi_traits::EbiTraitSemantics,
+        multiple_reader::MultipleReader,
     };
     use ebi_objects::{Importable, PetriNetMarkupLanguage};
     use std::fs::File;

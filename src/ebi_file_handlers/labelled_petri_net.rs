@@ -13,10 +13,13 @@ use crate::{
     surfaces::java::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Ok, Result},
     EbiObject, Exportable, Importable, LabelledPetriNet,
-    anyhow::{Ok, Result, anyhow},
 };
 
+/// .lpn
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",
     article: "a",

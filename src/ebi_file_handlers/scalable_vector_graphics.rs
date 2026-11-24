@@ -1,9 +1,12 @@
 use ebi_objects::{
-    Exportable, ScalableVectorGraphics, ebi_objects::scalable_vector_graphics::FORMAT_SPECIFICATION,
+    ebi_objects::scalable_vector_graphics::FORMAT_SPECIFICATION, Exportable, ScalableVectorGraphics,
 };
 
 use crate::ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_output::EbiObjectExporter};
 
+/// .svg
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     name: "scalable vector graphics",
     article: "a",

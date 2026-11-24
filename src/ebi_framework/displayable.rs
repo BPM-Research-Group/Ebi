@@ -1,5 +1,5 @@
 use ebi_objects::{
-    AutomatonState, ebi_bpmn::BPMNMarking, ebi_objects::process_tree::TreeMarking, marking::Marking,
+    ebi_bpmn::BPMNMarking, ebi_objects::process_tree::TreeMarking, marking::Marking, AutomatonState,
 };
 use std::{
     fmt::{Debug, Display},

@@ -10,11 +10,14 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
-    EbiObject, Exportable, Importable,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_objects::partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
+    EbiObject, Exportable, Importable,
 };
 
+/// .powl
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_PARTIALLY_ORDERED_WORKFLOW_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "partially ordered workflow language",
     article: "a",

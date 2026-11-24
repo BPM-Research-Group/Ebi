@@ -25,11 +25,11 @@ use ebi_objects::{
 };
 
 /// Allows for traversal of a state space and its probabilities if the activities determine the state deterministically.
-/// 
+///
 /// This is a wrapper enum in order to be able to implement algorithms that are agnostic of the marking/state type, amongst other things.
 /// This enum does not allow access to the underlying Semantics trait methods directly, but through a match the generics work out.
 /// See the implementation of [`crate::techniques::probability_queries::ProbabilityQueries`] for an example.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub enum EbiTraitStochasticDeterministicSemantics {
     Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),

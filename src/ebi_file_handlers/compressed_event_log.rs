@@ -19,14 +19,17 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
-    CompressedEventLogXes, Exportable, Importable,
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_event_attributes::CompressedEventLogEventAttributes,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
     },
+    CompressedEventLogXes, Exportable, Importable,
 };
 
+/// .xes.gz
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "compressed event log",
     article: "a",

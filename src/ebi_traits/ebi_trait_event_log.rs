@@ -53,7 +53,7 @@ macro_rules! trait_definition_logs {
 }
 
 /// Allows for iteration over traces of events without attributes attached.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTraces {
     /// Remove traces for which the function returns false.

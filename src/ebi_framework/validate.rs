@@ -1,4 +1,4 @@
-use ebi_objects::{Importable, anyhow::Result};
+use ebi_objects::{anyhow::Result, Importable};
 use std::io::BufRead;
 
 pub trait Validate: Importable {

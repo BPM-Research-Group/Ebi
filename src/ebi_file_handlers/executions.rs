@@ -1,12 +1,13 @@
-use ebi_objects::{
-    Executions, Exportable, Importable,
-};
+use ebi_objects::{Executions, Exportable, Importable};
 
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler, ebi_input::EbiObjectImporter, ebi_output::EbiObjectExporter,
     validate::Validate,
 };
 
+/// .exs
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     name: "executions",
     article: "an",

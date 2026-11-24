@@ -10,7 +10,7 @@ use ebi_objects::{
 use layout::backends::svg::SVGWriter;
 
 /// Allows for the creation of a graph.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitGraphable: Graphable {
     fn trait_explanation() -> &'static str

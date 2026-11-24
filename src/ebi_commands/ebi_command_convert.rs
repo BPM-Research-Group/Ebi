@@ -7,9 +7,9 @@ use crate::{
     techniques::stochastic_markovian_abstraction::build_embedded_snfa,
 };
 use ebi_objects::{
-    BusinessProcessModelAndNotation, EbiObject, EbiObjectType, EventLog, FiniteLanguage,
-    FiniteStochasticLanguage, LabelledPetriNet, StochasticDeterministicFiniteAutomaton,
-    StochasticLabelledPetriNet, anyhow::anyhow,
+    anyhow::anyhow, BusinessProcessModelAndNotation, EbiObject, EbiObjectType, EventLog,
+    FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
+    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
 };
 
 pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
@@ -181,7 +181,6 @@ pub const EBI_CONVERT_SLPN: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
 };
-
 
 pub const EBI_CONVERT_SDFM: EbiCommand = EbiCommand::Command {
     name_short: "sdfm",

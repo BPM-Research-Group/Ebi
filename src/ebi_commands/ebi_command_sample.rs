@@ -13,9 +13,9 @@ use crate::{
     },
 };
 use ebi_objects::{
+    anyhow::{anyhow, Context, Result},
     EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage,
     StochasticBusinessProcessModelAndNotation,
-    anyhow::{Context, Result, anyhow},
 };
 
 pub const SAMPLED_OBJECT_INPUTS: &[&EbiInputType] = &[
@@ -39,12 +39,10 @@ pub fn get_sampled_object(
                 .sample(number_of_traces)
                 .context("Sample semantics.")
         }
-        _ => {
-            Err(anyhow!(
-                "Unsupported object {:?} provided.",
-                object.get_type()
-            ))
-        }
+        _ => Err(anyhow!(
+            "Unsupported object {:?} provided.",
+            object.get_type()
+        )),
     }
 }
 

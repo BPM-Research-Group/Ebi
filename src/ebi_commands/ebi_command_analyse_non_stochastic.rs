@@ -3,16 +3,20 @@ use crate::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
-        ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject,
+        ebi_trait::EbiTrait,
+        ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
-        EbiTraitActivities, EbiTraitEventLogEventAttributes, EbiTraitFiniteLanguage, EbiTraitSemantics
+        EbiTraitActivities, EbiTraitEventLogEventAttributes, EbiTraitFiniteLanguage,
+        EbiTraitSemantics,
     },
     techniques::{
-        any_traces::AnyTraces, bounded::Bounded, empty_traces::HasEmptyTraces, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic, timestamps_ordered::TimestampsOrdered
-    }, 
+        any_traces::AnyTraces, bounded::Bounded, empty_traces::HasEmptyTraces,
+        executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces,
+        medoid_non_stochastic::MedoidNonStochastic, timestamps_ordered::TimestampsOrdered,
+    },
 };
-use ebi_objects::{EbiObject, EbiObjectType, ProcessTree, anyhow::anyhow};
+use ebi_objects::{anyhow::anyhow, EbiObject, EbiObjectType, ProcessTree};
 use std::io::Write;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -90,7 +94,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
         let result = match model {
             EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.bounded()?,
             EbiInput::Object(EbiObject::StochasticProcessTree(tree), _) => tree.bounded()?,
-            EbiInput::Object(EbiObject::PartiallyOrderedWorkflowLanguage(powl), _) => powl.bounded()?,
+            EbiInput::Object(EbiObject::PartiallyOrderedWorkflowLanguage(powl), _) => {
+                powl.bounded()?
+            }
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.bounded()?,
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.bounded()?,
             EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => dfa.bounded()?,
@@ -109,7 +115,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::EventLogXes(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => object.bounded()?,
-            EbiInput::Object(EbiObject::FiniteStochasticPartiallyOrderedLanguage(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::FiniteStochasticPartiallyOrderedLanguage(object), _) => {
+                object.bounded()?
+            }
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => {
                 object.bounded()?
@@ -194,28 +202,24 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
 };
 
-pub const EBI_ANALYSE_NON_STOCHASTIC_EMPTY_TRACES: EbiCommand = EbiCommand::Command { 
-    name_short: "et", 
-    name_long: Some("empty-traces"), 
+pub const EBI_ANALYSE_NON_STOCHASTIC_EMPTY_TRACES: EbiCommand = EbiCommand::Command {
+    name_short: "et",
+    name_long: Some("empty-traces"),
     explanation_short: "Returns wheter the log or model contains empty traces.",
-    explanation_long: None, 
-    latex_link: None, 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[
-        &[&EbiInputType::Object(EbiObjectType::ProcessTree)],
-    ], 
-    input_names: &["FILE"], 
-    input_helps: &["A file"], 
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Object(EbiObjectType::ProcessTree)]],
+    input_names: &["FILE"],
+    input_helps: &["A file"],
     execute: |mut objects, _| {
         let model = objects.remove(0).to_type::<ProcessTree>()?;
 
         Ok(EbiOutput::Bool(model.has_empty_traces()))
-    }, 
-    output_type: &EbiOutputType::Bool
+    },
+    output_type: &EbiOutputType::Bool,
 };
-
-
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Command {
     name_short: "exs",
@@ -485,21 +489,21 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED: EbiCommand = EbiCommand
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[
-        &[
-            &EbiInputType::Trait(EbiTrait::EventLogEventAttributes), 
-            &EbiInputType::Object(EbiObjectType::Executions)
-        ]
-    ],
+    input_types: &[&[
+        &EbiInputType::Trait(EbiTrait::EventLogEventAttributes),
+        &EbiInputType::Object(EbiObjectType::Executions),
+    ]],
     input_names: &["LOG"],
     input_helps: &["The event log"],
     execute: |mut objects, _| {
         let result = match objects.remove(0) {
-            EbiInput::Trait(EbiTraitObject::EventLogEventAttributes(log), _) => log.are_timestamps_ordered(),
+            EbiInput::Trait(EbiTraitObject::EventLogEventAttributes(log), _) => {
+                log.are_timestamps_ordered()
+            }
             EbiInput::Object(EbiObject::Executions(exs), _) => exs.are_timestamps_ordered(),
-            o => return Err(anyhow!("Unsupported object {:?} provided.", o.get_type()))
+            o => return Err(anyhow!("Unsupported object {:?} provided.", o.get_type())),
         };
         Ok(EbiOutput::Bool(result?))
-    }, 
+    },
     output_type: &EbiOutputType::Bool,
 };

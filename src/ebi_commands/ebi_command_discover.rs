@@ -6,10 +6,7 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
     },
-    ebi_traits::{
-        EbiTraitEventLog,
-        EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitEventLog, EbiTraitFiniteStochasticLanguage},
     techniques::{
         alergia::Alergia,
         alignment_stochastic_miner::AlignmentMiner,
@@ -27,9 +24,9 @@ use crate::{
     },
 };
 use ebi_objects::{
-    BusinessProcessModelAndNotation, EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree,
-    anyhow::{Context, anyhow},
+    anyhow::{anyhow, Context},
     ebi_arithmetic::{ConstFraction, Fraction, Random},
+    BusinessProcessModelAndNotation, EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree,
 };
 
 pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
@@ -352,7 +349,8 @@ pub const EBI_DISCOVER_OCCURRENCE_SPTREE: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_RANDOM: EbiCommand = EbiCommand::Group {
     name_short: "rnd",
     name_long: Some("random"),
-    explanation_short: "Give each transition a random weight between 0 (exclusive) and 1 (inclusive).",
+    explanation_short:
+        "Give each transition a random weight between 0 (exclusive) and 1 (inclusive).",
     explanation_long: None,
     children: &[
         &EBI_DISCOVER_RANDOM_SBPMN,
@@ -364,7 +362,8 @@ pub const EBI_DISCOVER_RANDOM: EbiCommand = EbiCommand::Group {
 pub const EBI_DISCOVER_RANDOM_SBPMN: EbiCommand = EbiCommand::Command {
     name_short: "sbpmn",
     name_long: Some("stochastic-business-process-model-and-notation"),
-    explanation_short: "Give each sequence flow a random weight between 0 (exclusive) and 1 (inclusive).",
+    explanation_short:
+        "Give each sequence flow a random weight between 0 (exclusive) and 1 (inclusive).",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -394,7 +393,8 @@ pub const EBI_DISCOVER_RANDOM_SBPMN: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_RANDOM_SLPN: EbiCommand = EbiCommand::Command {
     name_short: "slpn",
     name_long: Some("stochastic-labelled-Petri-net"),
-    explanation_short: "Give each transition a random weight between 0 (exclusive) and 1 (inclusive).",
+    explanation_short:
+        "Give each transition a random weight between 0 (exclusive) and 1 (inclusive).",
     explanation_long: None,
     latex_link: None,
     cli_command: None,

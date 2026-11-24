@@ -1,5 +1,20 @@
-use ebi_objects::anyhow::{Ok, Result};
+use crate::{
+    ebi_framework::{
+        ebi_command::{get_applicable_commands, EbiCommand, EBI_COMMANDS},
+        ebi_file_handler::{get_file_handlers, EBI_FILE_HANDLERS},
+        ebi_importer_parameters,
+        ebi_input::{self, EbiInputType},
+        ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
+        ebi_trait::EbiTrait,
+    },
+    python::python::{pm4py_function_name, PYTHON_PACKAGE},
+    surfaces::java::java_object_handler::{
+        JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport,
+    },
+    text::{Joiner, LatexEscaper, Rank},
+};
 use clap::Command;
+use ebi_objects::anyhow::{Ok, Result};
 use ebi_objects::EbiObjectType;
 use fnv::FnvBuildHasher;
 use inflector::Inflector;
@@ -16,7 +31,6 @@ use std::{
     io::Write,
 };
 use strum::IntoEnumIterator;
-use crate::{ebi_framework::{ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, surfaces::java::java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport}, python::python::{PYTHON_PACKAGE, pm4py_function_name}, text::{Joiner, LatexEscaper, Rank}};
 
 pub(crate) fn manual() -> Result<EbiOutput> {
     let mut f = vec![];
@@ -25,9 +39,17 @@ pub(crate) fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\def\\version{{{}}}", env!("CARGO_PKG_VERSION"))?;
 
     //statistics
-    writeln!(f, "\\def\\numberofcommands{{{}}}", EBI_COMMANDS.get_command_paths().len())?;
+    writeln!(
+        f,
+        "\\def\\numberofcommands{{{}}}",
+        EBI_COMMANDS.get_command_paths().len()
+    )?;
     writeln!(f, "\\def\\numberoftraits{{{}}}", EbiTrait::iter().len())?;
-    writeln!(f, "\\def\\numberoffilehandlers{{{}}}", EBI_FILE_HANDLERS.len())?;
+    writeln!(
+        f,
+        "\\def\\numberoffilehandlers{{{}}}",
+        EBI_FILE_HANDLERS.len()
+    )?;
 
     // //command list
     // writeln!(f, "\\def\\ebicommandlist{{\\begin{{itemize}}")?;
@@ -40,18 +62,56 @@ pub(crate) fn manual() -> Result<EbiOutput> {
 
     //file handlers
     writeln!(f, "\\long\\def\\ebifilehandlers{{")?;
-    let file_handlers: BTreeSet::<_> = EBI_FILE_HANDLERS.iter().collect();
+    let file_handlers: BTreeSet<_> = EBI_FILE_HANDLERS.iter().collect();
     for file_handler in file_handlers.iter() {
         writeln!(f, "\\clearpage")?;
-        writeln!(f, "\\section{{{} (.{})}}", file_handler.name.to_sentence_case(), file_handler.file_extension)?;
+        writeln!(
+            f,
+            "\\section{{{} (.{})}}",
+            file_handler.name.to_sentence_case(),
+            file_handler.file_extension
+        )?;
         writeln!(f, "\\label{{filehandler:{}}}", file_handler.name)?;
-        writeln!(f, "Import as objects: {}.", or_none(&file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
-        writeln!(f, "\\\\Fallible import as objects: {}.", or_none(&file_handler.object_importers_fallible.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
-        writeln!(f, "\\\\Import as traits: {}.", or_none(&file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
+        writeln!(
+            f,
+            "Import as objects: {}.",
+            or_none(
+                &file_handler
+                    .object_importers
+                    .iter()
+                    .map(|importer| importer.to_string())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        )?;
+        writeln!(
+            f,
+            "\\\\Fallible import as objects: {}.",
+            or_none(
+                &file_handler
+                    .object_importers_fallible
+                    .iter()
+                    .map(|importer| importer.to_string())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        )?;
+        writeln!(
+            f,
+            "\\\\Import as traits: {}.",
+            or_none(
+                &file_handler
+                    .trait_importers
+                    .iter()
+                    .map(|importer| importer.to_string())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        )?;
         writeln!(f, "\\subsection*{{Input to commands}} {}", or_none(&file_handler.get_applicable_commands().iter().map(
             |path| format!("\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
             .collect::<Vec<_>>().join("\\\\")))?;
-        
+
         writeln!(f, "\\subsection*{{Output of commands}} {}", or_none(&file_handler.get_producing_commands().iter().map(
             |path| format!("\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
             .collect::<Vec<_>>().join("\\\\")))?;
@@ -69,32 +129,64 @@ pub(crate) fn manual() -> Result<EbiOutput> {
                 }
             }
             if to_java && from_java {
-                writeln!(f, "{} {} can be imported and exported between Ebi, and ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+                writeln!(
+                    f,
+                    "{} {} can be imported and exported between Ebi, and ProM and Java.",
+                    file_handler.article.to_string().to_sentence_case(),
+                    file_handler
+                )?;
             } else if to_java {
-                writeln!(f, "{} {} can be exported from Ebi to ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+                writeln!(
+                    f,
+                    "{} {} can be exported from Ebi to ProM and Java.",
+                    file_handler.article.to_string().to_sentence_case(),
+                    file_handler
+                )?;
             } else if from_java {
-                writeln!(f, "{} {} can be imported from ProM and Java to Ebi.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+                writeln!(
+                    f,
+                    "{} {} can be imported from ProM and Java to Ebi.",
+                    file_handler.article.to_string().to_sentence_case(),
+                    file_handler
+                )?;
             } else {
-                writeln!(f, "{} {} can be neither imported nor exported between Ebi, and ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+                writeln!(
+                    f,
+                    "{} {} can be neither imported nor exported between Ebi, and ProM and Java.",
+                    file_handler.article.to_string().to_sentence_case(),
+                    file_handler
+                )?;
             }
         }
 
-        writeln!(f, "\\subsection*{{File format specification}}{}", file_handler.format_specification)?;
+        writeln!(
+            f,
+            "\\subsection*{{File format specification}}{}",
+            file_handler.format_specification
+        )?;
     }
     writeln!(f, "}}")?;
 
     //file handlers list
-    let file_handlers: BTreeSet::<_> = EBI_FILE_HANDLERS.iter().collect();
+    let file_handlers: BTreeSet<_> = EBI_FILE_HANDLERS.iter().collect();
     writeln!(f, "\\def\\ebifilehandlerlist{{\\begin{{itemize}}")?;
     for file_handler in file_handlers {
-        writeln!(f, "\\item {} (.{}) (\\cref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name)?;
+        writeln!(
+            f,
+            "\\item {} (.{}) (\\cref{{filehandler:{}}})",
+            file_handler.name, file_handler.file_extension, file_handler.name
+        )?;
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 
     //trait list
     writeln!(f, "\\long\\def\\ebitraitlist{{")?;
     for etrait in EbiTrait::iter() {
-        writeln!(f, "\\subsection{{{}}}", etrait.to_string().to_sentence_case())?;
+        writeln!(
+            f,
+            "\\subsection{{{}}}",
+            etrait.to_string().to_sentence_case()
+        )?;
         writeln!(f, "\\label{{trait:{}}}", etrait)?;
         writeln!(f, "{}", etrait.get_explanation())?;
 
@@ -138,27 +230,45 @@ pub(crate) fn manual() -> Result<EbiOutput> {
     for r#trait in EbiTrait::iter() {
         let java_object_handlers = r#trait.get_java_object_handlers_that_can_import();
         if !java_object_handlers.is_empty() {
-            writeln!(f, "\\item {} (trait).\\\\Java class: {}.", 
-                r#trait.to_string().to_sentence_case(), 
-                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            writeln!(
+                f,
+                "\\item {} (trait).\\\\Java class: {}.",
+                r#trait.to_string().to_sentence_case(),
+                java_object_handlers
+                    .into_iter()
+                    .map(|java_object_handler| java_object_handler.java_class)
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )?;
         }
     }
     for object_type in EbiObjectType::iter() {
         let java_object_handlers = object_type.get_java_object_handlers_that_can_import();
         if !java_object_handlers.is_empty() {
-            writeln!(f, "\\item {}.\\\\Java class: {}.", 
-                object_type.to_string().to_sentence_case(), 
-                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            writeln!(
+                f,
+                "\\item {}.\\\\Java class: {}.",
+                object_type.to_string().to_sentence_case(),
+                java_object_handlers
+                    .into_iter()
+                    .map(|java_object_handler| java_object_handler.java_class)
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )?;
         }
     }
     for output_type in EbiInputType::iter() {
         let java_object_handlers = output_type.get_java_object_handlers_that_can_import();
         if !java_object_handlers.is_empty() {
-            writeln!(f, "\\item {}.\\\\Java class: {}.", 
-                output_type.to_string().to_sentence_case(), 
-                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            writeln!(
+                f,
+                "\\item {}.\\\\Java class: {}.",
+                output_type.to_string().to_sentence_case(),
+                java_object_handlers
+                    .into_iter()
+                    .map(|java_object_handler| java_object_handler.java_class)
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )?;
         }
     }
@@ -169,32 +279,55 @@ pub(crate) fn manual() -> Result<EbiOutput> {
     for object_type in EbiObjectType::iter() {
         let java_object_handlers = object_type.get_java_object_handlers_that_can_export();
         if !java_object_handlers.is_empty() {
-            writeln!(f, "\\item {}.\\\\Java class: {}.", 
-                object_type.to_string().to_sentence_case(), 
-                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            writeln!(
+                f,
+                "\\item {}.\\\\Java class: {}.",
+                object_type.to_string().to_sentence_case(),
+                java_object_handlers
+                    .into_iter()
+                    .map(|java_object_handler| java_object_handler.java_class)
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )?;
         }
     }
     for output_type in EbiOutputType::iter() {
         let java_object_handlers = output_type.get_java_object_handlers_that_can_export();
         if !java_object_handlers.is_empty() {
-            writeln!(f, "\\item {}.\\\\Java class: {}.", 
-                output_type.to_string().to_sentence_case(), 
-                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            writeln!(
+                f,
+                "\\item {}.\\\\Java class: {}.",
+                output_type.to_string().to_sentence_case(),
+                java_object_handlers
+                    .into_iter()
+                    .map(|java_object_handler| java_object_handler.java_class)
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )?;
         }
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 
     //table file handlers -> object types
-    writeln!(f, "\\def\\filehandlersobjecttypes{{{}}}", object_importers_table()?)?;
+    writeln!(
+        f,
+        "\\def\\filehandlersobjecttypes{{{}}}",
+        object_importers_table()?
+    )?;
 
     //table file handlers -> traits
-    writeln!(f, "\\def\\filehandlerstraits{{{}}}", trait_importers_table()?)?;
+    writeln!(
+        f,
+        "\\def\\filehandlerstraits{{{}}}",
+        trait_importers_table()?
+    )?;
 
     //table object types -> file handlers
-    writeln!(f, "\\def\\objecttypesfilehandlers{{{}}}", object_exporters_table()?)?;
-    
+    writeln!(
+        f,
+        "\\def\\objecttypesfilehandlers{{{}}}",
+        object_exporters_table()?
+    )?;
 
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }
@@ -209,14 +342,38 @@ fn write_commands(f: &mut Vec<u8>) -> Result<()> {
 }
 
 fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
-    writeln!(f, "\\clearpage\\section{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path))?;
-    writeln!(f, "\\label{{command:{}}}", EbiCommand::path_to_string(&path))?;
+    writeln!(
+        f,
+        "\\clearpage\\section{{\\texttt{{{}}}}}",
+        EbiCommand::path_to_string(&path)
+    )?;
+    writeln!(
+        f,
+        "\\label{{command:{}}}",
+        EbiCommand::path_to_string(&path)
+    )?;
 
-    if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output_type, .. } = path[path.len()-1] {
-
+    if let EbiCommand::Command {
+        name_long,
+        explanation_short,
+        explanation_long,
+        latex_link,
+        cli_command,
+        exact_arithmetic,
+        input_types: input_typess,
+        input_names,
+        input_helps,
+        output_type,
+        ..
+    } = path[path.len() - 1]
+    {
         //alias
         if name_long.is_some() {
-            writeln!(f, "Alias: \\texttt{{{}}}.\\\\", EbiCommand::path_to_short_string(&path))?;
+            writeln!(
+                f,
+                "Alias: \\texttt{{{}}}.\\\\",
+                EbiCommand::path_to_short_string(&path)
+            )?;
         }
 
         //explanation
@@ -230,9 +387,14 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
         if let Some(link) = latex_link {
             writeln!(f, "More information: {}~\\\\", link)?;
         }
-        
+
         //output
-        writeln!(f, "\\noindent Output: {}, which can be written as {}.\\\\", output_type, output_types(output_type))?;
+        writeln!(
+            f,
+            "\\noindent Output: {}, which can be written as {}.\\\\",
+            output_type,
+            output_types(output_type)
+        )?;
 
         //ProM
         if path.last().unwrap().is_in_java() {
@@ -243,9 +405,18 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
 
         //pm4py
         if path.last().unwrap().is_in_python() {
-            writeln!(f, "\\\\This command is available in the {} Python package using the function {}.", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
+            writeln!(
+                f,
+                "\\\\This command is available in the {} Python package using the function {}.",
+                PYTHON_PACKAGE,
+                pm4py_function_name(&path).escape_latex()
+            )?;
         } else {
-            writeln!(f, "\\\\This command is not available in the {} Python package.", PYTHON_PACKAGE)?;
+            writeln!(
+                f,
+                "\\\\This command is not available in the {} Python package.",
+                PYTHON_PACKAGE
+            )?;
         }
 
         //parameters table
@@ -254,8 +425,11 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
         writeln!(f, "Parameter \\\\\\midrule")?;
 
         //standard parameters
-        for (input_name, (input_types, input_help)) in input_names.iter().zip(input_typess.iter().zip(input_helps.iter())) {
-            write!(f, "<\\texttt{{{}}}>", input_name.escape_latex())?;    
+        for (input_name, (input_types, input_help)) in input_names
+            .iter()
+            .zip(input_typess.iter().zip(input_helps.iter()))
+        {
+            write!(f, "<\\texttt{{{}}}>", input_name.escape_latex())?;
             writeln!(f, "&{}\\\\", input_help)?;
 
             //mandatoryness
@@ -266,7 +440,11 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
             }
 
             //accepted values
-            writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::get_possible_inputs_with_latex(input_types).join_with(", ", " and "))?;
+            writeln!(
+                f,
+                "&\\textit{{Accepted values:}}\\quad {}.\\\\",
+                EbiInputType::get_possible_inputs_with_latex(input_types).join_with(", ", " and ")
+            )?;
         }
 
         //custom parameters
@@ -285,14 +463,37 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
                         writeln!(f, "<\\texttt{{{}}}>", arg.get_value_names().unwrap()[0])?;
                     }
                 }
-                writeln!(f, "&{}\\\\", if let Some(h) = arg.get_long_help() {h.to_string()} else {arg.get_help().unwrap().to_string()})?;
+                writeln!(
+                    f,
+                    "&{}\\\\",
+                    if let Some(h) = arg.get_long_help() {
+                        h.to_string()
+                    } else {
+                        arg.get_help().unwrap().to_string()
+                    }
+                )?;
 
                 if arg.get_short().is_none() && arg.get_long().is_none() {
                     //custom argument
                     if let Some(default) = arg.get_default_values().iter().next() {
-                        writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes".to_owned()} else {format!("no; if not provided, a default value of {} will be used", default.to_string_lossy())} )?;
+                        writeln!(
+                            f,
+                            "&\\textit{{Mandatory:}}\\quad {}\\\\",
+                            if arg.is_required_set() {
+                                "yes".to_owned()
+                            } else {
+                                format!(
+                                    "no; if not provided, a default value of {} will be used",
+                                    default.to_string_lossy()
+                                )
+                            }
+                        )?;
                     } else {
-                        writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
+                        writeln!(
+                            f,
+                            "&\\textit{{Mandatory:}}\\quad {}\\\\",
+                            if arg.is_required_set() { "yes" } else { "no" }
+                        )?;
                     }
                 } else {
                     writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
@@ -303,18 +504,24 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
         //output-type
         if output_type.get_exporters().len() > 1 {
             let output_extensions = output_type
-                    .get_exporters()
-                    .iter()
-                    .map(|exporter| exporter.get_extension())
-                    .collect::<Vec<_>>()
-                    .join_with(", ", " and ");
-            writeln!(f, "\\texttt{{-t}} or \\texttt{{--output\\_type}} <\\texttt{{OUTPUT\\_TYPE}}> &")?;
+                .get_exporters()
+                .iter()
+                .map(|exporter| exporter.get_extension())
+                .collect::<Vec<_>>()
+                .join_with(", ", " and ");
+            writeln!(
+                f,
+                "\\texttt{{-t}} or \\texttt{{--output\\_type}} <\\texttt{{OUTPUT\\_TYPE}}> &"
+            )?;
             writeln!(f, "The output file extension (without period). The default is {}. Possible values are {}.\\\\", output_type.get_default_exporter().get_extension(), output_extensions)?;
             writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
         }
 
         //output
-        writeln!(f, "\\texttt{{-o}} or \\texttt{{--output}} <\\texttt{{FILE}}> &")?;
+        writeln!(
+            f,
+            "\\texttt{{-o}} or \\texttt{{--output}} <\\texttt{{FILE}}> &"
+        )?;
         if output_type.get_exporters().len() == 1 {
             let exporter = output_type.get_exporters().remove(0);
             writeln!(f, "The {} file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\\\", exporter)?;
@@ -323,7 +530,7 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
             writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_default_exporter().get_article(), output_type.get_default_exporter())?;
         }
         writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
-        
+
         //exact arithmetic flag
         if *exact_arithmetic {
             writeln!(f, "\\texttt{{-a}} or \\texttt{{--approximate}} & Use approximate arithmetic instead of exact arithmetic.\\\\")?;
@@ -331,12 +538,18 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
         }
 
         //importer parameters
-        for (input_index, (input_types, input_name)) in input_typess.iter().zip(input_names.iter()).enumerate() {
-            for parameter in ebi_importer_parameters::merge_importer_parameters(input_types) { 
+        for (input_index, (input_types, input_name)) in
+            input_typess.iter().zip(input_names.iter()).enumerate()
+        {
+            for parameter in ebi_importer_parameters::merge_importer_parameters(input_types) {
                 writeln!(f, "\\texttt{{--{}}} & {}. This parameter applies to some of the importers of the {} input {}. {}\\\\", ebi_importer_parameters::name_to_id(parameter.name(), input_index).escape_latex(), parameter.explanation().escape_latex(), input_index.rank(), input_name.escape_latex(), ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
                 writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
                 if ebi_importer_parameters::has_accepted_values(parameter) {
-                    writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
+                    writeln!(
+                        f,
+                        "&\\textit{{Accepted values:}}\\quad {}.\\\\",
+                        ebi_importer_parameters::explanation_with_values(parameter).escape_latex()
+                    )?;
                 }
             }
         }
@@ -356,16 +569,24 @@ pub(crate) fn or_none(string: &str) -> &str {
 }
 
 pub(crate) fn output_types(output_type: &EbiOutputType) -> String {
-    let mut list = output_type.get_exporters().into_iter().map(
-        |exp| exp.get_article().to_string() 
-        + " " 
-        + match exp {
-            EbiExporter::Object(_, file_handler) => format!("{} (.{} -- \\cref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name),
-            _ => exp.to_string()
-        }.as_str()
-    ).collect::<Vec<_>>();
+    let mut list = output_type
+        .get_exporters()
+        .into_iter()
+        .map(|exp| {
+            exp.get_article().to_string()
+                + " "
+                + match exp {
+                    EbiExporter::Object(_, file_handler) => format!(
+                        "{} (.{} -- \\cref{{filehandler:{}}})",
+                        file_handler.name, file_handler.file_extension, file_handler.name
+                    ),
+                    _ => exp.to_string(),
+                }
+                .as_str()
+        })
+        .collect::<Vec<_>>();
     if list.len() == 1 {
-        return list.remove(0)
+        return list.remove(0);
     }
     let (last, list) = list.split_last().unwrap();
     format!("{} {} {}", list.join(", "), "or", last)
@@ -406,10 +627,12 @@ pub(crate) fn graph() -> Result<VisualGraph> {
     //file handlers
     let mut file_handlers = HashMap::<_, _, FnvBuildHasher>::default();
     for file_handler in EBI_FILE_HANDLERS {
-        let shape = ShapeKind::new_circle(&(".".to_owned() + file_handler.file_extension.to_string().as_str()));
+        let shape = ShapeKind::new_circle(
+            &(".".to_owned() + file_handler.file_extension.to_string().as_str()),
+        );
         let look = StyleAttr::simple();
         let orientation = Orientation::LeftToRight;
-        let mut size = get_shape_size(orientation, &shape, look.font_size-5, false);
+        let mut size = get_shape_size(orientation, &shape, look.font_size - 5, false);
         scale(&mut size);
         let node = Element::create(shape, look, orientation, size);
         let nodeh = graph.add_node(node);
@@ -498,9 +721,19 @@ pub(crate) fn object_importers_table() -> Result<String> {
 
     //body
     for file_handler in handlers {
-        writeln!(f, "{}\\hfill .{}", file_handler.name, file_handler.file_extension)?;
+        writeln!(
+            f,
+            "{}\\hfill .{}",
+            file_handler.name, file_handler.file_extension
+        )?;
         for object_type in &types {
-            write!(f, "&{}", file_handler.can_import_as_object(object_type).to_latex_circle())?;
+            write!(
+                f,
+                "&{}",
+                file_handler
+                    .can_import_as_object(object_type)
+                    .to_latex_circle()
+            )?;
         }
         writeln!(f, "\\\\")?;
     }
@@ -508,7 +741,6 @@ pub(crate) fn object_importers_table() -> Result<String> {
     //footer
     writeln!(f, "\\bottomrule")?;
     writeln!(f, "\\end{{tabular}}")?;
-    
 
     Ok(String::from_utf8(f)?)
 }
@@ -534,7 +766,11 @@ pub(crate) fn trait_importers_table() -> Result<String> {
 
     //body
     for file_handler in handlers {
-        writeln!(f, "{}\\hfill .{}", file_handler.name, file_handler.file_extension)?;
+        writeln!(
+            f,
+            "{}\\hfill .{}",
+            file_handler.name, file_handler.file_extension
+        )?;
 
         for object_type in &types {
             if file_handler.can_import_as_trait(object_type) {
@@ -568,7 +804,11 @@ pub(crate) fn object_exporters_table() -> Result<String> {
     writeln!(f, "\\toprule")?;
     writeln!(f, "Object")?;
     for file_handler in &handlers {
-        writeln!(f, "&\\rotatebox{{90}}{{{} (.{})}}", file_handler.name, file_handler.file_extension)?;
+        writeln!(
+            f,
+            "&\\rotatebox{{90}}{{{} (.{})}}",
+            file_handler.name, file_handler.file_extension
+        )?;
     }
     writeln!(f, "\\\\\\midrule")?;
 
@@ -577,7 +817,13 @@ pub(crate) fn object_exporters_table() -> Result<String> {
         writeln!(f, "{}", object_type)?;
 
         for file_handler in &handlers {
-            write!(f, "&{}", file_handler.can_export_as_object(&object_type).to_latex_circle())?;
+            write!(
+                f,
+                "&{}",
+                file_handler
+                    .can_export_as_object(&object_type)
+                    .to_latex_circle()
+            )?;
         }
         writeln!(f, "\\\\")?;
     }

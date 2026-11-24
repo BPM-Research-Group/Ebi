@@ -11,10 +11,13 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, Importable, StochasticBusinessProcessModelAndNotation,
-    anyhow::{Result, anyhow},
 };
 
+/// .sbpmn
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandler {
     name: "stochastic business process model and notation",
     article: "a",

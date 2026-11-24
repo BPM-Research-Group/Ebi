@@ -15,6 +15,9 @@ use ebi_objects::{
     EbiObject, Exportable, FiniteLanguage, Importable,
 };
 
+/// .lang
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite language",
     article: "a",

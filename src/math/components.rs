@@ -36,19 +36,22 @@ where
             .position(|x| x == &b)
             .map(|i| self.groups[i]);
         if let (Some(group_a), Some(group_b)) = (g_a, g_b)
-            && group_a != group_b {
-                for g in self.groups.iter_mut() {
-                    if *g == group_a {
-                        *g = group_b;
-                    }
+            && group_a != group_b
+        {
+            for g in self.groups.iter_mut() {
+                if *g == group_a {
+                    *g = group_b;
                 }
             }
+        }
     }
 
     pub fn build_components(&self) -> HashMap<usize, HashSet<T>> {
         let mut map: HashMap<usize, HashSet<T>> = HashMap::new();
         for (index, activity) in self.activities.iter().enumerate() {
-            map.entry(self.groups[index]).or_default().insert(activity.clone());
+            map.entry(self.groups[index])
+                .or_default()
+                .insert(activity.clone());
         }
         map
     }

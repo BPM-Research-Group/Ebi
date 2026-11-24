@@ -47,13 +47,12 @@ macro_rules! trait_definition_finalisation {
     };
 }
 
-
 /// Allows for traversal of a state space.
-/// 
+///
 /// This is a wrapper enum in order to be able to implement algorithms that are agnostic of the marking/state type, amongst other things.
 /// This enum does not allow access to the underlying Semantics trait methods directly, but through a match the generics work out.
 /// See the implementation of [`crate::techniques::executions::FindExecutions`] for an example.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub enum EbiTraitSemantics {
     Usize(Box<dyn Semantics<SemState = usize, AliState = usize>>),

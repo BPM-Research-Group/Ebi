@@ -1,10 +1,10 @@
 use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
+    anyhow::{anyhow, Result},
+    ebi_objects::labelled_petri_net::TransitionIndex,
     Activity, AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton,
     DirectlyFollowsGraph, DirectlyFollowsModel, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticNondeterministicFiniteAutomaton,
-    anyhow::{Result, anyhow},
-    ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 macro_rules! aut {

@@ -18,8 +18,11 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
-use ebi_objects::{Exportable, Importable, ebi_objects::event_log_csv::EventLogCsv};
+use ebi_objects::{ebi_objects::event_log_csv::EventLogCsv, Exportable, Importable};
 
+/// .csv
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
     name: "comma-separated values",
     article: "a",

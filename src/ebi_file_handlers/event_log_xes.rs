@@ -28,6 +28,9 @@ use ebi_objects::{
     EbiObject, EventLog, EventLogCsv, EventLogTraceAttributes, EventLogXes, Exportable, Importable,
 };
 
+/// .xes
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
     name: "extensible event stream",
     article: "an",

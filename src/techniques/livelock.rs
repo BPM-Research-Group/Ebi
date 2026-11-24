@@ -6,15 +6,15 @@ use crate::{
     },
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
+    ebi_objects::process_tree::TreeMarking,
     AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
     DirectlyFollowsModel, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::{Result, anyhow},
-    ebi_objects::process_tree::TreeMarking,
 };
 use pastey::paste;
-use std::collections::{HashMap, HashSet, hash_map::Entry};
+use std::collections::{hash_map::Entry, HashMap, HashSet};
 
 pub trait IsPartOfLivelock {
     type LivState: Displayable;
@@ -241,12 +241,10 @@ mod tests {
         let fin = fs::read_to_string("testfiles/a-a-livelock.lpn").unwrap();
         let object = fin.parse::<LabelledPetriNet>().unwrap();
 
-        assert!(
-            object
-                .get_livelock_cache()
-                .is_state_part_of_livelock(&object.get_initial_state().unwrap())
-                .unwrap()
-        );
+        assert!(object
+            .get_livelock_cache()
+            .is_state_part_of_livelock(&object.get_initial_state().unwrap())
+            .unwrap());
     }
 
     #[test]
@@ -254,12 +252,10 @@ mod tests {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
         let object = fin.parse::<StochasticLabelledPetriNet>().unwrap();
 
-        assert!(
-            !object
-                .get_livelock_cache()
-                .is_state_part_of_livelock(&object.get_initial_state().unwrap())
-                .unwrap()
-        );
+        assert!(!object
+            .get_livelock_cache()
+            .is_state_part_of_livelock(&object.get_initial_state().unwrap())
+            .unwrap());
     }
 
     #[test]
@@ -270,12 +266,10 @@ mod tests {
         let state = object.get_initial_state().unwrap();
         assert!(!object.is_state_part_of_livelock(&state).unwrap());
 
-        assert!(
-            !object
-                .get_livelock_cache()
-                .is_state_part_of_livelock(&state)
-                .unwrap()
-        );
+        assert!(!object
+            .get_livelock_cache()
+            .is_state_part_of_livelock(&state)
+            .unwrap());
     }
 
     #[test]
@@ -288,12 +282,10 @@ mod tests {
         let state = object.get_initial_state().unwrap();
         assert!(!object.is_state_part_of_livelock(&state).unwrap());
 
-        assert!(
-            !object
-                .get_livelock_cache()
-                .is_state_part_of_livelock(&state)
-                .unwrap()
-        );
+        assert!(!object
+            .get_livelock_cache()
+            .is_state_part_of_livelock(&state)
+            .unwrap());
     }
 
     #[test]
@@ -304,11 +296,9 @@ mod tests {
         let state = object.get_initial_state().unwrap();
         assert!(!object.is_state_part_of_livelock(&state).unwrap());
 
-        assert!(
-            !object
-                .get_livelock_cache()
-                .is_state_part_of_livelock(&state)
-                .unwrap()
-        );
+        assert!(!object
+            .get_livelock_cache()
+            .is_state_part_of_livelock(&state)
+            .unwrap());
     }
 }

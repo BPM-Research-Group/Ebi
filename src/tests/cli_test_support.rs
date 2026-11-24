@@ -39,9 +39,7 @@ pub(crate) fn assert_cli_reads_inputs(command: &[&str], inputs: &[&str]) {
         .last()
         .unwrap()
         .read_inputs(leaf)
-        .unwrap_or_else(|e| {
-            panic!("`{line_text}` inputs were not read: {e:?}")
-        });
+        .unwrap_or_else(|e| panic!("`{line_text}` inputs were not read: {e:?}"));
 
     assert_eq!(read.len(), inputs.len(), "`{line_text}`");
 }

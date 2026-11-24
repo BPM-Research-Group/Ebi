@@ -1669,7 +1669,7 @@ mod tests {
     use super::{validate_object_of, EbiInputType};
     use crate::ebi_framework::ebi_input;
     use crate::{
-        ebi_file_handlers::compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
+        ebi_file_handlers::EBI_COMPRESSED_EVENT_LOG,
         ebi_framework::{
             ebi_file_handler::EBI_FILE_HANDLERS,
             ebi_input::{EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_USIZE},

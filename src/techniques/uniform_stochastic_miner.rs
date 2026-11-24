@@ -1,9 +1,9 @@
 use ebi_objects::{
-    BusinessProcessModelAndNotation, LabelledPetriNet, ProcessTree,
-    StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet, StochasticProcessTree,
     anyhow::anyhow,
     ebi_arithmetic::{Fraction, One},
     ebi_objects::process_tree::get_number_of_transitions,
+    BusinessProcessModelAndNotation, LabelledPetriNet, ProcessTree,
+    StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet, StochasticProcessTree,
 };
 use ebi_optimisation::anyhow::Result;
 

@@ -1,6 +1,6 @@
 use ebi_objects::{
-    DirectlyFollowsGraph, TranslateActivityKey,
     ebi_arithmetic::{Fraction, One, Zero},
+    DirectlyFollowsGraph, TranslateActivityKey,
 };
 
 /// DFG-difference ignoring frequency, counts differences in empty-trace, start, end, and edge presence.

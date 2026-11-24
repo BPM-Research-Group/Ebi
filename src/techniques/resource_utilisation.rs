@@ -1,8 +1,8 @@
 use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
+    anyhow::{anyhow, Result},
+    ebi_arithmetic::{f, Fraction, Zero},
     Activity, ActivityKey, Executions,
-    anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, Zero, f},
 };
 use itertools::Itertools;
 use std::fmt::Display;

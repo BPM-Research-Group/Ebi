@@ -1,9 +1,12 @@
 use ebi_objects::{
-    Exportable, PortableDocumentFormat, ebi_objects::portable_document_format::FORMAT_SPECIFICATION,
+    ebi_objects::portable_document_format::FORMAT_SPECIFICATION, Exportable, PortableDocumentFormat,
 };
 
 use crate::ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_output::EbiObjectExporter};
 
+/// .pdf
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_PORTABLE_DOCUMENT_FORMAT: EbiFileHandler = EbiFileHandler {
     name: "portable document format",
     article: "a",

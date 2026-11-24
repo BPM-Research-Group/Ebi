@@ -1,6 +1,6 @@
 use crate::math::root::Root;
 use ebi_objects::{
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, Zero},
 };
 

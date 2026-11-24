@@ -10,7 +10,7 @@ use ebi_objects::{
 use std::fmt::Display;
 
 /// Allows for iteration over traces (trace variants), without attributes attached.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitFiniteLanguage:
     Display + EbiTraitIterableLanguage + NumberOfTraces + Send + Sync

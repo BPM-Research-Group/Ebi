@@ -1,6 +1,6 @@
 use ebi_objects::{
-    DirectlyFollowsGraph, TranslateActivityKey,
     ebi_arithmetic::{Fraction, Signed},
+    DirectlyFollowsGraph, TranslateActivityKey,
 };
 
 pub trait EdgeDifference {

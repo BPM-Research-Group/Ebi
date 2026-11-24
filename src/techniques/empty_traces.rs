@@ -1,6 +1,4 @@
-use ebi_objects::{
-    ProcessTree, TreeNode, TreeOperator,
-};
+use ebi_objects::{ProcessTree, TreeNode, TreeOperator};
 
 pub trait HasEmptyTraces {
     fn has_empty_traces(&self) -> bool;
@@ -28,6 +26,8 @@ pub fn has_empty_traces_node(tree: &ProcessTree, node: usize) -> bool {
         | TreeNode::Operator(TreeOperator::Interleaved, _) => tree
             .get_children(node)
             .all(|node| has_empty_traces_node(tree, node)),
-        TreeNode::Operator(TreeOperator::Loop, _) => has_empty_traces_node(tree, tree.get_child(node, 0)),
+        TreeNode::Operator(TreeOperator::Loop, _) => {
+            has_empty_traces_node(tree, tree.get_child(node, 0))
+        }
     }
 }

@@ -173,7 +173,7 @@ pub fn should_file_be_tested(
 ) -> bool {
     //special case: empty.ptree and empty_2.ptree cannot be imported as an LPN, but it is not invalid
 
-    use crate::ebi_file_handlers::process_tree::EBI_PROCESS_TREE;
+    use crate::ebi_file_handlers::EBI_PROCESS_TREE;
     let special = if let EbiObjectImporter::LabelledPetriNet(_, _) = importer {
         true
     } else {

@@ -1,21 +1,21 @@
 use ebi_objects::{
-    Infoable,
-    anyhow::{Error, Result, anyhow},
+    anyhow::{anyhow, Error, Result},
     ebi_arithmetic::{
-        Fraction, Recip, Signed,
         ebi_number::{One, Zero},
         exact::MaybeExact,
-        fraction::{fraction_struct::APPROX_DIGITS, fraction_exact::FractionExact},
+        fraction::{fraction_exact::FractionExact, fraction_struct::APPROX_DIGITS},
         malachite::{
-            Natural,
             base::num::{
                 arithmetic::traits::{Parity, Pow, Sign as MSign},
                 basic::traits::Two,
                 logic::traits::SignificantBits,
             },
             rational::Rational,
+            Natural,
         },
+        Fraction, Recip, Signed,
     },
+    Infoable,
 };
 use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial_exact::LogPolynomialExact;
 use std::{

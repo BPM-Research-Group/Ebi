@@ -1,9 +1,9 @@
 use crate::semantics::stochastic_semantics::stochastic_semantics_trait::StochasticSemantics;
 use ebi_objects::{
-    AutomatonState, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::Fraction,
     ebi_objects::labelled_petri_net::TransitionIndex,
+    AutomatonState, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
 };
 
 impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {

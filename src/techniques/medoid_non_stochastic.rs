@@ -1,7 +1,4 @@
-use crate::{
-    ebi_traits::EbiTraitFiniteLanguage,
-    math::distances::TriangularDistanceMatrix,
-};
+use crate::{ebi_traits::EbiTraitFiniteLanguage, math::distances::TriangularDistanceMatrix};
 use ebi_objects::{
     anyhow::{anyhow, Result},
     ebi_arithmetic::{f, Fraction, One, Signed, Zero},

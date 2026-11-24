@@ -2,12 +2,17 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    object_importers::{ImportAsLabelledPetriNetObject, TryToBusinessProcessModelAndNotationObject},
+    object_importers::{
+        ImportAsLabelledPetriNetObject, TryToBusinessProcessModelAndNotationObject,
+    },
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
 use ebi_objects::{DeterministicFiniteAutomaton, Exportable, Importable};
 
+/// .dfa
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "deterministic finite automaton",
     article: "a",
@@ -39,12 +44,10 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
             DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
     ],
-    object_importers_fallible: &[
-        EbiObjectImporterFallible::BusinessProcessModelAndNotation(
-            DeterministicFiniteAutomaton::try_import_as_business_process_model_and_notation_object,
-            DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
-        ),
-    ],
+    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
+        DeterministicFiniteAutomaton::try_import_as_business_process_model_and_notation_object,
+        DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+    )],
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(
             DeterministicFiniteAutomaton::export_from_object,
@@ -79,8 +82,8 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::EbiTraitSemantics, semantics::semantics_trait::Semantics,
+        ebi_framework::trait_importers::ToSemanticsTrait, ebi_traits::EbiTraitSemantics,
+        semantics::semantics_trait::Semantics,
     };
     use ebi_objects::{DeterministicFiniteAutomaton, HasActivityKey};
     use std::fs;

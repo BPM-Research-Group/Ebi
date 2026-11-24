@@ -37,7 +37,11 @@ macro_rules! tree {
 
             fn infinitely_many_traces(&self) -> Result<bool> {
                 for node in 0..self.len() {
-                    if let Some(ebi_objects::TreeNode::Operator(ebi_objects::TreeOperator::Loop, _)) = self.get(node) {
+                    if let Some(ebi_objects::TreeNode::Operator(
+                        ebi_objects::TreeOperator::Loop,
+                        _,
+                    )) = self.get(node)
+                    {
                         //see whether at least one leaf in the loop is an activity
                         for child in self.get_descendants(node) {
                             if let ebi_objects::TreeNode::Activity(_) = child {

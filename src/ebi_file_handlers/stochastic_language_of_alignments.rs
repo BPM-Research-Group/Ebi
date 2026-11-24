@@ -8,10 +8,13 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, Importable, StochasticLanguageOfAlignments,
-    anyhow::{Result, anyhow},
 };
 
+/// .sali
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     name: "stochastic language of alignments",
     article: "a",

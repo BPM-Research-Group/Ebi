@@ -1,7 +1,10 @@
-use crate::{ebi_framework::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_input::EbiInputType,
-}, surfaces::javascript::javascript_link::javascript_function_name};
+use crate::{
+    ebi_framework::{
+        ebi_command::{EbiCommand, EBI_COMMANDS},
+        ebi_input::EbiInputType,
+    },
+    surfaces::javascript::javascript_link::javascript_function_name,
+};
 use ebi_objects::anyhow::anyhow;
 use ebi_optimisation::anyhow::Result;
 use itertools::Itertools;
@@ -192,10 +195,8 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
         writeln!(f, "<table>")?;
         let number_of_inputs = input_names.len();
 
-        for (input_i, (input_name, input_types)) in input_names
-            .iter()
-            .zip(input_typess.iter())
-            .enumerate()
+        for (input_i, (input_name, input_types)) in
+            input_names.iter().zip(input_typess.iter()).enumerate()
         {
             writeln!(f, "<tr><td>&lt;{input_name}&gt;</td><td>")?;
 
@@ -203,8 +204,7 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                 .iter()
                 .next()
                 .ok_or_else(|| anyhow!("empty input types"))?;
-            match input_type
-            {
+            match input_type {
                 EbiInputType::Trait(_) | EbiInputType::Object(_) | EbiInputType::AnyObject => {
                     //file
                     writeln!(
@@ -363,7 +363,11 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
 
         //output type selector
         let default_exporter = output_type.get_default_exporter();
-        let exporters = output_type.get_exporters().into_iter().filter(|exporter| !exporter.is_binary()).collect::<Vec<_>>();
+        let exporters = output_type
+            .get_exporters()
+            .into_iter()
+            .filter(|exporter| !exporter.is_binary())
+            .collect::<Vec<_>>();
         if exporters.len() > 1 {
             writeln!(f, "<tr><td>&lt;OUTPUT&gt;</td><td colspan=\"2\"><select id=\"{function_name}_output_type\" onchange=\"output_type_changed(event, '{function_name}', {number_of_inputs})\">{outputs}</select></td></tr>",
                 number_of_inputs = input_names.len(),
@@ -376,7 +380,9 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                 }).join("")
             )?;
         } else {
-            writeln!(f, "<input type=\"hidden\" id=\"{function_name}_output_type\" value=\"{extension}\"/>",
+            writeln!(
+                f,
+                "<input type=\"hidden\" id=\"{function_name}_output_type\" value=\"{extension}\"/>",
                 extension = output_type.get_default_exporter().get_extension()
             )?;
         }

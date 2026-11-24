@@ -3,11 +3,6 @@ use crate::{
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics},
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_objects::{
         event_log_csv::EventLogCsv, event_log_event_attributes::EventLogEventAttributes,
@@ -15,8 +10,13 @@ use ebi_objects::{
         partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
         process_tree::TreeMarking,
     },
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
+    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
+    FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
 };
-use std::collections::{HashMap, hash_map::Entry};
+use std::collections::{hash_map::Entry, HashMap};
 
 pub trait Bounded {
     type LivState: Displayable;

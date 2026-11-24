@@ -3,14 +3,25 @@ use crate::ebi_framework::{
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
-        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogEventAttributesObject, ImportAsEventLogObject, ImportAsEventLogXesObject, ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject, ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticNondeterministicFiniteAutomatonObject
+        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogEventAttributesObject,
+        ImportAsEventLogObject, ImportAsEventLogXesObject, ImportAsFiniteLanguageObject,
+        ImportAsFiniteStochasticLanguageObject,
+        ImportAsStochasticDeterministicFiniteAutomatonObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject,
     },
     trait_importers::{
-        ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait
+        ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait, ImportAsEventLogTrait,
+        ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait,
+        ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait,
+        ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait,
+        ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
     },
 };
 use ebi_objects::{EventLogPython, Exportable, Importable};
 
+/// Logs from Python
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_EVENT_LOG_PYTHON: EbiFileHandler = EbiFileHandler {
     name: "Python event log",
     article: "a",

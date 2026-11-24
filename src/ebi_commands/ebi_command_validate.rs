@@ -7,8 +7,8 @@ use crate::{
     },
     ebi_info,
 };
-use clap::{Arg, ArgAction, value_parser};
-use ebi_objects::anyhow::{Context, Ok, anyhow};
+use clap::{value_parser, Arg, ArgAction};
+use ebi_objects::anyhow::{anyhow, Context, Ok};
 use std::path::PathBuf;
 
 #[macro_export]

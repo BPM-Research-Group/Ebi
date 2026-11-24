@@ -413,13 +413,10 @@ impl EbiCommand {
     }
 
     /// Reads the inputs of this command from a parsed command line by opening
-    /// the files and selecting the importers. 
+    /// the files and selecting the importers.
     ///
     /// Does not touch the arithmetic mode, so it changes no global state.
-    pub(crate) fn read_inputs(
-        &self,
-        cli_matches: &ArgMatches,
-    ) -> Result<Vec<EbiInput>> {
+    pub(crate) fn read_inputs(&self, cli_matches: &ArgMatches) -> Result<Vec<EbiInput>> {
         let EbiCommand::Command {
             input_types: input_typess,
             input_names,
@@ -1143,8 +1140,8 @@ fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
 #[cfg(test)]
 pub(crate) mod tests {
 
-    use clap::{error::ErrorKind, Command};
     use super::{EbiCommand, EbiInputType, EBI_COMMANDS};
+    use clap::{error::ErrorKind, Command};
     use std::collections::HashSet;
 
     /// A StringList takes all remaining values on the command line, so it can only be the last input.
@@ -1186,10 +1183,8 @@ pub(crate) mod tests {
         let cli = EBI_COMMANDS.build_cli();
         for path in EBI_COMMANDS.get_command_paths() {
             //the first element is the root, which has no name on the line
-            let long: Vec<&str> =
-                path.iter().skip(1).map(|c| c.long_name()).collect();
-            let short: Vec<&str> =
-                path.iter().skip(1).map(|c| c.short_name()).collect();
+            let long: Vec<&str> = path.iter().skip(1).map(|c| c.long_name()).collect();
+            let short: Vec<&str> = path.iter().skip(1).map(|c| c.short_name()).collect();
             for names in [long, short] {
                 //every prefix: the groups on the way, then the command
                 for end in 1..=names.len() {

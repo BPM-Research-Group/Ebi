@@ -10,6 +10,9 @@ use crate::ebi_framework::{
 };
 use ebi_objects::{Exportable, Importable, ProcessTreeMarkupLanguage};
 
+/// .ptml
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "process tree markup language",
     article: "a",

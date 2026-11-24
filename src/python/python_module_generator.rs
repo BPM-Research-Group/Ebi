@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand, search_command_in_source_files},
+        ebi_command::{search_command_in_source_files, EbiCommand, EBI_COMMANDS},
         ebi_output::EbiOutput,
     },
     python::python::pm4py_function_name,
@@ -58,7 +58,8 @@ mod tests {
         };
         let checked_in = fs::read_to_string("src/python/python_module_autogen.rs").unwrap();
         assert!(
-            generated.replace("\r\n", "\n").trim_end() == checked_in.replace("\r\n", "\n").trim_end(),
+            generated.replace("\r\n", "\n").trim_end()
+                == checked_in.replace("\r\n", "\n").trim_end(),
             "python_module_autogen.rs is out of date; regenerate it with `ebi itself python`"
         );
     }

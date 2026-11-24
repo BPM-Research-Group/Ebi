@@ -2,12 +2,17 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    object_importers::{ImportAsLabelledPetriNetObject, TryToBusinessProcessModelAndNotationObject},
+    object_importers::{
+        ImportAsLabelledPetriNetObject, TryToBusinessProcessModelAndNotationObject,
+    },
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
 use ebi_objects::{DirectlyFollowsModel, Exportable, Importable};
 
+/// .dfm
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "directly follows model",
     article: "a",
@@ -39,12 +44,10 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
             DirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
     ],
-    object_importers_fallible: &[
-        EbiObjectImporterFallible::BusinessProcessModelAndNotation(
-            DirectlyFollowsModel::try_import_as_business_process_model_and_notation_object,
-            DirectlyFollowsModel::IMPORTER_PARAMETERS,
-        ),
-    ],
+    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
+        DirectlyFollowsModel::try_import_as_business_process_model_and_notation_object,
+        DirectlyFollowsModel::IMPORTER_PARAMETERS,
+    )],
     object_exporters: &[
         EbiObjectExporter::DirectlyFollowsModel(DirectlyFollowsModel::export_from_object),
         EbiObjectExporter::StochasticDirectlyFollowsModel(DirectlyFollowsModel::export_from_object),

@@ -8,17 +8,20 @@ use crate::{
         },
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
-    }, ebi_traits::{
-        EbiTraitFiniteLanguage,
-        EbiTraitFiniteStochasticLanguage,
-    }, techniques::{
-        flower_miner::{FlowerMinerDFA, FlowerMinerTree}, inductive_miner::{InductiveMiner, InductiveMinerInfrequent}, prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree}, split_miner::{SplitMiner, SplitMinerParameters}, trace_model_miner::TraceModelMinerTree,
+    },
+    ebi_traits::{EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage},
+    techniques::{
+        flower_miner::{FlowerMinerDFA, FlowerMinerTree},
+        inductive_miner::{InductiveMiner, InductiveMinerInfrequent},
+        prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
+        split_miner::{SplitMiner, SplitMinerParameters},
+        trace_model_miner::TraceModelMinerTree,
     },
 };
 use ebi_objects::{
-    EbiObject, EbiObjectType, HasActivityKey,
-    anyhow::{Context, anyhow},
+    anyhow::{anyhow, Context},
     ebi_arithmetic::{ConstFraction, Fraction},
+    EbiObject, EbiObjectType, HasActivityKey,
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -39,7 +42,8 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
     name_short: "flw",
     name_long: Some("flower"),
-    explanation_short: "Discover a model that supports any trace with the activities of the log or model.",
+    explanation_short:
+        "Discover a model that supports any trace with the activities of the log or model.",
     explanation_long: None,
     children: &[
         &EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA,
@@ -89,7 +93,8 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Command {
     name_short: "ptree",
     name_long: Some("process-tree"),
-    explanation_short: "Discover a process tree that supports any trace with the activities of the log.",
+    explanation_short:
+        "Discover a process tree that supports any trace with the activities of the log.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,

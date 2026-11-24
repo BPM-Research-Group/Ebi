@@ -15,7 +15,7 @@ use ebi_objects::{
 use std::fmt::Debug;
 
 /// Allows for iteration over traces and their probabilities.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitFiniteStochasticLanguage:
     EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug + TranslateActivityKey

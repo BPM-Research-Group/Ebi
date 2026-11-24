@@ -1,17 +1,28 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, object_importers::{
-        ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject, ImportAsPartiallyOrderedWorkflowLanguageObject, ImportAsProcessTreeObject, ImportAsStochasticNondeterministicFiniteAutomatonObject,
-    }, trait_importers::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
+    object_importers::{
+        ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject,
+        ImportAsPartiallyOrderedWorkflowLanguageObject, ImportAsProcessTreeObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject,
+    },
+    trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
         ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
         ImportAsStochasticSemanticsTrait,
-    }, validate::Validate,
+    },
+    validate::Validate,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, Importable, StochasticProcessTree,
-    anyhow::{Result, anyhow},
 };
 
+/// .sptree
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "stochastic process tree",
     article: "a",

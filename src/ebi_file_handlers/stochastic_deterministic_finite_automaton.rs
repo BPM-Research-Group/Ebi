@@ -4,7 +4,10 @@ use crate::ebi_framework::{
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
     object_importers::{
-        ImportAsDeterministicFiniteAutomatonObject, ImportAsLabelledPetriNetObject, ImportAsStochasticLabelledPetriNetObject, ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToBusinessProcessModelAndNotationObject
+        ImportAsDeterministicFiniteAutomatonObject, ImportAsLabelledPetriNetObject,
+        ImportAsStochasticLabelledPetriNetObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject,
+        TryToBusinessProcessModelAndNotationObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
@@ -13,8 +16,14 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
-use ebi_objects::{anyhow::{Result, anyhow}, EbiObject, Exportable, Importable, StochasticDeterministicFiniteAutomaton};
+use ebi_objects::{
+    anyhow::{anyhow, Result},
+    EbiObject, Exportable, Importable, StochasticDeterministicFiniteAutomaton,
+};
 
+/// .sdfa
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "stochastic deterministic finite automaton",
     article: "a",
@@ -109,12 +118,9 @@ impl FromEbiTraitObject for StochasticDeterministicFiniteAutomaton {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-    use crate::{
-        ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::EbiTraitSemantics,
-    };
     use super::StochasticDeterministicFiniteAutomaton;
+    use crate::{ebi_framework::trait_importers::ToSemanticsTrait, ebi_traits::EbiTraitSemantics};
+    use std::fs;
 
     #[test]
     fn sdfa_empty() {

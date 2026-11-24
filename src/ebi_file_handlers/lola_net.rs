@@ -7,6 +7,9 @@ use crate::ebi_framework::{
 };
 use ebi_objects::{Exportable, Importable, LolaNet};
 
+/// .lola
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
     name: "LoLa Petri net",
     article: "a",

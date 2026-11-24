@@ -22,7 +22,7 @@ use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;
 
 /// Allows for iteration over traces of events with attributes attached to events.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitEventLogEventAttributes:
     EbiTraitEventLog + EventAttributes + HasAttributeKey + IntoEventAttributeIterator + EventAttributes

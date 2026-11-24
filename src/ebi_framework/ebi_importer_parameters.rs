@@ -1,14 +1,14 @@
 use crate::{
     ebi_framework::{
-        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
         ebi_input::EbiInputType,
     },
     text::Joiner,
 };
-use clap::{Arg, ArgAction, ArgMatches, Command, builder::ValueParser, value_parser};
+use clap::{builder::ValueParser, value_parser, Arg, ArgAction, ArgMatches, Command};
 use ebi_objects::{
-    anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet},
+    anyhow::{anyhow, Result},
+    ebi_arithmetic::{parsing::FractionNotParsedYet, Fraction},
     traits::importable::{ImporterParameter, ImporterParameterValue, ImporterParameterValues},
 };
 use std::collections::BTreeSet;

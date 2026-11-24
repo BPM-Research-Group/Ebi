@@ -17,10 +17,13 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, Importable, StochasticDirectlyFollowsModel,
-    anyhow::{Result, anyhow},
 };
 
+/// .sdfm
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "stochastic directly follows model",
     article: "a",

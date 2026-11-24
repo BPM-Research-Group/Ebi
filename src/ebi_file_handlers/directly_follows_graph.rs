@@ -18,10 +18,13 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     DirectlyFollowsGraph, EbiObject, Exportable, Importable,
-    anyhow::{Result, anyhow},
 };
 
+/// .dfg
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     name: "directly follows graph",
     article: "a",

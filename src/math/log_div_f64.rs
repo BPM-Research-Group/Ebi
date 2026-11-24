@@ -1,11 +1,11 @@
 use ebi_objects::{
-    Infoable,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{
-        MaybeExact, One, Recip, Signed, Zero,
         fraction::fraction_f64::FractionF64,
-        malachite::{Natural, base::num::arithmetic::traits::Pow, rational::Rational},
+        malachite::{base::num::arithmetic::traits::Pow, rational::Rational, Natural},
+        MaybeExact, One, Recip, Signed, Zero,
     },
+    Infoable,
 };
 use ebi_optimisation::{
     anyhow::Error,

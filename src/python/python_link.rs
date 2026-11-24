@@ -1,5 +1,11 @@
 use crate::{
-    ebi_framework::ebi_input::{EbiInput, EbiInputType, attempt_parse}, multiple_reader::MultipleReader, python::{python_handle::{Log, Model}, python_import::PYTHON_IMPORTERS}, text::Joiner
+    ebi_framework::ebi_input::{attempt_parse, EbiInput, EbiInputType},
+    multiple_reader::MultipleReader,
+    python::{
+        python_handle::{Log, Model},
+        python_import::PYTHON_IMPORTERS,
+    },
+    text::Joiner,
 };
 use ebi_objects::anyhow::Result;
 use polars::prelude::*;
@@ -33,14 +39,14 @@ pub fn import_or_load(
 ) -> PyResult<EbiInput> {
     // 0) an object that has been parsed before
     if let Ok(model) = py_obj.extract::<PyRef<Model>>() {
-        return model
-            .into_input(input_types)
-            .map_err(|e| PyValueError::new_err(format!("Could not use argument {}: {}", index, e)));
+        return model.into_input(input_types).map_err(|e| {
+            PyValueError::new_err(format!("Could not use argument {}: {}", index, e))
+        });
     }
     if let Ok(log) = py_obj.extract::<PyRef<Log>>() {
-        return log
-            .into_input(input_types)
-            .map_err(|e| PyValueError::new_err(format!("Could not use argument {}: {}", index, e)));
+        return log.into_input(input_types).map_err(|e| {
+            PyValueError::new_err(format!("Could not use argument {}: {}", index, e))
+        });
     }
 
     // 1) try all in‑memory importers
@@ -77,8 +83,8 @@ pub fn import_or_load(
 mod tests {
     use crate::python::python_export::natural_to_num_biguints;
     use ebi_objects::ebi_arithmetic::malachite::{
-        Natural,
         base::num::basic::traits::{One, Zero},
+        Natural,
     };
 
     #[test]

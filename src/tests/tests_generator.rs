@@ -1,6 +1,6 @@
 use crate::{
-    ebi_framework::ebi_command::{EBI_COMMANDS, EbiCommand, search_command_in_source_files},
-    ebi_objects::anyhow::{Result, anyhow},
+    ebi_framework::ebi_command::{search_command_in_source_files, EbiCommand, EBI_COMMANDS},
+    ebi_objects::anyhow::{anyhow, Result},
     tests::{fallible_test::is_fallible, test_input::TestInput},
 };
 use itertools::Itertools;
@@ -65,9 +65,7 @@ pub(crate) fn generate_cli_tests_for_command(
             let mut inputss = TestInput::find_inputs(input_types);
             inputss.sort();
             //a command line cannot name some inputs; leave those combinations out
-            inputss.retain(|inputs| {
-                inputs.iter().all(|i| i.to_cli_argument().is_some())
-            });
+            inputss.retain(|inputs| inputs.iter().all(|i| i.to_cli_argument().is_some()));
             if inputss.is_empty() {
                 return Err(anyhow!(
                     "Could not find input to call command {}.",

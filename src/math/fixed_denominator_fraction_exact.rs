@@ -1,9 +1,9 @@
 use ebi_objects::{
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{
-        MaybeExact, One, Zero,
         fraction::fraction_exact::FractionExact,
-        malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational},
+        malachite::{base::num::arithmetic::traits::Lcm, rational::Rational, Natural},
+        MaybeExact, One, Zero,
     },
 };
 use std::{

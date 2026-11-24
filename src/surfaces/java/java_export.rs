@@ -1,7 +1,10 @@
-use crate::ebi_framework::{ebi_command::EbiCommand, ebi_output::{self, EbiOutput}};
+use crate::ebi_framework::{
+    ebi_command::EbiCommand,
+    ebi_output::{self, EbiOutput},
+};
 use core::result::Result;
-use std::path::PathBuf;
 use jni::objects::JString;
+use std::path::PathBuf;
 
 pub trait ExportableToJava {
     /// Exports an Ebi Output as its Java equivalent.
@@ -27,7 +30,7 @@ impl ExportableToJava for EbiOutput {
             Err(err) => {
                 env.throw(format!("Ebi error: {}", err.to_string().as_str()))?;
                 Ok(JString::null())
-            },
+            }
         }
     }
 }

@@ -1,13 +1,13 @@
 use crate::semantics::stochastic_semantics::stochastic_semantics_trait::StochasticSemantics;
 use ebi_objects::{
-    StochasticProcessTree,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::Fraction,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
         process_tree::TreeMarking,
         stochastic_process_tree::{get_total_weight_of_enabled_transitions, get_transition_weight},
     },
+    StochasticProcessTree,
 };
 
 impl StochasticSemantics for StochasticProcessTree {

@@ -1,7 +1,7 @@
 use super::fixed_denominator_fraction::FixedDenominatorFraction;
 use crate::math::distances::TriangularDistanceMatrix;
 use ebi_objects::{
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, Zero},
 };
 use std::{fmt::Debug, sync::Arc};

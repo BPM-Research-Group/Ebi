@@ -1,8 +1,8 @@
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
-        ebi_file_handler::{EbiFileHandler, get_file_handlers},
-        ebi_input::{EbiInput, EbiInputType, attempt_parse, read_as_any_object},
+        ebi_file_handler::{get_file_handlers, EbiFileHandler},
+        ebi_input::{attempt_parse, read_as_any_object, EbiInput, EbiInputType},
         ebi_output::{self, EbiOutput},
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
@@ -12,9 +12,9 @@ use crate::{
     python::python_import::ImportableFromPM4Py,
 };
 use ebi_objects::{
-    EbiObject, EventLogPython,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{exact::set_exact_globally, is_exact_globally},
+    EbiObject, EventLogPython,
 };
 use pyo3::{exceptions::PyValueError, prelude::*};
 
@@ -34,7 +34,10 @@ impl Model {
         let mut reader = MultipleReader::String(text.to_string());
         let (object, _) = read_as_any_object(&mut reader, None, 0)
             .map_err(|e| PyValueError::new_err(format!("Could not read a model: {e}")))?;
-        Ok(Model { object, exact: true })
+        Ok(Model {
+            object,
+            exact: true,
+        })
     }
 
     fn to_text(&self) -> PyResult<String> {
@@ -49,9 +52,13 @@ impl Model {
 
 impl Model {
     pub(crate) fn into_input(&self, wanted: &[&'static EbiInputType]) -> PyResult<EbiInput> {
-        object_into_input(self.object.clone(), wanted, self.exact == is_exact_globally())
-            .map(|(input, _)| input)
-            .map_err(|e| PyValueError::new_err(e.to_string()))
+        object_into_input(
+            self.object.clone(),
+            wanted,
+            self.exact == is_exact_globally(),
+        )
+        .map(|(input, _)| input)
+        .map_err(|e| PyValueError::new_err(e.to_string()))
     }
 }
 
@@ -73,12 +80,15 @@ impl Log {
 
 impl Log {
     pub(crate) fn into_input(&self, wanted: &[&'static EbiInputType]) -> PyResult<EbiInput> {
-        self.log.clone().py_object_to_ebi_input(wanted).ok_or_else(|| {
-            PyValueError::new_err(format!(
-                "an event log cannot be used here; expected {}",
-                EbiInputType::get_possible_inputs(wanted).join(", ")
-            ))
-        })
+        self.log
+            .clone()
+            .py_object_to_ebi_input(wanted)
+            .ok_or_else(|| {
+                PyValueError::new_err(format!(
+                    "an event log cannot be used here; expected {}",
+                    EbiInputType::get_possible_inputs(wanted).join(", ")
+                ))
+            })
     }
 }
 
@@ -112,7 +122,10 @@ pub(crate) fn object_into_input(
                 EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage) => {
                     if let Some(trait_object) = queriable_stochastic_language(&object) {
                         let file_handler = file_handler_of(&object)?;
-                        return Ok((EbiInput::Trait(trait_object, file_handler), Conversion::Direct));
+                        return Ok((
+                            EbiInput::Trait(trait_object, file_handler),
+                            Conversion::Direct,
+                        ));
                     }
                 }
                 _ => {}
@@ -142,13 +155,27 @@ pub(crate) fn object_into_input(
 /// The value-based counterpart of the trait importers, for the traits that have been added so far.
 fn queriable_stochastic_language(object: &EbiObject) -> Option<EbiTraitObject> {
     Some(match object {
-        EbiObject::StochasticLabelledPetriNet(o) => o.clone().to_queriable_stochastic_language_ebi_trait_object(),
-        EbiObject::StochasticProcessTree(o) => o.clone().to_queriable_stochastic_language_ebi_trait_object(),
-        EbiObject::StochasticNondeterministicFiniteAutomaton(o) => o.clone().to_queriable_stochastic_language_ebi_trait_object(),
-        EbiObject::StochasticDeterministicFiniteAutomaton(o) => o.clone().to_queriable_stochastic_language_ebi_trait_object(),
-        EbiObject::FiniteStochasticLanguage(o) => o.clone().to_queriable_stochastic_language_ebi_trait_object(),
-        EbiObject::DirectlyFollowsGraph(o) => o.clone().to_queriable_stochastic_language_ebi_trait_object(),
-        EbiObject::StochasticDirectlyFollowsModel(o) => o.clone().to_queriable_stochastic_language_ebi_trait_object(),
+        EbiObject::StochasticLabelledPetriNet(o) => o
+            .clone()
+            .to_queriable_stochastic_language_ebi_trait_object(),
+        EbiObject::StochasticProcessTree(o) => o
+            .clone()
+            .to_queriable_stochastic_language_ebi_trait_object(),
+        EbiObject::StochasticNondeterministicFiniteAutomaton(o) => o
+            .clone()
+            .to_queriable_stochastic_language_ebi_trait_object(),
+        EbiObject::StochasticDeterministicFiniteAutomaton(o) => o
+            .clone()
+            .to_queriable_stochastic_language_ebi_trait_object(),
+        EbiObject::FiniteStochasticLanguage(o) => o
+            .clone()
+            .to_queriable_stochastic_language_ebi_trait_object(),
+        EbiObject::DirectlyFollowsGraph(o) => o
+            .clone()
+            .to_queriable_stochastic_language_ebi_trait_object(),
+        EbiObject::StochasticDirectlyFollowsModel(o) => o
+            .clone()
+            .to_queriable_stochastic_language_ebi_trait_object(),
         _ => return None,
     })
 }
@@ -171,10 +198,10 @@ fn object_to_text(object: &EbiObject) -> Result<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{Conversion, object_into_input};
+    use super::{object_into_input, Conversion};
     use crate::{
         ebi_framework::{
-            ebi_input::{EbiInput, EbiInputType, read_as_any_object},
+            ebi_input::{read_as_any_object, EbiInput, EbiInputType},
             ebi_trait::EbiTrait,
         },
         multiple_reader::MultipleReader,
@@ -190,11 +217,15 @@ mod tests {
 
     #[test]
     fn an_object_of_the_wanted_type_is_passed_as_it_is() {
-        let wanted: &[&'static EbiInputType] =
-            &[&EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet)];
+        let wanted: &[&'static EbiInputType] = &[&EbiInputType::Object(
+            EbiObjectType::StochasticLabelledPetriNet,
+        )];
         let (input, conversion) = object_into_input(slpn(), wanted, true).unwrap();
         assert_eq!(conversion, Conversion::Direct);
-        assert!(matches!(input, EbiInput::Object(EbiObject::StochasticLabelledPetriNet(_), _)));
+        assert!(matches!(
+            input,
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(_), _)
+        ));
     }
 
     #[test]

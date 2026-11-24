@@ -7,10 +7,13 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     BusinessProcessModelAndNotation, EbiObject, Exportable, Importable,
-    anyhow::{Result, anyhow},
 };
 
+/// .bpmn
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandler {
     name: "business process model and notation",
     article: "a",

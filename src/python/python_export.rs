@@ -3,16 +3,14 @@ use crate::ebi_framework::{
     ebi_output::{self, EbiOutput},
 };
 use ebi_objects::{
+    ebi_arithmetic::{malachite::Natural, Fraction, MaybeExact, Signed},
     EbiObject, EventLogPython, NumberOfTraces,
-    ebi_arithmetic::{
-        Fraction, MaybeExact, Signed, malachite::Natural,
-    },
 };
 use process_mining::core::event_data::case_centric::AttributeValue;
 use pyo3::{
-    IntoPyObjectExt, Py, PyAny, PyResult, Python,
     exceptions::PyValueError,
     types::{IntoPyDict, PyAnyMethods, PyDict, PyList, PyString},
+    IntoPyObjectExt, Py, PyAny, PyResult, Python,
 };
 
 pub trait ExportableToPM4Py {
@@ -97,7 +95,9 @@ impl ExportableToPM4Py for Fraction {
 }
 
 /// The numerator, carrying the sign of the whole fraction, and the denominator of an exact fraction.
-pub(crate) fn exact_parts(fraction: &Fraction) -> Option<(num_bigint::BigInt, num_bigint::BigUint)> {
+pub(crate) fn exact_parts(
+    fraction: &Fraction,
+) -> Option<(num_bigint::BigInt, num_bigint::BigUint)> {
     let rational = fraction.exact_ref().ok()?;
     let sign = if fraction.is_negative() {
         num_bigint::Sign::Minus
@@ -113,7 +113,7 @@ pub(crate) fn exact_parts(fraction: &Fraction) -> Option<(num_bigint::BigInt, nu
 #[cfg(test)]
 mod exact_parts_tests {
     use super::exact_parts;
-    use ebi_objects::ebi_arithmetic::{Fraction, exact::set_exact_globally};
+    use ebi_objects::ebi_arithmetic::{exact::set_exact_globally, Fraction};
 
     fn parts(text: &str) -> (String, String) {
         set_exact_globally(true);

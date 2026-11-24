@@ -3,16 +3,18 @@ use crate::ebi_framework::{
     trait_importers::ToActivitiesTrait,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     HasActivityKey, Importable,
-    anyhow::{Result, anyhow},
 };
 
 /// Allows for access to activities.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitActivities: HasActivityKey {
-    
-    fn trait_explanation() -> &'static str where Self: Sized {
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
         "The trait ``activities'' provides access to activities."
     }
 }

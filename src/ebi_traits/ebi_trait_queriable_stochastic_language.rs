@@ -20,7 +20,7 @@ use ebi_objects::{
 use std::sync::{Arc, Mutex};
 
 /// Allows for the querying of an object for the probability of a given trace, automaton or language.
-/// 
+///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
     /**

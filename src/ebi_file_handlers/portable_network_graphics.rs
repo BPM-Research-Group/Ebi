@@ -1,10 +1,13 @@
 use crate::ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_output::EbiObjectExporter};
 use ebi_objects::{
-    Exportable, PortableNetworkGraphics,
-    ebi_objects::portable_network_graphics::FORMAT_SPECIFICATION,
+    ebi_objects::portable_network_graphics::FORMAT_SPECIFICATION, Exportable,
+    PortableNetworkGraphics,
 };
 
-pub const EBI_PORTABLE_NETWORK_GRAPHCIS: EbiFileHandler = EbiFileHandler {
+/// .png
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
+pub const EBI_PORTABLE_NETWORK_GRAPHICS: EbiFileHandler = EbiFileHandler {
     name: "portable network graphics",
     article: "a",
     file_extension: "png",

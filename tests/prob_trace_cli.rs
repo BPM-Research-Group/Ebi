@@ -54,7 +54,14 @@ fn a_missing_trace_is_a_usage_error() {
 #[test]
 fn explain_trace_takes_the_balance_and_then_the_trace_as_separate_arguments() {
     let output = Command::new(env!("CARGO_BIN_EXE_ebi"))
-        .args(["prob", "exptra", "testfiles/aa-ab-ba_ali.slpn", "1/2", "a", "a"])
+        .args([
+            "prob",
+            "exptra",
+            "testfiles/aa-ab-ba_ali.slpn",
+            "1/2",
+            "a",
+            "a",
+        ])
         .output()
         .unwrap();
     assert!(output.status.success());

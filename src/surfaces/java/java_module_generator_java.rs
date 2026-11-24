@@ -86,5 +86,7 @@ fn ebi_command_to_java_function(path: &Vec<&EbiCommand>) -> Result<String> {
         .collect::<Vec<_>>()
         .join(", ");
 
-    Ok(format!("\tpublic static native String {fn_name}(String output_format, {args});"))
+    Ok(format!(
+        "\tpublic static native String {fn_name}(String output_format, {args});"
+    ))
 }

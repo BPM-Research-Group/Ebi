@@ -3,7 +3,7 @@ use crate::ebi_framework::{
     ebi_input::{EbiInput, EbiInputType},
     ebi_output::{EbiOutput, EbiOutputType},
 };
-use ebi_objects::{Infoable, anyhow::anyhow};
+use ebi_objects::{anyhow::anyhow, Infoable};
 use inflector::Inflector;
 use std::io::Write;
 

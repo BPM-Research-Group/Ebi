@@ -7,6 +7,9 @@ use crate::ebi_framework::{
 };
 use ebi_objects::{Exportable, FiniteStochasticPartiallyOrderedLanguage, Importable};
 
+/// .spolang
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_FINITE_STOCHASTIC_PARTIALLY_ORDERED_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite stochastic partially ordered language",
     article: "a",

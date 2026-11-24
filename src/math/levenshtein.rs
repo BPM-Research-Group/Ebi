@@ -1,6 +1,6 @@
 use ebi_objects::{
-    Activity,
     ebi_arithmetic::{Fraction, Zero},
+    Activity,
 };
 
 pub fn normalised(trace1: &Vec<Activity>, trace2: &Vec<Activity>) -> Fraction {

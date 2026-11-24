@@ -18,28 +18,28 @@ use crate::{
         },
         trait_importers::{
             ToActivitiesTrait, ToEventLogEventAttributesTrait, ToEventLogTraceAttributesTrait,
-            ToEventLogTrait, ToFiniteLanguageTrait,
-            ToFiniteStochasticLanguageTrait, ToGraphableTrait, ToIterableLanguageTrait,
-            ToIterableStochasticLanguageTrait, ToQueriableStochasticLanguageTrait,
-            ToSemanticsTrait, ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
+            ToEventLogTrait, ToFiniteLanguageTrait, ToFiniteStochasticLanguageTrait,
+            ToGraphableTrait, ToIterableLanguageTrait, ToIterableStochasticLanguageTrait,
+            ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
+            ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
         },
     },
     ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
     text::Joiner,
 };
 use ebi_objects::{
-    ActivityKey, EbiObject, EbiObjectType, EventLogPython, LabelledPetriNet, ProcessTree,
     anyhow::Result,
-    ebi_arithmetic::{Fraction, is_exact_globally},
+    ebi_arithmetic::{is_exact_globally, Fraction},
     marking::Marking,
+    ActivityKey, EbiObject, EbiObjectType, EventLogPython, LabelledPetriNet, ProcessTree,
 };
 use process_mining::core::event_data::case_centric::{
-    AttributeValue, Attributes, Event, EventLogClassifier, Trace, to_attributes,
+    to_attributes, AttributeValue, Attributes, Event, EventLogClassifier, Trace,
 };
 use pyo3::{
-    Bound, PyAny, PyResult,
     exceptions::PyValueError,
     types::{PyAnyMethods, PyDict, PyDictMethods, PyList, PyListMethods, PySet, PySetMethods},
+    Bound, PyAny, PyResult,
 };
 use std::{
     collections::HashMap,
@@ -145,9 +145,9 @@ impl ImportableFromPM4Py for Vec<String> {
 
     fn py_extract_object(py_object: &Bound<'_, PyAny>) -> PyResult<Self> {
         //a bare string is rejected by PyO3 here, so a text is never taken for a list of characters
-        py_object.extract().map_err(|_| {
-            PyValueError::new_err("Expected a Python sequence of strings")
-        })
+        py_object
+            .extract()
+            .map_err(|_| PyValueError::new_err("Expected a Python sequence of strings"))
     }
 
     fn py_object_to_ebi_input(self, input_types: &[&'static EbiInputType]) -> Option<EbiInput> {

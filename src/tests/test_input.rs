@@ -1,12 +1,12 @@
 use crate::{
     ebi_framework::{
-        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
         ebi_input::{self, EbiInputType},
         ebi_trait::EbiTrait,
     },
     multiple_reader::MultipleReader,
 };
-use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
+use ebi_objects::{ebi_arithmetic::Fraction, EbiObject};
 use itertools::Itertools;
 use std::{
     fmt::Debug,
@@ -303,10 +303,8 @@ impl PartialEq for TestInput {
 
 #[cfg(test)]
 mod tests {
-    use super::{TEST_FILES_DIRECTORY, TestInput, test_file_path};
-    use crate::ebi_framework::ebi_file_handler::{
-        EBI_FILE_HANDLERS, EbiFileHandler,
-    };
+    use super::{test_file_path, TestInput, TEST_FILES_DIRECTORY};
+    use crate::ebi_framework::ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS};
     use std::{
         fs::{self, File},
         str::FromStr,
@@ -315,14 +313,10 @@ mod tests {
     #[test]
     fn file_handler_cli_argument_round_trips() {
         for file_handler in EBI_FILE_HANDLERS {
-            let argument =
-                TestInput::FileHandler(file_handler.clone()).to_cli_argument();
+            let argument = TestInput::FileHandler(file_handler.clone()).to_cli_argument();
             match argument {
                 //the command line can name the handler: it must read back
-                Some(text) => assert_eq!(
-                    &EbiFileHandler::from_str(&text).unwrap(),
-                    file_handler
-                ),
+                Some(text) => assert_eq!(&EbiFileHandler::from_str(&text).unwrap(), file_handler),
                 //otherwise the command line must be unable to name it
                 None => assert!(file_handler.validator.is_none()),
             }

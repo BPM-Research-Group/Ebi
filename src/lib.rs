@@ -39,38 +39,74 @@ pub mod ebi_commands {
     pub mod ebi_command_visualise;
 }
 
-/// The file handlers module connects file types to importers, exporters, conversions and Ebi traits.
+/// A file handler is an importer for a particular file format.
+/// In Ebi, a file handler defines how a file type is to be handled,
+/// and as which objects and traits it can be imported,
+/// and which objects can be exported to it.
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub mod ebi_file_handlers {
-    pub mod business_process_model_and_notation;
-    pub mod compressed_event_log;
-    pub mod deterministic_finite_automaton;
-    pub mod directly_follows_graph;
-    pub mod directly_follows_model;
-    pub mod event_log_csv;
-    pub mod event_log_ocel;
-    pub mod event_log_python;
-    pub mod event_log_xes;
-    pub mod executions;
-    pub mod finite_language;
-    pub mod finite_stochastic_language;
-    pub mod finite_stochastic_partially_ordered_language;
-    pub mod labelled_petri_net;
-    pub mod language_of_alignments;
-    pub mod lola_net;
-    pub mod partially_ordered_workflow_language;
-    pub mod petri_net_markup_language;
-    pub mod portable_document_format;
-    pub mod portable_network_graphics;
-    pub mod process_tree;
-    pub mod process_tree_markup_language;
-    pub mod scalable_vector_graphics;
-    pub mod stochastic_business_process_model_and_notation;
-    pub mod stochastic_deterministic_finite_automaton;
-    pub mod stochastic_directly_follows_model;
-    pub mod stochastic_labelled_petri_net;
-    pub mod stochastic_language_of_alignments;
-    pub mod stochastic_nondeterministic_finite_automaton;
-    pub mod stochastic_process_tree;
+    mod business_process_model_and_notation;
+    mod compressed_event_log;
+    mod deterministic_finite_automaton;
+    mod directly_follows_graph;
+    mod directly_follows_model;
+    mod event_log_csv;
+    mod event_log_ocel;
+    mod event_log_python;
+    mod event_log_xes;
+    mod executions;
+    mod finite_language;
+    mod finite_stochastic_language;
+    mod finite_stochastic_partially_ordered_language;
+    mod labelled_petri_net;
+    mod language_of_alignments;
+    mod lola_net;
+    mod partially_ordered_workflow_language;
+    mod petri_net_markup_language;
+    mod portable_document_format;
+    mod portable_network_graphics;
+    mod process_tree;
+    mod process_tree_markup_language;
+    mod scalable_vector_graphics;
+    mod stochastic_business_process_model_and_notation;
+    mod stochastic_deterministic_finite_automaton;
+    mod stochastic_directly_follows_model;
+    mod stochastic_labelled_petri_net;
+    mod stochastic_language_of_alignments;
+    mod stochastic_nondeterministic_finite_automaton;
+    mod stochastic_process_tree;
+
+    pub use business_process_model_and_notation::EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION;
+    pub use compressed_event_log::EBI_COMPRESSED_EVENT_LOG;
+    pub use deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON;
+    pub use directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH;
+    pub use directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL;
+    pub use event_log_csv::EBI_EVENT_LOG_CSV;
+    pub use event_log_ocel::EBI_EVENT_LOG_OCEL;
+    pub use event_log_python::EBI_EVENT_LOG_PYTHON;
+    pub use event_log_xes::EBI_EVENT_LOG_XES;
+    pub use executions::EBI_EXECUTIONS;
+    pub use finite_language::EBI_FINITE_LANGUAGE;
+    pub use finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE;
+    pub use finite_stochastic_partially_ordered_language::EBI_FINITE_STOCHASTIC_PARTIALLY_ORDERED_LANGUAGE;
+    pub use labelled_petri_net::EBI_LABELLED_PETRI_NET;
+    pub use language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS;
+    pub use lola_net::EBI_LOLA_NET;
+    pub use partially_ordered_workflow_language::EBI_PARTIALLY_ORDERED_WORKFLOW_LANGUAGE;
+    pub use petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE;
+    pub use portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT;
+    pub use portable_network_graphics::EBI_PORTABLE_NETWORK_GRAPHICS;
+    pub use process_tree::EBI_PROCESS_TREE;
+    pub use process_tree_markup_language::EBI_PROCESS_TREE_MARKUP_LANGUAGE;
+    pub use scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS;
+    pub use stochastic_business_process_model_and_notation::EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION;
+    pub use stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON;
+    pub use stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL;
+    pub use stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET;
+    pub use stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS;
+    pub use stochastic_nondeterministic_finite_automaton::EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON;
+    pub use stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE;
 }
 
 /// The framework module contains the Ebi framework.

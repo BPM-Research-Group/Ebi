@@ -21,6 +21,9 @@ use ebi_objects::{
     EbiObject, Exportable, Importable, StochasticLabelledPetriNet,
 };
 
+/// .slpn
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "stochastic labelled Petri net",
     article: "a",

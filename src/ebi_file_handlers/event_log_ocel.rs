@@ -10,12 +10,20 @@ use crate::ebi_framework::{
         ImportAsStochasticNondeterministicFiniteAutomatonObject,
     },
     trait_importers::{
-        ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait
+        ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait,
+        ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait,
+        ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait,
+        ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait,
+        ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
+        ImportAsStochasticSemanticsTrait,
     },
     validate::Validate,
 };
-use ebi_objects::{Exportable, Importable, ebi_objects::event_log_ocel::EventLogOcel};
+use ebi_objects::{ebi_objects::event_log_ocel::EventLogOcel, Exportable, Importable};
 
+/// .ocel
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_EVENT_LOG_OCEL: EbiFileHandler = EbiFileHandler {
     name: "object-centric event log",
     article: "an",

@@ -1,6 +1,8 @@
 use crate::{ebi_framework::displayable::Displayable, semantics::semantics_trait::Semantics};
 use ebi_objects::{
-    AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticNondeterministicFiniteAutomaton, anyhow::Result
+    anyhow::Result, AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton,
+    DirectlyFollowsGraph, DirectlyFollowsModel, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticNondeterministicFiniteAutomaton,
 };
 use pastey::paste;
 use std::collections::VecDeque;

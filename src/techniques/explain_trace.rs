@@ -1,6 +1,5 @@
 use crate::{
-    ebi_framework::displayable::Displayable,
-    ebi_traits::EbiTraitStochasticSemantics,
+    ebi_framework::displayable::Displayable, ebi_traits::EbiTraitStochasticSemantics,
     semantics::stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     techniques::align_astar::transform_alignment,
 };
@@ -77,11 +76,8 @@ impl PartialEq for StochasticWeightedCost {
 impl Eq for StochasticWeightedCost {}
 
 pub trait ExplainTrace {
-    fn explain_trace(
-        &self,
-        trace: &[Activity],
-        balance: &Fraction,
-    ) -> Result<LanguageOfAlignments>;
+    fn explain_trace(&self, trace: &[Activity], balance: &Fraction)
+        -> Result<LanguageOfAlignments>;
 }
 
 impl ExplainTrace for EbiTraitStochasticSemantics {
@@ -137,9 +133,7 @@ impl<State: Displayable>
 
                 //walk through the enabled transitions in the model
                 for transition in self.get_enabled_transitions(state) {
-                    let total_weight = self
-                        .get_total_weight_of_enabled_transitions(state)
-                        .unwrap();
+                    let total_weight = self.get_total_weight_of_enabled_transitions(state).unwrap();
 
                     let mut new_state = state.clone();
                     // log::debug!("\t\tnew state before {}", new_state);

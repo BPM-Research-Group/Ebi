@@ -1,4 +1,4 @@
-use ebi_objects::ebi_arithmetic::{Fraction, One, Zero, f};
+use ebi_objects::ebi_arithmetic::{f, Fraction, One, Zero};
 use fnv::FnvBuildHasher;
 use std::collections::HashMap;
 

@@ -57,7 +57,8 @@ impl Semantics for ProcessTree {
 #[cfg(test)]
 mod tests {
     use crate::semantics::{
-        semantics_trait::Semantics, stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
+        semantics_trait::Semantics,
+        stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     };
     use ebi_objects::{
         ebi_arithmetic::{Fraction, One},

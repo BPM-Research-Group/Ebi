@@ -1,11 +1,11 @@
 use ebi_objects::{
-    BusinessProcessModelAndNotation, LabelledPetriNet, ProcessTree,
-    StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet, StochasticProcessTree,
     ebi_arithmetic::{Fraction, Random},
     ebi_objects::process_tree::get_number_of_transitions,
     malachite::base::random::Seed,
+    BusinessProcessModelAndNotation, LabelledPetriNet, ProcessTree,
+    StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet, StochasticProcessTree,
 };
-use ebi_optimisation::anyhow::{Result, anyhow};
+use ebi_optimisation::anyhow::{anyhow, Result};
 
 pub trait RandomMinerSBPMN {
     fn mine_random_stochastic_business_process_model_and_notation(

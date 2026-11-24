@@ -142,7 +142,7 @@ mod tests {
 
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
-        ebi_file_handlers::stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        ebi_file_handlers::EBI_STOCHASTIC_LABELLED_PETRI_NET,
         ebi_framework::{
             ebi_command::EbiCommand,
             ebi_input::{

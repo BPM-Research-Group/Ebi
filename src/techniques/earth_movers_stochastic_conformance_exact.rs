@@ -1,10 +1,10 @@
 use crate::math::distances::WeightedDistances;
 use ebi_objects::{
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{
-        MaybeExact, One, Zero,
         fraction::{fraction_exact::FractionExact, signed::Numerator},
-        malachite::{Integer, base::num::basic::traits::One as MOne},
+        malachite::{base::num::basic::traits::One as MOne, Integer},
+        MaybeExact, One, Zero,
     },
 };
 use ebi_optimisation::network_simplex::NetworkSimplex;
@@ -44,7 +44,7 @@ impl dyn WeightedDistances {
         if self.len_a() == 0 || self.len_b() == 0 {
             return Err(anyhow!("One of the languages is empty."));
         }
-        
+
         // 2. Is exact arithmetic required?
         log::info!("Calculating exact EMSC value");
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
@@ -284,8 +284,8 @@ mod tests {
         techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     };
     use ebi_objects::{
-        FiniteStochasticLanguage,
         ebi_arithmetic::{Fraction, One, Zero},
+        FiniteStochasticLanguage,
     };
     use std::fs;
 

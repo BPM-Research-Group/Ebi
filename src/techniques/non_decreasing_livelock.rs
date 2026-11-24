@@ -3,10 +3,10 @@ use crate::{
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics},
 };
 use ebi_objects::{
-    AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet,
-    ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    anyhow::Result, ebi_objects::process_tree::TreeMarking, AutomatonState,
+    DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::Result, ebi_objects::process_tree::TreeMarking,
 };
 
 pub trait NonDecreasingLivelock {

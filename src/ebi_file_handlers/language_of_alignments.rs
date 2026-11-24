@@ -7,6 +7,9 @@ use crate::ebi_framework::{
 };
 use ebi_objects::{Exportable, Importable, LanguageOfAlignments};
 
+/// .ali
+///
+/// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub const EBI_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     name: "language of alignments",
     article: "a",

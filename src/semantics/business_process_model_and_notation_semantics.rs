@@ -1,7 +1,7 @@
 use crate::semantics::semantics_trait::Semantics;
 use ebi_objects::{
-    Activity, BusinessProcessModelAndNotation, anyhow::Result, ebi_bpmn::BPMNMarking,
-    ebi_objects::labelled_petri_net::TransitionIndex,
+    anyhow::Result, ebi_bpmn::BPMNMarking, ebi_objects::labelled_petri_net::TransitionIndex,
+    Activity, BusinessProcessModelAndNotation,
 };
 
 impl Semantics for BusinessProcessModelAndNotation {
@@ -45,5 +45,4 @@ impl Semantics for BusinessProcessModelAndNotation {
     ) -> Vec<TransitionIndex> {
         BusinessProcessModelAndNotation::get_enabled_transitions(self, state).unwrap()
     }
-
 }
