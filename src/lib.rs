@@ -39,9 +39,9 @@ pub mod ebi_commands {
     pub mod ebi_command_visualise;
 }
 
-/// A file handler is an importer for a particular file format.
+/// A file handler is an importer and exporter for a particular file format.
 /// In Ebi, a file handler defines how a file type is to be handled,
-/// and as which objects and traits it can be imported,
+/// as which objects and traits it can be imported,
 /// and which objects can be exported to it.
 ///
 /// For documentation on file handlers, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).

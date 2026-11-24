@@ -79,6 +79,7 @@ impl EbiInput {
     }
 }
 
+/// If an input of a command can be a fixed set of options, this macro creates the input type (without a default).
 #[macro_export]
 macro_rules! EbiInputTypeEnum {
     ($t:ident) => {
@@ -86,6 +87,7 @@ macro_rules! EbiInputTypeEnum {
     };
 }
 
+/// If an input of a command can be a fixed set of options, this macro creates the input type (with a default).
 #[macro_export]
 macro_rules! EbiInputTypeEnumDefault {
     ($t:ident, $d:expr) => {
