@@ -1,12 +1,9 @@
 use super::directly_follows_graph_abstractor::DirectlyFollowsAbstractor;
-use crate::ebi_traits::{
-    ebi_trait_event_log::EbiTraitEventLog,
-    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-};
+use crate::ebi_traits::{EbiTraitEventLog, EbiTraitFiniteStochasticLanguage};
 use ebi_objects::{
-    Activity, DirectlyFollowsGraph,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, One},
+    Activity, DirectlyFollowsGraph,
 };
 use std::collections::HashSet;
 
@@ -189,13 +186,12 @@ fn get_edges_to_filter(
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        semantics::semantics_trait::Semantics,
+        ebi_traits::EbiTraitFiniteStochasticLanguage, semantics::semantics_trait::Semantics,
         techniques::directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
     };
     use ebi_objects::{
-        FiniteStochasticLanguage,
         ebi_arithmetic::{Fraction, One},
+        FiniteStochasticLanguage,
     };
     use std::fs;
 

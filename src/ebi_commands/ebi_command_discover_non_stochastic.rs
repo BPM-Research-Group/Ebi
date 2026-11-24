@@ -9,8 +9,8 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
     }, ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        EbiTraitFiniteLanguage,
+        EbiTraitFiniteStochasticLanguage,
     }, techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree}, inductive_miner::{InductiveMiner, InductiveMinerInfrequent}, prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree}, split_miner::{SplitMiner, SplitMinerParameters}, trace_model_miner::TraceModelMinerTree,
     },

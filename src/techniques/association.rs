@@ -1,5 +1,5 @@
 use crate::{
-    ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+    ebi_traits::EbiTraitEventLogTraceAttributes,
     math::{correlation::correlation, levenshtein, root::ContainsRoot},
 };
 use ebi_objects::{
@@ -278,14 +278,11 @@ impl<'a> Iterator for SamplePairsSpaceIterator<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_objects::EventLogTraceAttributes;
-
     use crate::{
-        ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-        techniques::association::Associations,
+        ebi_traits::EbiTraitEventLogTraceAttributes, techniques::association::Associations,
     };
+    use ebi_objects::EventLogTraceAttributes;
+    use std::fs;
 
     #[test]
     fn zero() {

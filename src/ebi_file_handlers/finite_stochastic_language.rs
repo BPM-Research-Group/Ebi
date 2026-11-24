@@ -17,8 +17,8 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, FiniteStochasticLanguage, Importable,
-    anyhow::{Result, anyhow},
 };
 
 pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
@@ -107,14 +107,12 @@ impl FromEbiTraitObject for FiniteStochasticLanguage {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
+    use crate::ebi_traits::EbiTraitFiniteStochasticLanguage;
     use ebi_objects::{
-        FiniteStochasticLanguage, NumberOfTraces,
         ebi_arithmetic::{Fraction, Zero},
+        FiniteStochasticLanguage, NumberOfTraces,
     };
-
-    use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+    use std::fs;
 
     #[test]
     fn empty_slang() {

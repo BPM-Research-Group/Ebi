@@ -52,7 +52,7 @@
 
 use crate::{
     ebi_framework::{
-        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     },
     multiple_reader::MultipleReader,
@@ -139,13 +139,11 @@ pub fn get_all_test_files_for_file(
                     file_handler,
                     importer
                 );
-                assert!(
-                    (importer.get_importer())(
-                        &mut reader.get().unwrap(),
-                        &importer.default_parameter_values()
-                    )
-                    .is_err()
-                );
+                assert!((importer.get_importer())(
+                    &mut reader.get().unwrap(),
+                    &importer.default_parameter_values()
+                )
+                .is_err());
             }
 
             for importer in file_handler.trait_importers {
@@ -155,14 +153,12 @@ pub fn get_all_test_files_for_file(
                     file_handler,
                     importer
                 );
-                assert!(
-                    importer
-                        .import(
-                            &mut reader.get().unwrap(),
-                            &importer.default_parameter_values()
-                        )
-                        .is_err()
-                );
+                assert!(importer
+                    .import(
+                        &mut reader.get().unwrap(),
+                        &importer.default_parameter_values()
+                    )
+                    .is_err());
             }
         }
     }
@@ -197,9 +193,7 @@ pub mod tests {
             ebi_input::EbiInput,
             trait_importers::{ImportAsSemanticsTrait, ToSemanticsTrait},
         },
-        ebi_traits::{
-            ebi_trait_event_log::EbiTraitEventLog, ebi_trait_semantics::EbiTraitSemantics,
-        },
+        ebi_traits::{EbiTraitEventLog, EbiTraitSemantics},
         multiple_reader::MultipleReader,
         semantics::semantics_trait::Semantics,
     };

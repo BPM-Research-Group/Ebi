@@ -11,8 +11,8 @@ use crate::ebi_framework::{
     validate::Validate,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, FiniteLanguage, Importable,
-    anyhow::{Result, anyhow},
 };
 
 pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
@@ -78,14 +78,9 @@ impl FromEbiTraitObject for FiniteLanguage {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use crate::{
-        ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
-    };
-
     use super::FiniteLanguage;
+    use crate::{ebi_framework::trait_importers::ToSemanticsTrait, ebi_traits::EbiTraitSemantics};
+    use std::fs;
 
     #[test]
     fn lang_empty() {

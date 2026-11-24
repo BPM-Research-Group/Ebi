@@ -24,11 +24,13 @@ use ebi_objects::{
     TranslateActivityKey,
 };
 
-pub const TRAIT_DEFINITION_LATEX: &str = concat!(
-    "The trait ``stochastic semantics`` allows for traversal of the state space, with probabilities.",
-    trait_definition_finalisation!()
-);
-
+/// Allows for traversal of a state space and its probabilities.
+/// 
+/// This is a wrapper enum in order to be able to implement algorithms that are agnostic of the marking/state type, amongst other things.
+/// This enum does not allow access to the underlying StochasticSemantics trait methods directly, but through a match the generics work out.
+/// See the implementation of [`crate::techniques::sample::Sampler`] for an example.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub enum EbiTraitStochasticSemantics {
     Usize(
         Box<
@@ -70,6 +72,18 @@ pub enum EbiTraitStochasticSemantics {
             >,
         >,
     ),
+}
+
+impl EbiTraitStochasticSemantics {
+    pub fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        concat!(
+            "The trait ``stochastic semantics`` allows for traversal of the state space, with probabilities.",
+            trait_definition_finalisation!()
+        )
+    }
 }
 
 impl FromEbiTraitObject for EbiTraitStochasticSemantics {

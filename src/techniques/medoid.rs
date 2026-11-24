@@ -1,11 +1,10 @@
 use crate::{
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::distances::TriangularDistanceMatrix,
+    ebi_traits::EbiTraitFiniteStochasticLanguage, math::distances::TriangularDistanceMatrix,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
+    ebi_arithmetic::{f, Fraction, One, Zero},
     FiniteLanguage,
-    anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, One, Zero, f},
 };
 
 pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage>
@@ -21,12 +20,7 @@ where
 
     if number_of_traces.is_one() {
         if let Some(trace_index) = medoid_single(log, &distances) {
-            result.insert(
-                log.iter_traces()
-                    .nth(trace_index)
-                    .unwrap()
-                    .to_owned(),
-            );
+            result.insert(log.iter_traces().nth(trace_index).unwrap().to_owned());
             return Ok((activity_key, result).into());
         } else {
             return Err(anyhow!(

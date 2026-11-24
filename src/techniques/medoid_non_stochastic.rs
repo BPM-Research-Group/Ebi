@@ -1,5 +1,5 @@
 use crate::{
-    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
+    ebi_traits::EbiTraitFiniteLanguage,
     math::distances::TriangularDistanceMatrix,
 };
 use ebi_objects::{

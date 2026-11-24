@@ -7,9 +7,14 @@ use ebi_objects::{
     anyhow::{Result, anyhow},
 };
 
-pub const TRAIT_DEFINITION_LATEX: &str = "The trait ``activities'' provides access to activities.";
-
+/// Allows for access to activities.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitActivities: HasActivityKey {
+    
+    fn trait_explanation() -> &'static str where Self: Sized {
+        "The trait ``activities'' provides access to activities."
+    }
 }
 
 impl<X> EbiTraitActivities for X where X: HasActivityKey {} //blanket implementation

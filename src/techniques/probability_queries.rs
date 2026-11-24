@@ -1,11 +1,7 @@
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_stochastic_deterministic_semantics::{
-            EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
-        },
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitStochasticDeterministicSemantics},
+    semantics::stochastic_deterministic_semantics::stochastic_deterministic_semantics_trait::StochasticDeterministicSemantics,
 };
 use core::hash::Hash;
 use ebi_objects::{
@@ -585,15 +581,13 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
 mod tests {
     use crate::{
         ebi_framework::trait_importers::ToStochasticDeterministicSemanticsTrait,
-        ebi_traits::{
-            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-            ebi_trait_stochastic_deterministic_semantics::{
-                EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
-            },
-        },
+        ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitStochasticDeterministicSemantics},
         semantics::{
             labelled_petri_net_semantics::LPNMarking,
-            stochastic_deterministic_semantics::deterministic_semantics_for_stochastic_semantics::PMarking,
+            stochastic_deterministic_semantics::{
+                deterministic_semantics_for_stochastic_semantics::PMarking,
+                stochastic_deterministic_semantics_trait::StochasticDeterministicSemantics,
+            },
         },
         techniques::probability_queries::ProbabilityQueries,
     };

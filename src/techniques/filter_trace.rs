@@ -1,9 +1,6 @@
 use crate::{
     ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
-    ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitEventLog, EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage},
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},

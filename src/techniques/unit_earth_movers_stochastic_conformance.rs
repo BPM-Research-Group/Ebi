@@ -1,8 +1,5 @@
 use crate::{
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
     semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
@@ -71,7 +68,7 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     };
     use ebi_objects::{

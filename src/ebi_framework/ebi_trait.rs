@@ -4,10 +4,11 @@ use super::{
     ebi_input::{EbiInput, EbiInputType},
 };
 use crate::ebi_traits::{
-    ebi_trait_activities, ebi_trait_event_log, ebi_trait_event_log_event_attributes,
-    ebi_trait_event_log_trace_attributes, ebi_trait_graphable, ebi_trait_semantics,
-    ebi_trait_stochastic_deterministic_semantics, ebi_trait_stochastic_partially_ordered_semantics,
-    ebi_trait_stochastic_semantics,
+    EbiTraitActivities, EbiTraitEventLog, EbiTraitEventLogEventAttributes,
+    EbiTraitEventLogTraceAttributes, EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage,
+    EbiTraitGraphable, EbiTraitIterableLanguage, EbiTraitIterableStochasticLanguage,
+    EbiTraitQueriableStochasticLanguage, EbiTraitSemantics,
+    EbiTraitStochasticDeterministicSemantics, EbiTraitStochasticPartiallyOrderedSemantics,
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},
@@ -109,36 +110,34 @@ impl EbiTrait {
 
     pub fn get_explanation(&self) -> &str {
         match self {
-            EbiTrait::EventLog => ebi_trait_event_log::TRAIT_DEFINITION_LATEX,
-            EbiTrait::EventLogEventAttributes => ebi_trait_event_log_event_attributes::TRAIT_DEFINITION_LATEX,
-            EbiTrait::EventLogTraceAttributes => ebi_trait_event_log_trace_attributes::TRAIT_DEFINITION_LATEX,
-            EbiTrait::FiniteLanguage => "Iterating over a finite language will yield each trace variant once.
-            \\\\
-            Definition: let $\\Sigma$ be an alphabet of activities.
-            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
-            a \\emph{finite language} $F \\subseteq \\Sigma^*$ is a finite set of traces.",
-            EbiTrait::FiniteStochasticLanguage => "Iterating over a finite stochastic language will yield each trace variant once, as well as how likely that trace variant is in the language.
-            The probabilities are positive and their sum must be smaller than or equal to one.
-            The ``missing'' probability means ``no trace'' or ``livelock''.
-            \\\\
-            Definition: let $\\Sigma$ be an alphabet of activities.
-            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
-            a \\emph{finite stochastic language} $S \\subseteq \\Sigma^* \\mapsto \\mathcal{R}^+$ is a finite set of trace-probability tuples, such that $1 \\geq \\sum_{\\sigma \\in \\Sigma^*} S(\\sigma) $.",
-            EbiTrait::IterableLanguage => {
-                "An iterable language allows to walk over its traces. May iterate over infinitely many traces and not terminate."
+            EbiTrait::EventLog => <ebi_objects::EventLog as EbiTraitEventLog>::trait_explanation(),
+            EbiTrait::EventLogEventAttributes => {
+                <ebi_objects::EventLogEventAttributes as EbiTraitEventLogEventAttributes>::trait_explanation()
             }
+            EbiTrait::EventLogTraceAttributes => {
+                <ebi_objects::EventLogTraceAttributes as EbiTraitEventLogTraceAttributes>::trait_explanation()
+            }
+            EbiTrait::FiniteLanguage => <ebi_objects::FiniteLanguage as EbiTraitFiniteLanguage>::trait_explanation(),
+            EbiTrait::FiniteStochasticLanguage => {
+                <ebi_objects::FiniteStochasticLanguage as EbiTraitFiniteStochasticLanguage>::trait_explanation()
+            }
+            EbiTrait::IterableLanguage => <ebi_objects::FiniteLanguage as EbiTraitIterableLanguage>::trait_explanation(),
             EbiTrait::IterableStochasticLanguage => {
-                "An iterable stochastic language allows to walk over its traces and their probabilities. May iterate over infinitely many traces and not terminate."
+                <ebi_objects::FiniteStochasticLanguage as EbiTraitIterableStochasticLanguage>::trait_explanation()
             }
             EbiTrait::QueriableStochasticLanguage => {
-                "A queriable stochastic language can be given a trace, and it will return the probability of the trace."
+                <ebi_objects::StochasticProcessTree as EbiTraitQueriableStochasticLanguage>::trait_explanation()
             }
-            EbiTrait::Semantics => ebi_trait_semantics::TRAIT_DEFINITION_LATEX,
-            EbiTrait::StochasticPartiallyOrderedSemantics => ebi_trait_stochastic_partially_ordered_semantics::TRAIT_DEFINITION_LATEX,
-            EbiTrait::StochasticDeterministicSemantics => ebi_trait_stochastic_deterministic_semantics::TRAIT_DEFINITION_LATEX,
-            EbiTrait::StochasticSemantics => ebi_trait_stochastic_semantics::TRAIT_DEFINITION_LATEX,
-            EbiTrait::Graphable => ebi_trait_graphable::TRAIT_DEFINITION_LATEX,
-            EbiTrait::Activities => ebi_trait_activities::TRAIT_DEFINITION_LATEX,
+            EbiTrait::Semantics => EbiTraitSemantics::trait_explanation(),
+            EbiTrait::StochasticPartiallyOrderedSemantics => {
+                EbiTraitStochasticPartiallyOrderedSemantics::trait_explanation()
+            }
+            EbiTrait::StochasticDeterministicSemantics => {
+                EbiTraitStochasticDeterministicSemantics::trait_explanation()
+            }
+            EbiTrait::StochasticSemantics => EbiTraitSemantics::trait_explanation(),
+            EbiTrait::Graphable => <ebi_objects::LabelledPetriNet as EbiTraitGraphable>::trait_explanation(),
+            EbiTrait::Activities => <ebi_objects::EventLog as EbiTraitActivities>::trait_explanation(),
         }
     }
 }

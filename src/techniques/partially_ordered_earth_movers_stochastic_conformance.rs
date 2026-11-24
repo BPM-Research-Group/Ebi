@@ -1,7 +1,10 @@
-use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix}};
+use crate::{
+    ebi_traits::EbiTraitFiniteStochasticLanguage,
+    math::{distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix},
+};
 use ebi_objects::{
-    FiniteStochasticPartiallyOrderedLanguage, HasActivityKey, TranslateActivityKey, anyhow::Result,
-    ebi_arithmetic::Fraction,
+    anyhow::Result, ebi_arithmetic::Fraction, FiniteStochasticPartiallyOrderedLanguage,
+    HasActivityKey, TranslateActivityKey,
 };
 
 pub trait PartiallyOrderedEarthMoversStochasticConformance {
@@ -33,7 +36,8 @@ impl PartiallyOrderedEarthMoversStochasticConformance for dyn EbiTraitFiniteStoc
         lang_b: &mut FiniteStochasticPartiallyOrderedLanguage,
     ) -> Result<Fraction> {
         lang_b.translate_using_activity_key(self.activity_key_mut());
-        let distances = WeightedDistanceMatrix::from_total_and_partially_ordered_languages(self, lang_b);
+        let distances =
+            WeightedDistanceMatrix::from_total_and_partially_ordered_languages(self, lang_b);
         let distances: Box<dyn WeightedDistances> = Box::new(distances);
         distances.earth_movers_stochastic_conformance()
     }

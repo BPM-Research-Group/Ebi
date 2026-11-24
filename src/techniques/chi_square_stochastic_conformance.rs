@@ -1,8 +1,5 @@
 use crate::{
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
     semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
@@ -52,9 +49,10 @@ impl ChiSquareStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
         //something went wrong
         if let Ok(mutex) = Arc::try_unwrap(error)
             && let Ok(err) = mutex.into_inner()
-                && let Some(err) = err {
-                    return Err(err);
-                }
+            && let Some(err) = err
+        {
+            return Err(err);
+        }
         sum /= 2usize;
         sum = sum.one_minus();
         Ok(sum)
@@ -64,7 +62,7 @@ impl ChiSquareStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::chi_square_stochastic_conformance::ChiSquareStochasticConformance,
     };
     use ebi_objects::{

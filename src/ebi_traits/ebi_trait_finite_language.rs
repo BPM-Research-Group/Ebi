@@ -4,11 +4,14 @@ use crate::ebi_framework::{
     trait_importers::ToFiniteLanguageTrait,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     Activity, FiniteLanguage, FiniteStochasticLanguage, Importable, NumberOfTraces,
-    anyhow::{Result, anyhow},
 };
 use std::fmt::Display;
 
+/// Allows for iteration over traces (trace variants), without attributes attached.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitFiniteLanguage:
     Display + EbiTraitIterableLanguage + NumberOfTraces + Send + Sync
 {
@@ -19,6 +22,17 @@ pub trait EbiTraitFiniteLanguage:
     /// Note to callers: please put the closure definition inside the Box::new in the call of retain_traces.
     /// Otherwise, Rust may give weird compile errors.
     fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>);
+
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        "Iterating over a finite language will yield each trace variant once.
+            \\\\
+            Definition: let $\\Sigma$ be an alphabet of activities.
+            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
+            a \\emph{finite language} $F \\subseteq \\Sigma^*$ is a finite set of traces."
+    }
 }
 
 impl FromEbiTraitObject for dyn EbiTraitFiniteLanguage {

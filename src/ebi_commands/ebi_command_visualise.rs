@@ -1,5 +1,5 @@
 use ebi_objects::{
-    EbiObject, EbiObjectType, anyhow::anyhow, ebi_objects::scalable_vector_graphics::ToSVG,
+    anyhow::anyhow, ebi_objects::scalable_vector_graphics::ToSVG, EbiObject, EbiObjectType,
 };
 
 use crate::{
@@ -9,7 +9,7 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
+    ebi_traits::EbiTraitGraphable,
 };
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
@@ -152,8 +152,8 @@ mod tests {
         },
     };
     use ebi_objects::{
-        FiniteLanguage,
         ebi_arithmetic::{Fraction, One},
+        FiniteLanguage,
     };
 
     #[test]

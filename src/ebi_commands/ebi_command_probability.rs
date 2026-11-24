@@ -6,17 +6,15 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+        EbiTraitFiniteLanguage, EbiTraitQueriableStochasticLanguage, EbiTraitStochasticSemantics,
     },
     semantics::follower_semantics::FollowerSemantics,
     techniques::explain_trace::ExplainTrace,
 };
 use ebi_objects::{
-    EbiObject, EbiObjectType, HasActivityKey,
     anyhow::Context,
     ebi_arithmetic::{ConstFraction, Fraction},
+    EbiObject, EbiObjectType, HasActivityKey,
 };
 
 pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
@@ -34,7 +32,8 @@ pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
 pub const EBI_PROBABILITY_LOG: EbiCommand = EbiCommand::Command {
     name_short: "log",
     name_long: None,
-    explanation_short: "Compute the probability that a stochastic model produces any trace of a log.",
+    explanation_short:
+        "Compute the probability that a stochastic model produces any trace of a log.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:journals/is/LeemansMM24}"),
     cli_command: None,

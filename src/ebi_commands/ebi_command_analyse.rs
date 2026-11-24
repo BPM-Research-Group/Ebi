@@ -7,10 +7,8 @@ use crate::{
         ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
+        EbiTraitEventLog, EbiTraitEventLogTraceAttributes, EbiTraitFiniteStochasticLanguage,
+        EbiTraitStochasticDeterministicSemantics,
     },
     techniques::{
         cohort_analysis::CohortAnalysis, completeness::Completeness,
@@ -20,9 +18,9 @@ use crate::{
     },
 };
 use ebi_objects::{
-    DirectlyFollowsGraph, EbiObject, EbiObjectType,
-    anyhow::{Context, anyhow},
+    anyhow::{anyhow, Context},
     ebi_arithmetic::{ConstFraction, Fraction, Zero},
+    DirectlyFollowsGraph, EbiObject, EbiObjectType,
 };
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {

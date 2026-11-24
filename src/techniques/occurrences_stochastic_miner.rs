@@ -1,6 +1,11 @@
-use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+use crate::ebi_traits::EbiTraitFiniteStochasticLanguage;
 use ebi_objects::{
-    ActivityKeyTranslator, BusinessProcessModelAndNotation, HasActivityKey, LabelledPetriNet, ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet, StochasticProcessTree, TreeNode, anyhow::anyhow, ebi_arithmetic::{Fraction, One, Zero}, ebi_bpmn::traits::objectable::BPMNObject,
+    anyhow::anyhow,
+    ebi_arithmetic::{Fraction, One, Zero},
+    ebi_bpmn::traits::objectable::BPMNObject,
+    ActivityKeyTranslator, BusinessProcessModelAndNotation, HasActivityKey, LabelledPetriNet,
+    ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet,
+    StochasticProcessTree, TreeNode,
 };
 use ebi_optimisation::anyhow::Result;
 use fnv::FnvBuildHasher;
@@ -169,7 +174,7 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
 mod tests {
     use super::OccurrencesStochasticMinerLPN;
     use ebi_objects::{
-        FiniteStochasticLanguage, LabelledPetriNet, ebi_arithmetic::exact::is_exact_globally,
+        ebi_arithmetic::exact::is_exact_globally, FiniteStochasticLanguage, LabelledPetriNet,
     };
     use std::fs;
 

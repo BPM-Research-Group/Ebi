@@ -3,16 +3,23 @@ use crate::ebi_framework::{
     trait_importers::ToGraphableTrait,
 };
 use ebi_objects::{
-    Graphable, Importable, ScalableVectorGraphics,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_objects::scalable_vector_graphics::ToSVG,
+    Graphable, Importable, ScalableVectorGraphics,
 };
 use layout::backends::svg::SVGWriter;
 
-pub const TRAIT_DEFINITION_LATEX: &str =
-    "The trait ``graphable'' allows to create a graph representation.";
-
-pub trait EbiTraitGraphable: Graphable {}
+/// Allows for the creation of a graph.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
+pub trait EbiTraitGraphable: Graphable {
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        "The trait ``graphable'' allows to create a graph representation."
+    }
+}
 
 impl<X> EbiTraitGraphable for X where X: Graphable {} //blanket implementation
 

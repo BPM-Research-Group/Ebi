@@ -1,6 +1,6 @@
 use ebi_objects::{ebi_arithmetic::Zero, ProcessTree, TreeNode, TreeOperator};
 
-use crate::ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage;
+use crate::ebi_traits::EbiTraitFiniteLanguage;
 
 pub trait TraceModelMinerTree {
     fn mine_trace_model_tree(&self) -> ProcessTree;

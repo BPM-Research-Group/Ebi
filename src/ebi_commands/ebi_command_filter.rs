@@ -1,19 +1,16 @@
 use crate::{
-    EbiInputTypeEnum,
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::EbiInputType,
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage},
     techniques::{
         filter_stochastic_trace::FilterStochasticTraces,
         filter_trace::{EventSelector, FilterTrace, Operator},
     },
+    EbiInputTypeEnum,
 };
 use ebi_objects::{EbiObject, EbiObjectType, EventLogXes, HasActivityKey};
 use strum::VariantNames;

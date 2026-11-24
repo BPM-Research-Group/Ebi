@@ -6,7 +6,7 @@ use crate::{
         ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
-        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics
+        EbiTraitActivities, EbiTraitEventLogEventAttributes, EbiTraitFiniteLanguage, EbiTraitSemantics
     },
     techniques::{
         any_traces::AnyTraces, bounded::Bounded, empty_traces::HasEmptyTraces, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic, timestamps_ordered::TimestampsOrdered

@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::displayable::Displayable,
-    ebi_traits::ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+    ebi_traits::EbiTraitStochasticSemantics,
     semantics::stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     techniques::align_astar::transform_alignment,
 };

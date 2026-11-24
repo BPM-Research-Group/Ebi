@@ -1,5 +1,5 @@
-use crate::ebi_traits::ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes;
-use ebi_objects::{Executions, anyhow::Result, ebi_objects::executions::Execution};
+use crate::ebi_traits::EbiTraitEventLogEventAttributes;
+use ebi_objects::{anyhow::Result, ebi_objects::executions::Execution, Executions};
 
 pub trait TimestampsOrdered {
     /// Checks whether that all appearing timestamps are in increasing order.

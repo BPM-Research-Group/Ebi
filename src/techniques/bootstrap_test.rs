@@ -1,9 +1,6 @@
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::{
-        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitEventLogTraceAttributes, EbiTraitFiniteStochasticLanguage},
     math::{
         average::Average,
         distances::{TriangularDistanceMatrix, WeightedDistances},
@@ -13,14 +10,14 @@ use crate::{
     techniques::sample::{self, Resampler},
 };
 use ebi_objects::{
-    Attribute,
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{Fraction, OneMinus},
+    Attribute,
 };
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::sync::{
-    Arc,
     atomic::{AtomicUsize, Ordering},
+    Arc,
 };
 
 pub trait BootstrapTest {
@@ -180,7 +177,9 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
         let base_conformance = Arc::new(
             self_other_distances
                 .earth_movers_stochastic_conformance()
-                .with_context(|| "computing base earth movers' stochastic conformance".to_string())?,
+                .with_context(|| {
+                    "computing base earth movers' stochastic conformance".to_string()
+                })?,
         );
 
         log::info!("Compute the trace distances");
@@ -219,7 +218,11 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
 
                 if let Ok(d) = sample_conformance {
                     //Here, the paper says "<=", however that does not match intuition.
-                    if &d < base_conformance { 1 } else { 0 }
+                    if &d < base_conformance {
+                        1
+                    } else {
+                        0
+                    }
                 } else {
                     err.fetch_add(1, Ordering::Relaxed);
                     0
@@ -245,14 +248,11 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::{
-            ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        },
+        ebi_traits::{EbiTraitEventLogTraceAttributes, EbiTraitFiniteStochasticLanguage},
         techniques::bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
     };
     use ebi_objects::{
-        EventLog, EventLogTraceAttributes, FiniteStochasticLanguage, ebi_arithmetic::Fraction,
+        ebi_arithmetic::Fraction, EventLog, EventLogTraceAttributes, FiniteStochasticLanguage,
     };
     use std::fs;
 

@@ -1,5 +1,5 @@
 use crate::{
-    ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+    ebi_traits::EbiTraitQueriableStochasticLanguage,
     semantics::follower_semantics::FollowerSemantics,
     semantics::{
         labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics,
@@ -173,8 +173,8 @@ impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutoma
                     let mut result = Fraction::one();
 
                     for activity in trace.iter() {
-                        let (found, pos) = self
-                            .binary_search(state, self.activity_key.activity_to_id(activity));
+                        let (found, pos) =
+                            self.binary_search(state, self.activity_key.activity_to_id(activity));
                         if !found {
                             return Ok(Fraction::zero());
                         }
@@ -466,7 +466,7 @@ struct Y {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+        ebi_traits::EbiTraitQueriableStochasticLanguage,
         semantics::follower_semantics::FollowerSemantics,
     };
     use ebi_objects::{

@@ -1,33 +1,36 @@
 use crate::{
     ebi_framework::{
-        displayable::Displayable, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
-        ebi_trait_object::EbiTraitObject, trait_importers::ToStochasticDeterministicSemanticsTrait,
+        ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+        trait_importers::ToStochasticDeterministicSemanticsTrait,
     },
     semantics::{
         labelled_petri_net_semantics::LPNMarking,
-        stochastic_deterministic_semantics::deterministic_semantics_for_stochastic_semantics::PMarking,
+        stochastic_deterministic_semantics::{
+            deterministic_semantics_for_stochastic_semantics::PMarking,
+            stochastic_deterministic_semantics_trait::StochasticDeterministicSemantics,
+        },
     },
-    techniques::infinitely_many_traces::InfinitelyManyTraces,
     trait_definition_finalisation,
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},
-    ebi_arithmetic::Fraction,
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv, process_tree::TreeMarking,
     },
-    Activity, AutomatonState, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel,
-    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
+    AutomatonState, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel,
+    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
 };
 
-pub const TRAIT_DEFINITION_LATEX: &str = concat!(
-    "The trait ``stochastic deterministic semantics'' allows for state space traversal in a deterministic fashion, that is, in each state every activity appears at most once and silent steps are not present.",
-    trait_definition_finalisation!()
-);
-
+/// Allows for traversal of a state space and its probabilities if the activities determine the state deterministically.
+/// 
+/// This is a wrapper enum in order to be able to implement algorithms that are agnostic of the marking/state type, amongst other things.
+/// This enum does not allow access to the underlying Semantics trait methods directly, but through a match the generics work out.
+/// See the implementation of [`crate::techniques::probability_queries::ProbabilityQueries`] for an example.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub enum EbiTraitStochasticDeterministicSemantics {
     Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
     AutomatonState(
@@ -67,6 +70,18 @@ pub enum EbiTraitStochasticDeterministicSemantics {
     ),
 }
 
+impl EbiTraitStochasticDeterministicSemantics {
+    pub fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        concat!(
+            "The trait ``stochastic deterministic semantics'' allows for state space traversal in a deterministic fashion, that is, in each state every activity appears at most once and silent steps are not present.",
+            trait_definition_finalisation!()
+        )
+    }
+}
+
 impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
@@ -80,59 +95,6 @@ impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
             )),
         }
     }
-}
-
-pub trait StochasticDeterministicSemantics: HasActivityKey + InfinitelyManyTraces {
-    type DetState: Displayable;
-
-    /**
-     * (Re)set the semantics to the initial state.
-     */
-    fn get_deterministic_initial_state(&self) -> Result<Option<Self::DetState>>;
-
-    /**
-     * Get the state that results from executing the activity.
-     * Returns whether the execution was successful.
-     */
-    fn execute_deterministic_activity(
-        &self,
-        state: &Self::DetState,
-        activity: Activity,
-    ) -> Result<Self::DetState>;
-
-    /**
-     *
-     * @return the probability of terminating in this state.
-     * Note that the sum of termination and the probability of all enabled activities may be smaller than 1. The reminder is a silent livelock.
-     */
-    fn get_deterministic_termination_probability(&self, state: &Self::DetState) -> Fraction;
-
-    /**
-     *
-     * @param activity
-     * @return the probability of executing the activity in the given state.
-     * Note that the sum of termination and the probability of all enabled activities may be smaller than 1. The remainder is a silent livelock.
-     */
-    fn get_deterministic_activity_probability(
-        &self,
-        state: &Self::DetState,
-        activity: Activity,
-    ) -> Fraction;
-
-    fn get_deterministic_enabled_activities(&self, state: &Self::DetState) -> Vec<Activity>;
-
-    /**
-     * The probability that from the given state, the model will never leave a livelock of silent activities.
-     */
-    fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction;
-
-    /**
-     * The probability that from the given state, the model will never leave a livelock. Note that this is not the probability to -end up- in a livelock, but the probability that the state is -in- a livelock.
-     */
-    fn get_deterministic_non_decreasing_livelock_probability(
-        &self,
-        state: &mut Self::DetState,
-    ) -> Result<Fraction>;
 }
 
 macro_rules! via_fslang {

@@ -1,9 +1,6 @@
 use crate::{
     ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
     techniques::{
         chi_square_stochastic_conformance::ChiSquareStochasticConformance,
         hellinger_stochastic_conformance::HellingerStochasticConformance,
@@ -84,7 +81,7 @@ impl StochasticMarkovianConformance for MarkovianAbstraction {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::{
             stochastic_markovian_abstraction::AbstractMarkovian,
             stochastic_markovian_abstraction_conformance::{

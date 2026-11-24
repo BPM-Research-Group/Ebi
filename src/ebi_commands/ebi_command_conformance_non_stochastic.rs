@@ -5,11 +5,7 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_semantics::EbiTraitSemantics,
-    },
+    ebi_traits::{EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage, EbiTraitSemantics},
     techniques::{
         align::{Align, AlignmentAlgorithm},
         escaping_edges_precision::EscapingEdgesPrecision,

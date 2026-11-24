@@ -1,15 +1,15 @@
 use crate::{
-    ebi_framework::displayable::Displayable, ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
+    ebi_framework::displayable::Displayable, ebi_traits::EbiTraitSemantics,
     semantics::semantics_trait::Semantics,
 };
 use ebi_objects::{
-    StochasticLanguageOfAlignments,
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::language_of_alignments::Move,
+    StochasticLanguageOfAlignments,
 };
 use fnv::FnvBuildHasher;
-use std::collections::{HashMap, hash_map::Entry};
+use std::collections::{hash_map::Entry, HashMap};
 
 pub const UNMATCHING: &str = "Alignments and model do not belong to one another";
 
@@ -157,8 +157,8 @@ impl PrefixTreeNode {
 mod tests {
     use crate::techniques::escaping_edges_precision::EscapingEdgesPrecision;
     use ebi_objects::{
-        StochasticDeterministicFiniteAutomaton, StochasticLanguageOfAlignments,
-        ebi_arithmetic::Fraction,
+        ebi_arithmetic::Fraction, StochasticDeterministicFiniteAutomaton,
+        StochasticLanguageOfAlignments,
     };
     use std::fs;
 

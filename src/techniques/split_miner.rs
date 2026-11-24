@@ -1,15 +1,15 @@
 use crate::{
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::EbiTraitFiniteStochasticLanguage,
     techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
 };
 use ebi_objects::{
-    Activity, BusinessProcessModelAndNotation, DirectlyFollowsGraph,
     anyhow::Result,
-    ebi_arithmetic::{Fraction, Signed, ToNative, Zero, f},
+    ebi_arithmetic::{f, Fraction, Signed, ToNative, Zero},
     ebi_bpmn::{
-        BPMNCreator, Container, EndEventType, GatewayType, GlobalIndex, StartEventType,
-        if_not::IfNot,
+        if_not::IfNot, BPMNCreator, Container, EndEventType, GatewayType, GlobalIndex,
+        StartEventType,
     },
+    Activity, BusinessProcessModelAndNotation, DirectlyFollowsGraph,
 };
 use intmap::IntMap;
 use itertools::Itertools;
@@ -27,7 +27,10 @@ pub trait SplitMiner {
 }
 
 impl SplitMiner for dyn EbiTraitFiniteStochasticLanguage {
-    fn split_miner(&self, parameters: &SplitMinerParameters) -> Result<BusinessProcessModelAndNotation> {
+    fn split_miner(
+        &self,
+        parameters: &SplitMinerParameters,
+    ) -> Result<BusinessProcessModelAndNotation> {
         split_miner(self, parameters)
     }
 }
@@ -101,7 +104,11 @@ fn step_1_dfg(
         .edges()
         .filter_map(
             |(source, (target, _))| {
-                if source == target { Some(source) } else { None }
+                if source == target {
+                    Some(source)
+                } else {
+                    None
+                }
             },
         )
         .collect::<Vec<_>>();
@@ -125,7 +132,8 @@ fn step_1_dfg(
         {
             let weight_ab = weight;
             let weight_ba = dfg.edge_weight(target, source);
-            if (weight_ab - weight_ba).abs() / (weight_ab + weight_ba) <= parameters.epsilon_parallelism
+            if (weight_ab - weight_ba).abs() / (weight_ab + weight_ba)
+                <= parameters.epsilon_parallelism
             //paper says "<", but example suggests "<="
             {
                 //activities are concurrent

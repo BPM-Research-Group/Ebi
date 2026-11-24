@@ -7,19 +7,22 @@ use crate::ebi_framework::{
     trait_importers::ToFiniteStochasticLanguageTrait,
 };
 use ebi_objects::{
-    Activity, Importable, TranslateActivityKey,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+    Activity, Importable, TranslateActivityKey,
 };
 use std::fmt::Debug;
 
+/// Allows for iteration over traces and their probabilities.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitFiniteStochasticLanguage:
     EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug + TranslateActivityKey
 {
     fn get_probability_sum(&self) -> Fraction;
 
-    /// Creates a finite stochastic language. 
+    /// Creates a finite stochastic language.
     /// This clones all traces, so if you have a struct, it is probably cheaper to call .into() on it.
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage;
 
@@ -52,6 +55,19 @@ pub trait EbiTraitFiniteStochasticLanguage:
 
     /// Make the sum of probabilities one, unless there are no traces.
     fn normalise(&mut self);
+
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        "Iterating over a finite stochastic language will yield each trace variant once, as well as how likely that trace variant is in the language.
+            The probabilities are positive and their sum must be smaller than or equal to one.
+            The ``missing'' probability means ``no trace'' or ``livelock''.
+            \\\\
+            Definition: let $\\Sigma$ be an alphabet of activities.
+            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
+            a \\emph{finite stochastic language} $S \\subseteq \\Sigma^* \\mapsto \\mathcal{R}^+$ is a finite set of trace-probability tuples, such that $1 \\geq \\sum_{\\sigma \\in \\Sigma^*} S(\\sigma) $."
+    }
 }
 
 impl FromEbiTraitObject for dyn EbiTraitFiniteStochasticLanguage {
@@ -94,16 +110,14 @@ impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
     ) {
         self.traces.retain(f);
     }
-    
+
     fn clear(&mut self) {
         self.traces.clear();
     }
-    
+
     fn normalise(&mut self) {
         self.normalise();
     }
-
-    
 }
 
 impl<T> ToFiniteStochasticLanguageTrait for T

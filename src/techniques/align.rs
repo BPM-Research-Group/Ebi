@@ -2,10 +2,7 @@ use crate::{
     ebi_framework::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     },
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage},
     techniques::align_process_tree::ProcessTreeAligner,
 };
 use ebi_derive::EbiInputEnum;

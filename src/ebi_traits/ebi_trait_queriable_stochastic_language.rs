@@ -19,6 +19,9 @@ use ebi_objects::{
 };
 use std::sync::{Arc, Mutex};
 
+/// Allows for the querying of an object for the probability of a given trace, automaton or language.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
     /**
      * Compute the probability that self produces a trace that is accepted by the follower.
@@ -62,11 +65,19 @@ pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
         //see whether an error was reported
         if let Result::Ok(mutex) = Arc::try_unwrap(error)
             && let Result::Ok(err) = mutex.into_inner()
-                && let Some(err) = err {
-                    return Err(err);
-                }
+            && let Some(err) = err
+        {
+            return Err(err);
+        }
 
         Ok(sum)
+    }
+
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        "A queriable stochastic language can be given a trace, and it will return the probability of the trace."
     }
 }
 
@@ -86,12 +97,10 @@ impl FromEbiTraitObject for dyn EbiTraitQueriableStochasticLanguage {
 impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
     fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
         match follower {
-            FollowerSemantics::Trace(trace) => {
-                match self.traces.get(*trace) {
-                    Some(x) => Ok(x.clone()),
-                    None => Ok(Fraction::zero()),
-                }
-            }
+            FollowerSemantics::Trace(trace) => match self.traces.get(*trace) {
+                Some(x) => Ok(x.clone()),
+                None => Ok(Fraction::zero()),
+            },
         }
     }
 }

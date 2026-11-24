@@ -18,13 +18,9 @@ use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;
 use std::collections::HashMap;
 
-pub const TRAIT_DEFINITION_LATEX: &str = concat!("The trait ``event log with trace attributes'' provides an iterator over traces, where each trace may have trace attributes attached.
-                \\\\
-                Definition: let $\\Sigma$ be an alphabet of activities.
-                Let $A \\colon \\text{attribute} \\mapsto \\text{value}$ be an attribute-value mapping, and let $\\mathcal{A}$ be the set of all attribute-value mappings.
-                A \\emph{trace with attributes} $\\sigma^{A} \\in \\Sigma^* \\times \\mathcal{A}$ is a finite sequence of activities, where the sequence is annotated with attributes.
-                An \\emph{event log with trace attributes} $L^A \\in (\\Sigma^* \\times \\mathcal{A})^*$ is a sequence of traces with attributes.", trait_definition_logs!());
-
+/// Allows for iteration over traces of events with attributes attached to traces.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitEventLogTraceAttributes:
     EbiTraitEventLog
     + IntoAttributeIterator
@@ -40,6 +36,18 @@ pub trait EbiTraitEventLogTraceAttributes:
         &'a mut self,
         f: Box<dyn Fn(&(Vec<Activity>, IntMap<Attribute, AttributeValue>)) -> bool + 'static>,
     );
+
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        concat!("The trait ``event log with trace attributes'' provides an iterator over traces, where each trace may have trace attributes attached.
+                \\\\
+                Definition: let $\\Sigma$ be an alphabet of activities.
+                Let $A \\colon \\text{attribute} \\mapsto \\text{value}$ be an attribute-value mapping, and let $\\mathcal{A}$ be the set of all attribute-value mappings.
+                A \\emph{trace with attributes} $\\sigma^{A} \\in \\Sigma^* \\times \\mathcal{A}$ is a finite sequence of activities, where the sequence is annotated with attributes.
+                An \\emph{event log with trace attributes} $L^A \\in (\\Sigma^* \\times \\mathcal{A})^*$ is a sequence of traces with attributes.", trait_definition_logs!())
+    }
 }
 
 impl dyn EbiTraitEventLogTraceAttributes {

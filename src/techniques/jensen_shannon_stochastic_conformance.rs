@@ -1,8 +1,5 @@
 use crate::{
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
     math::{log_div::LogDiv, root_log_div::RootLogDiv},
     semantics::follower_semantics::FollowerSemantics,
 };
@@ -94,7 +91,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         math::{log_div::LogDiv, root_log_div::RootLogDiv},
         techniques::jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
     };

@@ -7,8 +7,8 @@ use crate::{
         ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        EbiTraitEventLog,
+        EbiTraitFiniteStochasticLanguage,
     },
     techniques::{
         alergia::Alergia,

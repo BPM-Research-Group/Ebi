@@ -1,5 +1,5 @@
 use crate::ebi_framework::ebi_command::EbiCommand;
-use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+use crate::ebi_traits::EbiTraitFiniteStochasticLanguage;
 use crate::math::levenshtein;
 #[cfg(any(
     all(

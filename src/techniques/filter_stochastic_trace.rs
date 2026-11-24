@@ -1,8 +1,5 @@
-use crate::{
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    techniques::filter_trace::Operator,
-};
-use ebi_objects::{FiniteStochasticLanguage, NumberOfTraces, ebi_arithmetic::Fraction};
+use crate::{ebi_traits::EbiTraitFiniteStochasticLanguage, techniques::filter_trace::Operator};
+use ebi_objects::{ebi_arithmetic::Fraction, FiniteStochasticLanguage, NumberOfTraces};
 use fnv::FnvBuildHasher;
 use std::collections::HashMap;
 

@@ -8,10 +8,8 @@ use crate::{
     },
     ebi_info,
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+        EbiTraitEventLog, EbiTraitEventLogTraceAttributes, EbiTraitFiniteStochasticLanguage,
+        EbiTraitStochasticSemantics,
     },
     techniques::{
         bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
@@ -20,7 +18,7 @@ use crate::{
     },
 };
 use ebi_objects::{
-    anyhow::{Context, anyhow},
+    anyhow::{anyhow, Context},
     ebi_arithmetic::{ConstFraction, Fraction},
 };
 use std::io::Write;

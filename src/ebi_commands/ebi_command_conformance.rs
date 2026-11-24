@@ -1,6 +1,5 @@
 use super::ebi_command_sample::{self, SAMPLED_OBJECT_INPUTS};
 use crate::{
-    EbiInputTypeEnum,
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
@@ -8,10 +7,7 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
     },
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
     techniques::{
         chi_square_stochastic_conformance::ChiSquareStochasticConformance,
         earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
@@ -26,12 +22,13 @@ use crate::{
         },
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     },
+    EbiInputTypeEnum,
 };
 use ebi_objects::{
-    EbiObject, EbiObjectType,
-    anyhow::{Context, anyhow},
+    anyhow::{anyhow, Context},
     ebi_arithmetic::{ConstFraction, Fraction},
     ebi_objects::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+    EbiObject, EbiObjectType,
 };
 use strum::VariantNames;
 
@@ -203,7 +200,8 @@ pub const EBI_CONFORMANCE_ENTROPIC_RELEVANCE: EbiCommand = EbiCommand::Command {
 pub const EBI_CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
     name_short: "jssc",
     name_long: Some("jensen-shannon"),
-    explanation_short: "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance.",
+    explanation_short:
+        "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance.",
     explanation_long: None,
     latex_link: Some(
         r"Compute Jensen-Shannon stochastic conformance is computed as follows:
@@ -575,7 +573,8 @@ pub const EBI_CONFORMANCE_CHI_SQUARED: EbiCommand = EbiCommand::Command {
 pub const EBI_CONFORMANCE_CHI_SQUARED_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "cssc-sample",
     name_long: Some("chi-squared-sample"),
-    explanation_short: "Compute chi-squared stochastic conformance, if both inputs need to be sampled.",
+    explanation_short:
+        "Compute chi-squared stochastic conformance, if both inputs need to be sampled.",
     explanation_long: Some(
         "Compute chi-square stochastic conformance, if both inputs need to be sampled. 
         If one input is a log or a finite stochastic language, then use `cssc`.
@@ -792,7 +791,7 @@ pub const EBI_CONFORMANCE_GAIN_RECALL: EbiCommand = EbiCommand::Command {
 #[cfg(test)]
 pub mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     };
     use ebi_objects::FiniteStochasticLanguage;

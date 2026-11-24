@@ -1,9 +1,6 @@
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage},
     techniques::align::Align,
 };
 use ebi_objects::{

@@ -1,9 +1,8 @@
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
-        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+        EbiTraitFiniteStochasticLanguage, EbiTraitStochasticPartiallyOrderedSemantics,
+        EbiTraitStochasticSemantics,
     },
     semantics::{
         stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics_trait::StochasticPartiallyOrderedSemantics,
@@ -319,10 +318,7 @@ pub fn sample_indices_uniform(number_of_indices: usize, result: &mut [usize]) {
 mod tests {
     use crate::{
         ebi_framework::trait_importers::ToStochasticSemanticsTrait,
-        ebi_traits::{
-            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-            ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
-        },
+        ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitStochasticSemantics},
     };
     use ebi_objects::{FiniteStochasticLanguage, StochasticDirectlyFollowsModel};
     use std::fs;

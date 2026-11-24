@@ -1,5 +1,5 @@
 use super::align::Align;
-use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+use crate::ebi_traits::EbiTraitFiniteStochasticLanguage;
 use ebi_objects::{
     anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{Fraction, Zero},
@@ -68,9 +68,8 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                                         .global_index_2_sequence_flow_mut(sequence_flow_index)
                                         .ok_or_else(|| anyhow!("sequence flow not found"))?;
 
-                                    *sequence_flow
-                                        .weight
-                                        .get_or_insert_with(Fraction::zero) += probability;
+                                    *sequence_flow.weight.get_or_insert_with(Fraction::zero) +=
+                                        probability;
                                 }
                             }
 

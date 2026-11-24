@@ -1,5 +1,5 @@
 use crate::{
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::EbiTraitFiniteStochasticLanguage,
     math::{distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix},
 };
 use ebi_objects::{anyhow::Result, ebi_arithmetic::Fraction};

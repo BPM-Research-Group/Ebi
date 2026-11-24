@@ -1,8 +1,5 @@
 use crate::{
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
     semantics::follower_semantics::FollowerSemantics,
     techniques::entropy::{number_of_average_visits_per_state_approximate, Entropy},
 };
@@ -11,7 +8,9 @@ use ebi_objects::{
     ebi_arithmetic::{
         fraction::approximate::Approximate,
         is_exact_globally,
-        log_polynomial::{log_polynomial_struct::LogPolynomial, log_polynomial_f64::LogPolynomialF64},
+        log_polynomial::{
+            log_polynomial_f64::LogPolynomialF64, log_polynomial_struct::LogPolynomial,
+        },
         ConstFraction, Fraction, Log, MaybeExact, One, OneMinus, Signed, Zero,
     },
     StochasticDeterministicFiniteAutomaton,

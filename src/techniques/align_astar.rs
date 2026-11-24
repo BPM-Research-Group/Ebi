@@ -1,10 +1,6 @@
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_semantics::EbiTraitSemantics,
-    },
+    ebi_traits::{EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage, EbiTraitSemantics},
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
         finite_stochastic_partially_ordered_language_semantics::FspolangMarking,

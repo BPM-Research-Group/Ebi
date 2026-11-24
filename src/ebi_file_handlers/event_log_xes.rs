@@ -204,9 +204,7 @@ mod tests {
 
     use crate::{
         ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::{
-            ebi_trait_event_log::EbiTraitEventLog, ebi_trait_semantics::EbiTraitSemantics,
-        },
+        ebi_traits::{EbiTraitEventLog, EbiTraitSemantics},
     };
 
     use super::EventLog;

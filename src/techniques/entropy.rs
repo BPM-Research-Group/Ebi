@@ -1,13 +1,10 @@
-use crate::{
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    techniques::livelock::IsPartOfLivelock,
-};
+use crate::{ebi_traits::EbiTraitFiniteStochasticLanguage, techniques::livelock::IsPartOfLivelock};
 use ebi_objects::{
-    AutomatonSemantics, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{
-        EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Log, One, Signed, Zero, f,
+        f, EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Log, One, Signed, Zero,
     },
+    AutomatonSemantics, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
 };
 use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial_struct::LogPolynomial;
 use std::ops::Neg;
@@ -191,11 +188,11 @@ fn c_s_iterative(
 
 #[cfg(test)]
 mod tests {
-    use crate::techniques::entropy::{Entropy, c_s_iterative, number_of_average_visits_per_state};
+    use crate::techniques::entropy::{c_s_iterative, number_of_average_visits_per_state, Entropy};
     use ebi_objects::{
-        StochasticDeterministicFiniteAutomaton,
         anyhow::Result,
-        ebi_arithmetic::{Fraction, f, fraction::approximate::Approximate},
+        ebi_arithmetic::{f, fraction::approximate::Approximate, Fraction},
+        StochasticDeterministicFiniteAutomaton,
     };
     use std::fs;
 

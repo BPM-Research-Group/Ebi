@@ -1,8 +1,5 @@
 use crate::{
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
     semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
@@ -68,7 +65,7 @@ impl HellingerStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::hellinger_stochastic_conformance::HellingerStochasticConformance,
     };
     use ebi_objects::{

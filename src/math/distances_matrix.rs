@@ -34,7 +34,7 @@ use ebi_objects::ebi_arithmetic::exact::MaybeExact;
 
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::EbiTraitFiniteStochasticLanguage,
     math::{distances::WeightedDistances, levenshtein},
     techniques::partially_ordered_trace_distance::PartiallyOrderedTraceDistance,
 };

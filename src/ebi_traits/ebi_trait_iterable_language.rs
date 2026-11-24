@@ -3,11 +3,21 @@ use crate::ebi_framework::{
     trait_importers::ToIterableLanguageTrait,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable, IntoRefTraceIterator,
-    anyhow::{Result, anyhow},
 };
 
-pub trait EbiTraitIterableLanguage: HasActivityKey + IntoRefTraceIterator {}
+/// Allows for iteration over traces (which may not be finite).
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
+pub trait EbiTraitIterableLanguage: HasActivityKey + IntoRefTraceIterator {
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        "An iterable language allows to walk over its traces. May iterate over infinitely many traces and not terminate."
+    }
+}
 
 impl FromEbiTraitObject for dyn EbiTraitIterableLanguage {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {

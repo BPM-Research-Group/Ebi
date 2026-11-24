@@ -6,10 +6,10 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_info,
-    ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+    ebi_traits::EbiTraitEventLogTraceAttributes,
     techniques::association::Associations,
 };
-use ebi_objects::anyhow::{Context, anyhow};
+use ebi_objects::anyhow::{anyhow, Context};
 use std::io::Write;
 
 pub const DEFAULT_NUMBER_OF_SAMPLES: usize = 500;
@@ -111,7 +111,11 @@ pub const EBI_ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
                     y.approximate(),
                     y
                 )?,
-                Err(e) => writeln!(f, "Trace atribute `{}` has no association, as {:?}.", attribute, e)?,
+                Err(e) => writeln!(
+                    f,
+                    "Trace atribute `{}` has no association, as {:?}.",
+                    attribute, e
+                )?,
             }
         }
         Ok(EbiOutput::String(String::from_utf8(f).unwrap()))

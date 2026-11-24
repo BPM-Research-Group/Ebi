@@ -47,14 +47,14 @@ macro_rules! trait_definition_finalisation {
     };
 }
 
-pub const TRAIT_DEFINITION_LATEX: &str = concat!(
-    "The trait ``semantics'' allows a state space can be traversed.",
-    trait_definition_finalisation!()
-);
 
+/// Allows for traversal of a state space.
+/// 
 /// This is a wrapper enum in order to be able to implement algorithms that are agnostic of the marking/state type, amongst other things.
-/// This enum does not allow access to the underlying Semantics trait methods.
-/// For these methods, such as 'get_initial_state' and 'get_enabled_transitions', please access the struct directly.
+/// This enum does not allow access to the underlying Semantics trait methods directly, but through a match the generics work out.
+/// See the implementation of [`crate::techniques::executions::FindExecutions`] for an example.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub enum EbiTraitSemantics {
     Usize(Box<dyn Semantics<SemState = usize, AliState = usize>>),
     AutomatonState(Box<dyn Semantics<SemState = AutomatonState, AliState = AutomatonState>>),
@@ -62,6 +62,18 @@ pub enum EbiTraitSemantics {
     TreeMarking(Box<dyn Semantics<SemState = TreeMarking, AliState = TreeMarking>>),
     BPMNMarking(Box<dyn Semantics<SemState = BPMNMarking, AliState = BPMNMarking>>),
     FspolangMarking(Box<dyn Semantics<SemState = FspolangMarking, AliState = FspolangMarking>>),
+}
+
+impl EbiTraitSemantics {
+    pub fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        concat!(
+            "The trait ``semantics'' allows a state space can be traversed.",
+            trait_definition_finalisation!()
+        )
+    }
 }
 
 impl HasActivityKey for EbiTraitSemantics {

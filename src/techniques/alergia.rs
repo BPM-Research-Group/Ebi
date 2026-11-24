@@ -1,8 +1,8 @@
-use crate::ebi_traits::ebi_trait_event_log::EbiTraitEventLog;
+use crate::ebi_traits::EbiTraitEventLog;
 use ebi_objects::{
-    Activity, ActivityKey, AutomatonState, Graphable, StochasticDeterministicFiniteAutomaton,
-    ebi_arithmetic::{Fraction, Recip, Signed, Sqrt, Zero, f, fraction::approximate::Approximate},
+    ebi_arithmetic::{f, fraction::approximate::Approximate, Fraction, Recip, Signed, Sqrt, Zero},
     traits::graphable,
+    Activity, ActivityKey, AutomatonState, Graphable, StochasticDeterministicFiniteAutomaton,
 };
 use ebi_optimisation::anyhow::{Ok, Result};
 use fnv::FnvBuildHasher;
@@ -103,9 +103,9 @@ fn stochastic_merge(
         && let Some((_, next_q, _)) = fpta.node_2_transitions[parent]
             .iter_mut()
             .find(|(_, next_q, _)| *next_q == q_prime)
-        {
-            *next_q = q;
-        }
+    {
+        *next_q = q;
+    }
 
     stochastic_fold(fpta, parents, q, q_prime);
 }
@@ -193,10 +193,10 @@ fn alergia_compatible(
         if let (Some(blue_target), Some(red_target)) = (
             fpta.get_edge_target(activity, q_blue),
             fpta.get_edge_target(activity, q_red),
-        )
-            && !alergia_compatible(confidence_factor, fpta, blue_target, red_target) {
-                return false;
-            }
+        ) && !alergia_compatible(confidence_factor, fpta, blue_target, red_target)
+        {
+            return false;
+        }
     }
 
     true
@@ -417,8 +417,8 @@ impl Graphable for FrequencyPrefixTree {
 mod tests {
     use crate::{ebi_framework::trait_importers::ToEventLogTrait, techniques::alergia::Alergia};
     use ebi_objects::{
+        ebi_arithmetic::{f, Fraction},
         EventLogXes,
-        ebi_arithmetic::{Fraction, f},
     };
     use std::fs;
 

@@ -1,11 +1,7 @@
+use crate::ebi_traits::{EbiTraitEventLog, EbiTraitFiniteStochasticLanguage};
 use ebi_objects::{
-    DirectlyFollowsGraph, FiniteStochasticLanguage,
     ebi_arithmetic::{Fraction, One},
-};
-
-use crate::ebi_traits::{
-    ebi_trait_event_log::EbiTraitEventLog,
-    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    DirectlyFollowsGraph, FiniteStochasticLanguage,
 };
 
 pub trait DirectlyFollowsAbstractor {

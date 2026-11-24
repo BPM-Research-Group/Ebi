@@ -110,12 +110,10 @@ impl FromEbiTraitObject for StochasticDeterministicFiniteAutomaton {
 #[cfg(test)]
 mod tests {
     use std::fs;
-
     use crate::{
         ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
+        ebi_traits::EbiTraitSemantics,
     };
-
     use super::StochasticDeterministicFiniteAutomaton;
 
     #[test]

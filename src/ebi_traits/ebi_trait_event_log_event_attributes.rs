@@ -21,13 +21,9 @@ use ebi_objects::{
 use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;
 
-pub const TRAIT_DEFINITION_LATEX: &str = concat!("The trait ``event log with event attributes'' provides an iterator over traces, and within each trace, each event may have event attributes attached.
-                \\\\
-                Definition: let $\\Sigma$ be an alphabet of activities.
-                Let $E \\colon \\text{attribute} \\mapsto \\text{value}$ be an attribute-value mapping, and let $\\mathcal{E}$ be the set of all attribute-value mappings.
-                An \\emph{event with attributes} $\\sigma^{E} \\in \\Sigma \\times \\mathcal{E}$ is a combination of an activity and a attribute-value mapping.
-                An \\emph{event log with event attributes} $L^E \\in (\\Sigma \\times \\mathcal{A})^*{}^*$ is a sequence of traces with event attributes.", trait_definition_logs!());
-
+/// Allows for iteration over traces of events with attributes attached to events.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitEventLogEventAttributes:
     EbiTraitEventLog + EventAttributes + HasAttributeKey + IntoEventAttributeIterator + EventAttributes
 {
@@ -39,6 +35,18 @@ pub trait EbiTraitEventLogEventAttributes:
         &'a mut self,
         f: Box<dyn Fn(&(Vec<Activity>, Vec<IntMap<Attribute, AttributeValue>>)) -> bool + 'static>,
     );
+
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        concat!("The trait ``event log with event attributes'' provides an iterator over traces, and within each trace, each event may have event attributes attached.
+                \\\\
+                Definition: let $\\Sigma$ be an alphabet of activities.
+                Let $E \\colon \\text{attribute} \\mapsto \\text{value}$ be an attribute-value mapping, and let $\\mathcal{E}$ be the set of all attribute-value mappings.
+                An \\emph{event with attributes} $\\sigma^{E} \\in \\Sigma \\times \\mathcal{E}$ is a combination of an activity and a attribute-value mapping.
+                An \\emph{event log with event attributes} $L^E \\in (\\Sigma \\times \\mathcal{A})^*{}^*$ is a sequence of traces with event attributes.", trait_definition_logs!())
+    }
 }
 
 impl FromEbiTraitObject for dyn EbiTraitEventLogEventAttributes {

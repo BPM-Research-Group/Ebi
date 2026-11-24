@@ -1,12 +1,12 @@
 use crate::{
-    ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
+    semantics::stochastic_deterministic_semantics::stochastic_deterministic_semantics_trait::StochasticDeterministicSemantics,
     techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
+    ebi_arithmetic::{Fraction, One, Zero},
     Activity, AutomatonSemantics, AutomatonState, HasActivityKey,
     StochasticDeterministicFiniteAutomaton,
-    anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, One, Zero},
 };
 
 impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton {
@@ -21,8 +21,7 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         state: &AutomatonState,
         activity: Activity,
     ) -> Result<AutomatonState> {
-        let (found, i) =
-            self.binary_search(*state, self.activity_key().activity_to_id(activity));
+        let (found, i) = self.binary_search(*state, self.activity_key().activity_to_id(activity));
         if found {
             Ok(self.targets[i])
         } else {
@@ -39,8 +38,7 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         state: &AutomatonState,
         activity: Activity,
     ) -> Fraction {
-        let (found, i) =
-            self.binary_search(*state, self.activity_key().activity_to_id(activity));
+        let (found, i) = self.binary_search(*state, self.activity_key().activity_to_id(activity));
         match found {
             true => self.probabilities[i].clone(),
             false => Fraction::zero(),

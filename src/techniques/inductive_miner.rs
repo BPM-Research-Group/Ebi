@@ -1,8 +1,5 @@
 use crate::{
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteLanguage, EbiTraitFiniteStochasticLanguage},
     techniques::{
         inductive_miner::{
             cut_finding::{find_default_cut, Cut},
@@ -249,8 +246,7 @@ mod find_base_cases {
 
 mod log_splitting {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        techniques::inductive_miner::cut_finding::Cut,
+        ebi_traits::EbiTraitFiniteStochasticLanguage, techniques::inductive_miner::cut_finding::Cut,
     };
     use ebi_objects::{Activity, FiniteStochasticLanguage};
     use std::collections::{HashMap, HashSet};
@@ -795,7 +791,7 @@ mod cut_finding {
 
 mod find_fall_throughs {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::inductive_miner::{
             build_operator_node, debug, find_default_cut, inductive_miner_recursion,
             log_info::{ComputeLogInfo, LogInfo},
@@ -1034,7 +1030,7 @@ mod find_fall_throughs {
 
 mod log_info {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
     };
     use ebi_objects::{

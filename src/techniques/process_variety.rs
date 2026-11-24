@@ -1,7 +1,4 @@
-use crate::{
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::levenshtein,
-};
+use crate::{ebi_traits::EbiTraitFiniteStochasticLanguage, math::levenshtein};
 use ebi_objects::ebi_arithmetic::Fraction;
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 
@@ -31,10 +28,9 @@ impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        techniques::process_variety::ProcessVariety,
+        ebi_traits::EbiTraitFiniteStochasticLanguage, techniques::process_variety::ProcessVariety,
     };
-    use ebi_objects::{FiniteStochasticLanguage, ebi_arithmetic::Fraction};
+    use ebi_objects::{ebi_arithmetic::Fraction, FiniteStochasticLanguage};
     use std::fs;
 
     #[test]

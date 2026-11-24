@@ -27,10 +27,7 @@ use ebi_objects::ebi_arithmetic::exact::MaybeExact;
 
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::{
-        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitEventLogTraceAttributes, EbiTraitFiniteStochasticLanguage},
     math::{distances::WeightedDistances, levenshtein},
 };
 

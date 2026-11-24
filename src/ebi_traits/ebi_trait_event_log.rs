@@ -52,15 +52,9 @@ macro_rules! trait_definition_logs {
     };
 }
 
-pub const TRAIT_DEFINITION_LATEX: &str = concat!(
-    "The trait ``event log'' allows for iteration over an event log that contains traces of activities.
-            \\\\
-            Definition: let $\\Sigma$ be an alphabet of activities.
-            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
-            an \\emph{event log} $L \\in (\\Sigma^*)^*$ is a sequence of traces.",
-    trait_definition_logs!()
-);
-
+/// Allows for iteration over traces of events without attributes attached.
+/// 
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTraces {
     /// Remove traces for which the function returns false.
     ///
@@ -90,6 +84,20 @@ pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTrac
         }
 
         FiniteStochasticLanguage::new_raw(map, self.activity_key().clone())
+    }
+
+    fn trait_explanation() -> &'static str
+    where
+        Self: Sized,
+    {
+        concat!(
+    "The trait ``event log'' allows for iteration over an event log that contains traces of activities.
+            \\\\
+            Definition: let $\\Sigma$ be an alphabet of activities.
+            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
+            an \\emph{event log} $L \\in (\\Sigma^*)^*$ is a sequence of traces.",
+            trait_definition_logs!()
+        )
     }
 }
 

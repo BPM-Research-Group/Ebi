@@ -1,9 +1,6 @@
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
-    ebi_traits::{
-        ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
-        ebi_trait_semantics::EbiTraitSemantics,
-    },
+    ebi_traits::{EbiTraitEventLogEventAttributes, EbiTraitSemantics},
     semantics::semantics_trait::Semantics,
     techniques::{align::Align, resource_utilisation::set_resource_utilisations},
 };
@@ -142,10 +139,7 @@ struct C {
 
 impl C {
     fn new(trace_index: usize, moves: Vec<Move>) -> Self {
-        Self {
-            trace_index,
-            moves,
-        }
+        Self { trace_index, moves }
     }
 
     fn alignment_to_executions<T, FS>(

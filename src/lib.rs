@@ -89,23 +89,39 @@ pub mod ebi_framework {
     pub mod validate;
 }
 
-/// An Ebi trait is a contract, interface and abstraction on objects.
+/// An Ebi trait is a contract or interface on objects.
+/// A trait allows to call methods on the object without knowing what object it is, thereby providing an abstraction.
+/// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 pub mod ebi_traits {
-    pub mod ebi_trait_activities;
-    pub mod ebi_trait_event_log;
-    pub mod ebi_trait_event_log_event_attributes;
-    pub mod ebi_trait_event_log_trace_attributes;
-    pub mod ebi_trait_finite_language;
-    pub mod ebi_trait_finite_stochastic_language;
-    pub mod ebi_trait_graphable;
-    pub mod ebi_trait_iterable_language;
-    pub mod ebi_trait_iterable_stochastic_language;
-    pub mod ebi_trait_markovian_abstraction;
-    pub mod ebi_trait_queriable_stochastic_language;
-    pub mod ebi_trait_semantics;
-    pub mod ebi_trait_stochastic_deterministic_semantics;
-    pub mod ebi_trait_stochastic_partially_ordered_semantics;
-    pub mod ebi_trait_stochastic_semantics;
+    mod ebi_trait_activities;
+    mod ebi_trait_event_log;
+    mod ebi_trait_event_log_event_attributes;
+    mod ebi_trait_event_log_trace_attributes;
+    mod ebi_trait_finite_language;
+    mod ebi_trait_finite_stochastic_language;
+    mod ebi_trait_graphable;
+    mod ebi_trait_iterable_language;
+    mod ebi_trait_iterable_stochastic_language;
+    mod ebi_trait_queriable_stochastic_language;
+    mod ebi_trait_semantics;
+    mod ebi_trait_stochastic_deterministic_semantics;
+    mod ebi_trait_stochastic_partially_ordered_semantics;
+    mod ebi_trait_stochastic_semantics;
+
+    pub use ebi_trait_activities::EbiTraitActivities;
+    pub use ebi_trait_event_log::EbiTraitEventLog;
+    pub use ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes;
+    pub use ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes;
+    pub use ebi_trait_finite_language::EbiTraitFiniteLanguage;
+    pub use ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+    pub use ebi_trait_graphable::EbiTraitGraphable;
+    pub use ebi_trait_iterable_language::EbiTraitIterableLanguage;
+    pub use ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage;
+    pub use ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage;
+    pub use ebi_trait_semantics::EbiTraitSemantics;
+    pub use ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics;
+    pub use ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics;
+    pub use ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics;
 }
 
 /// The math module contains helper code for mathematical operations.
@@ -184,6 +200,7 @@ pub mod semantics {
     pub mod stochastic_deterministic_semantics {
         pub mod deterministic_semantics_for_stochastic_semantics;
         pub mod stochastic_deterministic_finite_automaton_deterministic;
+        pub mod stochastic_deterministic_semantics_trait;
     }
     pub mod stochastic_partially_ordered_semantics {
         pub mod stochastic_partially_ordered_semantics_trait;
@@ -341,5 +358,6 @@ pub mod multiple_reader;
 /// Helper functions for text manipulation.
 pub mod text;
 
+/// The structs of the objects are found in the sub-crate `ebi_objects`
 pub use ebi_objects;
 pub use ebi_objects::AutomatonState;

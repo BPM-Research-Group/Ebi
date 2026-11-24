@@ -6,7 +6,7 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
     },
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::EbiTraitFiniteStochasticLanguage,
     techniques::{
         sample::{PartiallyOrderedSampler, Sampler},
         sample_folds::FoldsSampler,

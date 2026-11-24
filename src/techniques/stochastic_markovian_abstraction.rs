@@ -1,5 +1,5 @@
 use crate::{
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::EbiTraitFiniteStochasticLanguage,
     semantics::{
         labelled_petri_net_semantics::LPNMarking, semantics_trait::Semantics,
         stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
@@ -881,7 +881,7 @@ fn compute_phi_ids(
 mod tests {
     use super::*;
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::stochastic_markovian_abstraction_conformance::{
             DistanceMeasure, StochasticMarkovianConformance,
         },

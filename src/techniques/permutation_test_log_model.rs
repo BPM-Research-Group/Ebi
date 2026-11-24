@@ -1,10 +1,6 @@
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
-    },
+    ebi_traits::{EbiTraitEventLog, EbiTraitFiniteStochasticLanguage, EbiTraitStochasticSemantics},
     techniques::{
         earth_movers_stochastic_conformance::EarthMoversStochasticConformance, sample::Sampler,
     },

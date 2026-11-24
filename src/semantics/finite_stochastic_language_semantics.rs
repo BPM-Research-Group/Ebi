@@ -180,7 +180,7 @@ impl Semantics for FiniteStochasticLanguageSemantics {
 mod tests {
     use crate::{
         ebi_framework::trait_importers::ToStochasticSemanticsTrait,
-        ebi_traits::ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+        ebi_traits::EbiTraitStochasticSemantics,
     };
     use ebi_objects::FiniteStochasticLanguage;
     use std::fs;

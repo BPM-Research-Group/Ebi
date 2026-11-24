@@ -1,8 +1,5 @@
 use crate::{
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
     semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
@@ -131,10 +128,7 @@ fn h(x: &Fraction) -> Result<LogPolynomial> {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::{
-            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-            ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-        },
+        ebi_traits::{EbiTraitFiniteStochasticLanguage, EbiTraitQueriableStochasticLanguage},
         techniques::entropic_relevance::EntropicRelvance,
     };
     use ebi_objects::{ebi_arithmetic::ebi_number::One, EventLog, FiniteStochasticLanguage};

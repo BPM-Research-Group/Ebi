@@ -63,7 +63,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
 mod tests {
     use crate::{
         ebi_framework::trait_importers::ImportAsSemanticsTrait,
-        ebi_traits::ebi_trait_semantics::EbiTraitSemantics, multiple_reader::MultipleReader,
+        ebi_traits::EbiTraitSemantics, multiple_reader::MultipleReader,
     };
     use ebi_objects::{Importable, PetriNetMarkupLanguage};
     use std::fs::File;

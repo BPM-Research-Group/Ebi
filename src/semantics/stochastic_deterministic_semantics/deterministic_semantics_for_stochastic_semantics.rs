@@ -1,6 +1,5 @@
 use crate::{
     ebi_framework::displayable::Displayable,
-    ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
     math::markov_model::MarkovModel,
     semantics::labelled_petri_net_semantics::LPNMarking,
     semantics::{
@@ -35,7 +34,7 @@ trait Helper<S: Displayable> {
 
 macro_rules! default_stochastic_deterministic_semantics {
     ($t:ident, $s:ident) => {
-        impl StochasticDeterministicSemantics for $t {
+        impl $crate::semantics::stochastic_deterministic_semantics::stochastic_deterministic_semantics_trait::StochasticDeterministicSemantics for $t {
             type DetState = PMarking<$s>;
 
             fn get_deterministic_initial_state(&self) -> Result<Option<Self::DetState>> {
@@ -422,12 +421,12 @@ impl<S: Displayable> Displayable for MarkovMarking<S> {}
 
 #[cfg(test)]
 mod tests {
-    use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
     use ebi_objects::{
         ebi_arithmetic::{Fraction, Zero},
         HasActivityKey, StochasticLabelledPetriNet,
     };
     use std::fs;
+use crate::semantics::stochastic_deterministic_semantics::stochastic_deterministic_semantics_trait::StochasticDeterministicSemantics;
 
     #[test]
     fn deterministic_semantics() {

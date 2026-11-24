@@ -1,8 +1,8 @@
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+        EbiTraitEventLog,
+        EbiTraitEventLogTraceAttributes,
     },
     math::{distances::WeightedDistances, distances_triangular::WeightedTriangularDistanceMatrix},
 };

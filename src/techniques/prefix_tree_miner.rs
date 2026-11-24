@@ -1,9 +1,7 @@
-use crate::{
-    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
-    semantics::semantics_trait::Semantics,
-};
+use crate::{ebi_traits::EbiTraitFiniteLanguage, semantics::semantics_trait::Semantics};
 use ebi_objects::{
-    DeterministicFiniteAutomaton, FiniteLanguage, NumberOfTraces, ProcessTree, TreeNode, TreeOperator, ebi_arithmetic::ebi_number::Zero,
+    ebi_arithmetic::ebi_number::Zero, DeterministicFiniteAutomaton, FiniteLanguage, NumberOfTraces,
+    ProcessTree, TreeNode, TreeOperator,
 };
 use fnv::FnvBuildHasher;
 use std::collections::HashMap;
@@ -81,7 +79,10 @@ pub fn node_2_tree(lang: FiniteLanguage, tree: &mut Vec<TreeNode>) {
     if activity_2_lang.len() == 1 {
         //do nothing
     } else if empty_traces {
-        tree.push(TreeNode::Operator(TreeOperator::Xor, activity_2_lang.len() + 1));
+        tree.push(TreeNode::Operator(
+            TreeOperator::Xor,
+            activity_2_lang.len() + 1,
+        ));
         tree.push(TreeNode::Tau);
     } else {
         tree.push(TreeNode::Operator(TreeOperator::Xor, activity_2_lang.len()));
