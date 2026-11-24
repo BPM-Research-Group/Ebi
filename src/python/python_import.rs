@@ -1,8 +1,5 @@
 use crate::{
-    ebi_file_handlers::{
-        event_log_python::EBI_EVENT_LOG_PYTHON, labelled_petri_net::EBI_LABELLED_PETRI_NET,
-        process_tree::EBI_PROCESS_TREE,
-    },
+    ebi_file_handlers::{EBI_EVENT_LOG_PYTHON, EBI_LABELLED_PETRI_NET, EBI_PROCESS_TREE},
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
         ebi_input::{EbiInput, EbiInputType},
@@ -24,7 +21,7 @@ use crate::{
             ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
         },
     },
-    ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
+    ebi_traits::EbiTraitSemantics,
     text::Joiner,
 };
 use ebi_objects::{

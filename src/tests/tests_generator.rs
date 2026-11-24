@@ -1,9 +1,9 @@
 use crate::{
     ebi_framework::ebi_command::{search_command_in_source_files, EbiCommand, EBI_COMMANDS},
-    ebi_objects::anyhow::{anyhow, Result},
     tests::{fallible_test::is_fallible, test_input::TestInput},
 };
 use itertools::Itertools;
+use ebi_objects::anyhow::{anyhow, Result};
 
 pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 25;
 

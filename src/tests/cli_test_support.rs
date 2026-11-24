@@ -11,6 +11,7 @@ use crate::ebi_framework::ebi_command::EBI_COMMANDS;
 ///
 /// `command` is the names of the groups and the command, without the program
 /// name. `inputs` is the positional arguments, one per input of the command.
+#[cfg(test)]
 pub(crate) fn assert_cli_reads_inputs(command: &[&str], inputs: &[&str]) {
     let line = ["ebi"]
         .into_iter()
