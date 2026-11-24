@@ -1,8 +1,10 @@
+#[cfg(feature = "surface_generation")]
+use crate::surfaces::website::website_link::FILE_HANDLERS_PAGE;
+#[cfg(feature = "surface_generation")]
 use const_format::concatcp;
+#[cfg(feature = "surface_generation")]
 use regex::{Captures, Regex};
 use std::fmt::Display;
-
-use crate::surfaces::website::website_link::FILE_HANDLERS_PAGE;
 
 pub trait Rank {
     fn rank(&self) -> String;
@@ -37,10 +39,12 @@ pub trait LatexEscaper {
 }
 
 pub trait JavaEscaper {
+    #[cfg(feature = "surface_generation")]
     fn escape_java_string(&self) -> String;
     fn escape_java_code(&self) -> String;
 }
 
+#[cfg(feature = "surface_generation")]
 pub trait HTMLEscaper {
     fn escape_html(&self) -> String;
     fn latex_to_html_string(&self) -> String;
@@ -97,6 +101,7 @@ impl<T> JavaEscaper for T
 where
     T: AsRef<str>,
 {
+    #[cfg(feature = "surface_generation")]
     fn escape_java_string(&self) -> String {
         let str = self.as_ref().replace("\"", "\\\"").replace("\n", "");
         let re = Regex::new(r"~\\cite\{[^\}]*\}").unwrap();
@@ -112,6 +117,7 @@ where
     }
 }
 
+#[cfg(feature = "surface_generation")]
 impl<T> HTMLEscaper for T
 where
     T: AsRef<str>,

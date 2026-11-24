@@ -1,9 +1,9 @@
-use ebi::ebi_objects::FiniteStochasticLanguage;
 use ebi::{
     ebi_traits::EbiTraitFiniteStochasticLanguage,
     techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
 };
 use ebi_objects::ebi_arithmetic::{Fraction, One};
+use ebi_objects::FiniteStochasticLanguage;
 use std::fs;
 
 #[test]

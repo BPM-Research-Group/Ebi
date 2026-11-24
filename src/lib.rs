@@ -389,11 +389,7 @@ pub mod tests {
     pub mod tests_generator;
 }
 
-pub mod multiple_reader;
+pub(crate) mod multiple_reader;
 
 /// Helper functions for text manipulation.
-pub mod text;
-
-/// The structs of the objects are found in the sub-crate `ebi_objects`
-pub use ebi_objects;
-pub use ebi_objects::AutomatonState;
+pub(crate) mod text;
