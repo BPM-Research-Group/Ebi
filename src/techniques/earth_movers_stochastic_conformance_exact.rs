@@ -280,7 +280,7 @@ impl dyn WeightedDistances {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_traits::EbiTraitFiniteStochasticLanguage,
         techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     };
     use ebi_objects::{
