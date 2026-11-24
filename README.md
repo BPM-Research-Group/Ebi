@@ -175,7 +175,8 @@ Information on the architecture of Ebi, including its sub-crates, can be found i
 We welcome pull requests on [Github](https://github.com/BPM-Research-Group/Ebi).
 Before submitting a pull request:
 
-1. Run `cargo clippy` and address lints if they are sensible.
+1. Run `cargo clippy` and address new lints if they are sensible.
+1. Run `cargo fmt` to auto-layout the source code.
 1. Test Ebi locally using `src/tests/test.sh`. On Windows, rename this file to .bat and remove the first 7 lines. Testing may take up to an hour to run, depending on your machine.
 
 ## License

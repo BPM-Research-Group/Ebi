@@ -315,7 +315,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(object), _) => object.any_traces()?,
-            
+            //
             EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(_), _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }

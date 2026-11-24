@@ -75,7 +75,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::DeterministicFiniteAutomaton(
-            StochasticDeterministicFiniteAutomaton::import_as_deterministic_finite_automaton_object, 
+            StochasticDeterministicFiniteAutomaton::import_as_deterministic_finite_automaton_object,
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS
         ),
     ],

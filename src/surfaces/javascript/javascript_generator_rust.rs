@@ -47,7 +47,7 @@ pub fn ebi_command_to_javascript_function(path: &Vec<&EbiCommand>) -> Result<Str
         "#[wasm_bindgen]
 pub fn {fun_nam}(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {{
     ebi_objects::ebi_arithmetic::exact::set_exact_globally({exa_ari});
-    let command: &&EbiCommand = 
+    let command: &&EbiCommand =
         &&{lib_nam};
     execute_javascript_command(command, javascript_inputs, \"{fun_nam}\", exporter_file_extension);
 }}",

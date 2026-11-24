@@ -162,9 +162,9 @@ pub(crate) fn javascript_html_header() -> String {
         </script>", 
         function_list = EBI_COMMANDS.get_command_paths()
             .iter()
-            .filter_map(|path| 
+            .filter_map(|path|
                     if path.last().unwrap().is_in_javascript() {
-                        Some(javascript_function_name(&path)) 
+                        Some(javascript_function_name(&path))
                     } else {
                         None
                     })

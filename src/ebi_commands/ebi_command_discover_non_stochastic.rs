@@ -280,7 +280,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER: EbiCommand = EbiCommand::Comm
         let eta_frequency = inputs.remove(0).to_type::<Fraction>()?;
 
         let parameters = SplitMinerParameters{epsilon_parallelism: *epsilon_parallelism, eta_frequency: *eta_frequency};
-    
+
         Ok(EbiOutput::Object(
             EbiObject::BusinessProcessModelAndNotation(log.split_miner(&parameters)?),
         ))

@@ -11,7 +11,6 @@ use ebi_objects::{
 /// Allows for iteration over traces and their probabilities (which may not be finite).
 ///
 /// For documentation on Ebi traits and mathematical definitions, please refer to the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
-
 pub trait EbiTraitIterableStochasticLanguage:
     IntoRefTraceIterator + IntoRefProbabilityIterator + IntoRefTraceProbabilityIterator
 {

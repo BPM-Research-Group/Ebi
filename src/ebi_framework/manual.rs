@@ -194,7 +194,7 @@ pub(crate) fn manual() -> Result<EbiOutput> {
             etrait.get_article(),
             etrait,
             or_none(
-                    &etrait.get_file_handlers().iter().map(|file_handler| 
+                    &etrait.get_file_handlers().iter().map(|file_handler|
                         format!("\\\\\\null\\qquad\\hyperref[filehandler:{}]{{{}}} (.{} -- \\cref{{filehandler:{}}})", file_handler.name, file_handler.name, file_handler.file_extension, file_handler.name)
                     ).collect::<Vec<_>>().join(", "))
             )?;
@@ -215,7 +215,7 @@ pub(crate) fn manual() -> Result<EbiOutput> {
     //prom commands
     writeln!(f, "\\def\\promcommands{{{}}}", 
         EBI_COMMANDS.get_command_paths().iter().filter_map(
-            |path| 
+            |path|
             {
                 if path.last().unwrap().is_in_java() {
                     Some(format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
