@@ -3,7 +3,7 @@
 mod tests{
 	use crate::ebi_framework::{
 		ebi_command::EbiCommand,
-		ebi_input::{self, EbiInput, read_as_object_with_file_handler, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE, TEST_INPUT_TYPE_FRACTION}
+		ebi_input::{self, EbiInput, read_as_object_with_file_handler, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_STRING_LIST}
 	};
 	use ebi_objects::ebi_activity_key::TestActivityKey;
 	use crate::multiple_reader::MultipleReader;
@@ -55664,6 +55664,1560 @@ mod tests{
 	}
 
 
+	// ==== command trac ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/a-aa-bb.slpn",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-aa-bb.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/a-b-double.xes",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/a-b.csv",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/a-b.slang",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/a-b.xes",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/a-b.xes.gz",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/a-b_multiple_separators.csv",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-aaa-bb.slpn",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-aaa-bb.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.dfg",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.sdfa",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.sdfm",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfm").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.slang",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.snfa",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba_ali.slpn",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_ali.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba_occ-f64.slpn",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba_occ.slpn",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa-ab-ba_uni.slpn",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_uni.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/aa.slang",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/alergia.xes",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/all_operators.sptree",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/all_operators.sptree").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/ba-aa-ab.slang",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_trac_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_TRACE,
+			&[
+				"trait queriable stochastic language#./testfiles/ba.slang",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== command exptra ====
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/a-aa-bb.slpn",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-aa-bb.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/a-b-double.xes",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/a-b.csv",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/a-b.slang",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/a-b.xes",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/a-b.xes.gz",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/a-b_multiple_separators.csv",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-aaa-bb.slpn",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-aaa-bb.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba.dfg",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba.sdfa",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba.sdfm",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfm").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba.slang",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba.snfa",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba_ali.slpn",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_ali.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba_occ-f64.slpn",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba_occ.slpn",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa-ab-ba_uni.slpn",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_uni.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/aa.slang",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/abc-acb-aaabc.slang",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/alergia.xes",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/all_operators.sptree",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/all_operators.sptree").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/ba-aa-ab.slang",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(30000)]
+	pub fn ebi_prob_exptra_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_EXPLAIN_TRACE,
+			&[
+				"trait stochastic semantics#./testfiles/ba.slang",
+				"fraction 0",
+				"stringlist ["a", "b"]"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::StringList(vec!["a".to_string(), "b".to_string()], &TEST_INPUT_TYPE_STRING_LIST);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group red ====
@@ -62959,6 +64513,44 @@ mod cli_tests{
 	#[timeout(30000)]
 	pub fn prob_log_cli_2() {
 		assert_cli_reads_inputs(&["prob", "log"], &["./testfiles/cohort_test.xes", "./testfiles/a-b-double.xes"]);
+	}
+
+	// ==== command prob trac ====
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_trac_cli_0() {
+		assert_cli_reads_inputs(&["prob", "trac"], &["./testfiles/a-aa-bb.slpn", "a b"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_trac_cli_1() {
+		assert_cli_reads_inputs(&["prob", "trac"], &["./testfiles/aa-ab-ba_uni.slpn", "a b"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_trac_cli_2() {
+		assert_cli_reads_inputs(&["prob", "trac"], &["./testfiles/cohort_test.xes", "a b"]);
+	}
+
+	// ==== command prob exptra ====
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_exptra_cli_0() {
+		assert_cli_reads_inputs(&["prob", "exptra"], &["./testfiles/a-aa-bb.slpn", "0", "a b"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_exptra_cli_1() {
+		assert_cli_reads_inputs(&["prob", "exptra"], &["./testfiles/aa-ab-ba_uni.slpn", "0", "a b"]);
+	}
+
+	#[test]
+	#[timeout(30000)]
+	pub fn prob_exptra_cli_2() {
+		assert_cli_reads_inputs(&["prob", "exptra"], &["./testfiles/cohort_test.xes", "0", "a b"]);
 	}
 
 	// ==== command red lpn ====

@@ -92,14 +92,14 @@ fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<a href=\"{}\">Supported files</a>", FILE_HANDLERS_PAGE)?;
     writeln!(f, "<a href=\"https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf\">Manual</a>")?;
     writeln!(f, "<a href=\"https://crates.io/crates/ebi\">crates.io</a>")?;
-    writeln!(f, "<a href=\"https://pypi.org/project/ebi-pm/\">PyPI</a>")?;
+    writeln!(f, "<a href=\"https://pypi.org/project/ebi-pm/\">pypi</a>")?;
     writeln!(
         f,
-        "<a href=\"https://www.npmjs.com/package/ebi_pm\">NPM</a>"
+        "<a href=\"https://www.npmjs.com/package/ebi_pm\">npm</a>"
     )?;
     writeln!(
         f,
-        "<a href=\"https://github.com/BPM-Research-Group/Ebi\">Github</a>"
+        "<a href=\"https://github.com/BPM-Research-Group/Ebi\">github</a>"
     )?;
     writeln!(
         f,

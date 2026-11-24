@@ -15,7 +15,7 @@ Ebi can be used in several manners:
 
 Ebi provides process mining and stochastic process mining algorithms, and supports exact arithmetic for most of these algorithms.
 
-More information on its use can be found in its [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
+More information on its use can be found in its [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
 ## Using Ebi
 
@@ -38,7 +38,7 @@ Ebi does not upload or store files; everything is ran locally on your computer o
 
 1. Open a command prompt and run the executable.
     Installation is not necessary, and Ebi does not require internet access.
-1. For an overview of the commands, refer to the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
+1. For an overview of the commands, refer to the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
 Ebi runs on many other platforms by self-compilation; please see the [development](#feedback--development) section.
 
@@ -51,7 +51,7 @@ In the ProM Package Manager, install Ebi.
 Then, several Ebi commands can be used like any other ProM plug-in. 
 As Ebi is extremely flexible in its inputs and outputs, please ensure you choose the correct input and output plug-in (there are many). 
 
-The [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) indicates which commands are available in ProM.
+The [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) indicates which commands are available in ProM.
 
 ### Use Ebi in the Knime analytics platform
 
@@ -65,6 +65,7 @@ Ebi can be used as a Python package, which integrates with [PM4Py](https://pypi.
 1. Install the Ebi-pm package using pip: 
 
         pip install ebi-pm
+        pip install pm4py
 
 1. Then, one can use Ebi as follows:
 
@@ -83,7 +84,7 @@ Ebi can be used as a Python package, which integrates with [PM4Py](https://pypi.
         )
         print(result)
 
-The names of the Ebi functions can be found on the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or in the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
+The names of the Ebi functions can be found on the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or in the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
 Some PM4Py objects, such as event logs, are read directly by Ebi, but most are passed as strings.
 If Ebi returns an exact fraction, it is returned as an array consisting of 1) a floating-point approximation, 2) the full numerator, and 3) the full denominator.
@@ -169,7 +170,7 @@ To get started with development, or to compile Ebi yourself:
 1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "ebi". Everything else is equivalent to the commands mentioned in the manual.
 1. To compile Ebi, give the command "cargo build --release". The binary is then placed in the project folder, in the "build/release" sub-folder.
 
-Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) and in the [code documentation](https://docs.rs/ebi/latest/).
+Information on the architecture of Ebi, including its sub-crates, can be found in the [manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) and in the [code documentation](https://docs.rs/ebi/latest/).
 
 We welcome pull requests on [Github](https://github.com/BPM-Research-Group/Ebi).
 Before submitting a pull request:

@@ -27,8 +27,8 @@ cargo build --features java
 cargo test --verbose
 
 # Check commands with compile features
-cargo test --package ebi --lib -- tests::tests_autogen::tests --nocapture --features exactarithmetic
-cargo test --package ebi --lib -- tests::tests_autogen::tests --nocapture --features approximatearithmetic
-cargo test --package ebi --lib -- tests::tests_autogen::tests --nocapture --features javascript
+cargo test --features exactarithmetic --package ebi --lib -- tests::tests_autogen::tests --nocapture
+cargo test --features approximatearithmetic --package ebi --lib -- tests::tests_autogen::tests --nocapture
+cargo test --features javascript --package ebi --lib -- tests::tests_autogen::tests --nocapture
 
 echo "Ebi passed the tests."
