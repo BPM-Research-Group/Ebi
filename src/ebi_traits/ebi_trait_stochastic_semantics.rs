@@ -3,12 +3,12 @@ use crate::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
         trait_importers::ToStochasticSemanticsTrait,
     },
+    ebi_traits::ebi_trait_semantics::trait_definition_finalisation,
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
         labelled_petri_net_semantics::LPNMarking,
         stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     },
-    trait_definition_finalisation,
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},

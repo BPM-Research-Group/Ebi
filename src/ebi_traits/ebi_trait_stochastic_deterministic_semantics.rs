@@ -3,6 +3,7 @@ use crate::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
         trait_importers::ToStochasticDeterministicSemanticsTrait,
     },
+    ebi_traits::ebi_trait_semantics::trait_definition_finalisation,
     semantics::{
         labelled_petri_net_semantics::LPNMarking,
         stochastic_deterministic_semantics::{
@@ -10,7 +11,6 @@ use crate::{
             stochastic_deterministic_semantics_trait::StochasticDeterministicSemantics,
         },
     },
-    trait_definition_finalisation,
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},

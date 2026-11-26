@@ -3,8 +3,7 @@ use crate::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
         trait_importers::ToEventLogTraceAttributesTrait,
     },
-    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
-    trait_definition_logs,
+    ebi_traits::ebi_trait_event_log::{trait_definition_logs, EbiTraitEventLog},
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},

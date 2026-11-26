@@ -29,7 +29,6 @@ use ebi_objects::{
     TreeMarking,
 };
 
-#[macro_export]
 macro_rules! trait_definition_finalisation {
     () => {
         "Each deadlock is a final state, and each final state is a deadlock. It is not necessary that a final state is always reachable, and thus you may end up in a livelock.
@@ -46,6 +45,7 @@ macro_rules! trait_definition_finalisation {
         As a developer, using a trait may avoid a conversion. Use objects if this conversion is acceptable, or when the object needs to be updated."
     };
 }
+pub(crate) use trait_definition_finalisation;
 
 /// Allows for traversal of a state space.
 ///

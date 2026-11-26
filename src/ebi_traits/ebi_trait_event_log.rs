@@ -17,7 +17,6 @@ use ebi_objects::{
 use fnv::FnvBuildHasher;
 use std::collections::{hash_map::Entry, HashMap};
 
-#[macro_export]
 macro_rules! trait_definition_logs {
     () => {
         " Comparison between log traits and objects: \\begin{tabularx}{\\linewidth}{XXccc}
@@ -51,6 +50,7 @@ macro_rules! trait_definition_logs {
         \\end{itemize}~"
     };
 }
+pub(crate) use trait_definition_logs;
 
 /// Allows for iteration over traces of events without attributes attached.
 ///
