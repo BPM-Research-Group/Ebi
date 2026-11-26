@@ -229,11 +229,11 @@ mod tests {
             Fraction::from(4)
         );
         assert_eq!(
-            tree.get_transition_weight(&state, 4).unwrap(),
+            tree.get_transition_weight(&state, 3).unwrap(),
             &Fraction::from(4)
         );
 
-        assert!(tree.execute_transition(&mut state, 4).is_ok());
+        assert!(tree.execute_transition(&mut state, 3).is_ok());
         assert!(tree.is_final_state(&state));
         assert!(tree.get_enabled_transitions(&state).is_empty());
     }
