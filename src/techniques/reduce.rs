@@ -196,7 +196,8 @@ mod tree {
                                 tree.edit(|tree| {
                                     //remove the grandchild
                                     tree.remove(grandchild_tau);
-                                    _ = tree[child].set_number_of_children(number_of_child_children - 1);
+                                    _ = tree[child]
+                                        .set_number_of_children(number_of_child_children - 1);
 
                                     //lift the or(..) to xor(tau, or(..))
                                     tree.insert(node, TreeNode::Tau);
