@@ -48,18 +48,23 @@ mod tree {
                 changed = false;
                 for node in (0..self.len()).rev() {
                     for rule in &rules {
-                        changed |= rule.apply(self, node);
+                        let effect = rule.apply(self, node);
+                        // if effect {
+                        //     println!("after {:?}\n{}\n", rule, self.to_canonical_string());
+                        // }
+                        changed |= effect;
                     }
                 }
             }
         }
     }
 
-    trait TreeRule {
+    trait TreeRule: std::fmt::Debug {
         /// Apply the rule to the node; returns whether the rule changed the tree.
         fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool;
     }
 
+    #[derive(Debug)]
     struct Singularity;
 
     impl TreeRule for Singularity {
@@ -84,6 +89,7 @@ mod tree {
         }
     }
 
+    #[derive(Debug)]
     struct Associativity;
 
     impl TreeRule for Associativity {
@@ -123,6 +129,7 @@ mod tree {
         }
     }
 
+    #[derive(Debug)]
     struct Tau;
 
     impl TreeRule for Tau {
@@ -134,11 +141,7 @@ mod tree {
                     .any(|child| child.is_activity())
             {
                 //subtree has no activities -> replace with tau
-                let x = tree.traverse(node);
-                tree.edit(|tree| {
-                    tree.drain(node..x);
-                    tree.insert(node, TreeNode::Tau);
-                });
+                let _ = tree.replace(node, vec![TreeNode::Tau]);
                 return true;
             }
 
@@ -161,7 +164,7 @@ mod tree {
                 TreeNode::Operator(TreeOperator::Or, number_of_children)
                     if number_of_children > 1 =>
                 {
-                    //option 1: diect tau
+                    //option 1: direct tau
                     for child in tree.children(node) {
                         if tree[child].is_tau() {
                             //move tau to xor(tau) above or
@@ -188,10 +191,12 @@ mod tree {
                                 .children(child)
                                 .find(|grandchild| tree[*grandchild].is_tau())
                             {
+                                //println!("\tgrandchild_tau {grandchild_tau}");
+                                let number_of_child_children = tree[child].number_of_children();
                                 tree.edit(|tree| {
                                     //remove the grandchild
                                     tree.remove(grandchild_tau);
-                                    _ = tree[child].set_number_of_children(number_of_children - 1);
+                                    _ = tree[child].set_number_of_children(number_of_child_children - 1);
 
                                     //lift the or(..) to xor(tau, or(..))
                                     tree.insert(node, TreeNode::Tau);
@@ -246,7 +251,7 @@ mod tree {
                     }
 
                     if tree[tree.get_child(node, 0)].is_tau() {
-                        println!("target");
+                        // println!("target");
                         //loop has a body tau; pull it up
                         //remove the body tau
                         let x = tree.get_child(node, 0);
@@ -279,6 +284,7 @@ mod tree {
         }
     }
 
+    #[derive(Debug)]
     struct ImplicitConcurrent;
 
     impl TreeRule for ImplicitConcurrent {
@@ -305,6 +311,7 @@ mod tree {
         }
     }
 
+    #[derive(Debug)]
     struct IntroduceORs;
 
     impl TreeRule for IntroduceORs {
