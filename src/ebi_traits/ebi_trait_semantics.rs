@@ -17,7 +17,6 @@ use ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel,
         partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
-        process_tree::TreeMarking,
     },
     ActivityKey, AutomatonState, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
     DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes,
@@ -27,6 +26,7 @@ use ebi_objects::{
     StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
+    TreeMarking,
 };
 
 #[macro_export]

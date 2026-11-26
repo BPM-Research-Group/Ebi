@@ -4,9 +4,8 @@ use ebi_objects::{
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
         partially_ordered_workflow_language::{PartiallyOrderedWorkflowLanguage, PowlNode},
-        process_tree::{NodeState, TreeMarking},
     },
-    Activity,
+    Activity, NodeState, TreeMarking,
 };
 use strum_macros::EnumIs;
 

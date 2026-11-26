@@ -4,6 +4,7 @@ use super::{
     ebi_trait::{EbiTrait, FromEbiTraitObject},
 };
 use crate::{
+    ebi_commands::ebi_command_validate::ebi_validate,
     ebi_framework::{
         ebi_file_handler::{get_file_handlers, get_file_handlers_fallible, EbiFileHandler},
         ebi_importer_parameters,
@@ -17,7 +18,6 @@ use crate::{
         EbiTraitStochasticDeterministicSemantics, EbiTraitStochasticPartiallyOrderedSemantics,
         EbiTraitStochasticSemantics,
     },
-    ebi_validate,
     multiple_reader::MultipleReader,
     surfaces::website::website_link::FILE_HANDLERS_PAGE,
     text::Joiner,

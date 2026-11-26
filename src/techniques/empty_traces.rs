@@ -19,12 +19,12 @@ pub fn has_empty_traces_node(tree: &ProcessTree, node: usize) -> bool {
         TreeNode::Tau => true,
         TreeNode::Activity(_) => false,
         TreeNode::Operator(TreeOperator::Xor, _) | TreeNode::Operator(TreeOperator::Or, _) => tree
-            .get_children(node)
+            .children(node)
             .any(|node| has_empty_traces_node(tree, node)),
         TreeNode::Operator(TreeOperator::Concurrent, _)
         | TreeNode::Operator(TreeOperator::Sequence, _)
         | TreeNode::Operator(TreeOperator::Interleaved, _) => tree
-            .get_children(node)
+            .children(node)
             .all(|node| has_empty_traces_node(tree, node)),
         TreeNode::Operator(TreeOperator::Loop, _) => {
             has_empty_traces_node(tree, tree.get_child(node, 0))

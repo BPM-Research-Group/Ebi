@@ -1,6 +1,5 @@
 use ebi_objects::{
     ebi_arithmetic::{Fraction, Random},
-    ebi_objects::process_tree::get_number_of_transitions,
     malachite::base::random::Seed,
     BusinessProcessModelAndNotation, LabelledPetriNet, ProcessTree,
     StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet, StochasticProcessTree,
@@ -62,7 +61,7 @@ impl RandomMinerSTREE for ProcessTree {
     fn mine_random_stochastic_process_tree(self, mut seed: Seed) -> StochasticProcessTree {
         let termination = Fraction::random_non_zero_probability(10, Fraction::random_seed());
 
-        let len = get_number_of_transitions(&self) - 1;
+        let len = self.number_of_leaves();
         let mut weights = Vec::with_capacity(len);
         for _ in 0..len {
             weights.push(Fraction::random_non_zero_probability(10, seed));

@@ -1,12 +1,13 @@
 use crate::{
-    ebi_commands::ebi_command_association::DEFAULT_NUMBER_OF_SAMPLES,
+    ebi_commands::{
+        ebi_command_association::DEFAULT_NUMBER_OF_SAMPLES, ebi_command_info::ebi_info,
+    },
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::EbiInputType,
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_info,
     ebi_traits::{
         EbiTraitEventLog, EbiTraitEventLogTraceAttributes, EbiTraitFiniteStochasticLanguage,
         EbiTraitStochasticSemantics,

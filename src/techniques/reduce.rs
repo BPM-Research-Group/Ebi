@@ -95,7 +95,7 @@ mod tree {
                 | TreeNode::Operator(TreeOperator::Sequence, _)
                 | TreeNode::Operator(TreeOperator::Concurrent, _)
                 | TreeNode::Operator(TreeOperator::Or, _) => {
-                    for child in tree.get_children(node) {
+                    for child in tree.children(node) {
                         if tree[child].is_operator_and_matches(&tree[node]) {
                             _ = tree.remove(child);
                             return true;
@@ -104,7 +104,7 @@ mod tree {
                     false
                 }
                 TreeNode::Operator(TreeOperator::Loop, _) => {
-                    for (c, child) in tree.get_children(node).enumerate() {
+                    for (c, child) in tree.children(node).enumerate() {
                         if c == 0 {
                             if tree[child].is_operator_and_matches(&tree[node]) {
                                 let _ = tree.remove(child);
@@ -149,7 +149,7 @@ mod tree {
                 | TreeNode::Operator(TreeOperator::Interleaved, number_of_children)
                     if number_of_children > 1 =>
                 {
-                    for child in tree.get_children(node) {
+                    for child in tree.children(node) {
                         //remove tau altogether
                         if tree[child].is_tau() {
                             _ = tree.remove(child);
@@ -162,7 +162,7 @@ mod tree {
                     if number_of_children > 1 =>
                 {
                     //option 1: diect tau
-                    for child in tree.get_children(node) {
+                    for child in tree.children(node) {
                         if tree[child].is_tau() {
                             //move tau to xor(tau) above or
 
@@ -181,14 +181,11 @@ mod tree {
                     }
 
                     //option 2: tau-under-xor
-                    for child in tree.get_children(node) {
-                        if let Some(number_of_children) = tree.get_number_of_children(child)
-                            && number_of_children >= 2
-                            && tree[child].is_operator_xor()
-                        {
+                    for child in tree.children(node) {
+                        if tree[child].number_of_children() >= 2 && tree[child].is_operator_xor() {
                             //find a grandchild tau
                             if let Some(grandchild_tau) = tree
-                                .get_children(child)
+                                .children(child)
                                 .find(|grandchild| tree[*grandchild].is_tau())
                             {
                                 tree.edit(|tree| {
@@ -209,13 +206,12 @@ mod tree {
                 TreeNode::Operator(TreeOperator::Xor, number_of_children)
                     if number_of_children > 1 =>
                 {
-                    if let Some(tau_child) =
-                        tree.get_children(node).find(|child| tree[*child].is_tau())
+                    if let Some(tau_child) = tree.children(node).find(|child| tree[*child].is_tau())
                     {
                         //there is a tau child
 
                         if tree
-                            .get_children(node)
+                            .children(node)
                             .any(|child| child != tau_child && has_empty_traces_node(tree, child))
                         {
                             //there is another child with the empty trace
@@ -231,14 +227,14 @@ mod tree {
                     if number_of_children > 1 =>
                 {
                     if let Some(tau_child) = tree
-                        .get_children(node)
+                        .children(node)
                         .skip(1)
                         .find(|child| tree[*child].is_tau())
                     {
                         //there is a tau child
 
                         if tree
-                            .get_children(node)
+                            .children(node)
                             .skip(1)
                             .any(|child| child != tau_child && has_empty_traces_node(tree, child))
                         {
@@ -297,7 +293,7 @@ mod tree {
                 | TreeNode::Operator(TreeOperator::Concurrent, _) => false,
                 TreeNode::Operator(TreeOperator::Interleaved, _) => {
                     if tree
-                        .get_children(node)
+                        .children(node)
                         .all(|child| max_trace_length(tree, child) <= 1)
                     {
                         tree.set_operator(node, TreeOperator::Concurrent);
@@ -323,11 +319,11 @@ mod tree {
                 | TreeNode::Operator(TreeOperator::Interleaved, _) => false,
                 TreeNode::Operator(TreeOperator::Concurrent, number_of_children) => {
                     if let Some((i, child1)) = tree
-                        .get_children(node)
+                        .children(node)
                         .enumerate()
                         .find(|(_, child)| has_empty_traces_node(tree, *child))
                         && let Some(child2) = tree
-                            .get_children(node)
+                            .children(node)
                             .skip(i + 1)
                             .find(|child| has_empty_traces_node(tree, *child))
                     {
@@ -368,7 +364,7 @@ mod tree {
             TreeNode::Tau => 0,
             TreeNode::Activity(_) => 1,
             TreeNode::Operator(TreeOperator::Xor, _) => tree
-                .get_children(node)
+                .children(node)
                 .map(|child| max_trace_length(tree, child))
                 .max()
                 .unwrap(),
@@ -376,12 +372,12 @@ mod tree {
             | TreeNode::Operator(TreeOperator::Concurrent, _)
             | TreeNode::Operator(TreeOperator::Interleaved, _)
             | TreeNode::Operator(TreeOperator::Or, _) => tree
-                .get_children(node)
+                .children(node)
                 .map(|child| max_trace_length(tree, child))
                 .sum(),
             TreeNode::Operator(TreeOperator::Loop, _) => {
                 if tree
-                    .get_children(node)
+                    .children(node)
                     .map(|child| max_trace_length(tree, child))
                     .sum::<usize>()
                     > 0
@@ -774,7 +770,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -784,7 +780,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -794,7 +790,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -804,7 +800,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -814,7 +810,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -842,7 +838,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -852,7 +848,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -867,7 +863,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -880,7 +876,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -890,7 +886,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 
     #[test]
@@ -906,6 +902,6 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+        assert_eq!(tree.to_canonical_string(), target.to_canonical_string());
     }
 }

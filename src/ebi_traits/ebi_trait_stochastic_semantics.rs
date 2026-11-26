@@ -15,13 +15,13 @@ use ebi_objects::{
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
+        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel,
     },
     ActivityKey, AutomatonState, DirectlyFollowsGraph, EventLog, EventLogPython,
     EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    TranslateActivityKey,
+    TranslateActivityKey, TreeMarking,
 };
 
 /// Allows for traversal of a state space and its probabilities.

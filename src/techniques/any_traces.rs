@@ -10,14 +10,13 @@ use ebi_objects::{
         event_log_csv::EventLogCsv, event_log_event_attributes::EventLogEventAttributes,
         event_log_ocel::EventLogOcel,
         partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
-        process_tree::TreeMarking,
     },
     AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
     EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
     FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet,
     NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TreeMarking,
 };
 
 pub trait AnyTraces {

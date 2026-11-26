@@ -9,9 +9,8 @@ use crate::{
 use ebi_objects::{
     anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero},
-    ebi_objects::process_tree::TreeMarking,
     AutomatonState, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TreeMarking,
 };
 use std::{
     collections::{HashMap, HashSet},

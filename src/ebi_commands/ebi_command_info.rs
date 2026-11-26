@@ -7,12 +7,12 @@ use ebi_objects::{anyhow::anyhow, Infoable};
 use inflector::Inflector;
 use std::io::Write;
 
-#[macro_export]
 macro_rules! ebi_info {
     () => {
         "info"
     };
 }
+pub(crate) use ebi_info;
 
 pub const EBI_INFO: EbiCommand = EbiCommand::Command {
     name_short: "info",

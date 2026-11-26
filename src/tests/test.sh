@@ -31,4 +31,10 @@ cargo test --features exactarithmetic --package ebi --lib -- tests::tests_autoge
 cargo test --features approximatearithmetic --package ebi --lib -- tests::tests_autogen::tests --nocapture
 cargo test --features javascript --package ebi --lib -- tests::tests_autogen::tests --nocapture
 
+# Clear generated Rust code files
+> src/tests/tests_autogen.rs
+> src/surfaces/javascript/javascript_autogen.rs
+> src/python/python_module_autogen.rs
+> src/surfaces/java/java_autogen.rs
+
 echo "Ebi passed the tests."

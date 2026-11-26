@@ -1,7 +1,6 @@
 use ebi_objects::{
     anyhow::anyhow,
     ebi_arithmetic::{Fraction, One},
-    ebi_objects::process_tree::get_number_of_transitions,
     BusinessProcessModelAndNotation, LabelledPetriNet, ProcessTree,
     StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet, StochasticProcessTree,
 };
@@ -49,7 +48,7 @@ impl UniformStochasticMinerLPN for LabelledPetriNet {
 
 impl UniformStochasticMinerTree for ProcessTree {
     fn mine_uniform_stochastic_tree(self) -> StochasticProcessTree {
-        let len = get_number_of_transitions(&self) - 1;
+        let len = self.number_of_leaves();
         (self, vec![Fraction::one(); len], Fraction::one())
             .try_into()
             .unwrap()

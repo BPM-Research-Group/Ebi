@@ -8,13 +8,13 @@ use ebi_objects::{
         event_log_csv::EventLogCsv, event_log_event_attributes::EventLogEventAttributes,
         event_log_ocel::EventLogOcel,
         partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
-        process_tree::TreeMarking,
     },
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
     EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
     FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    TreeMarking,
 };
 use std::collections::{hash_map::Entry, HashMap};
 

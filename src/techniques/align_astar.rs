@@ -14,14 +14,13 @@ use ebi_objects::{
     ebi_objects::{
         labelled_petri_net::TransitionIndex, language_of_alignments::Move,
         partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
-        process_tree::TreeMarking,
     },
     Activity, ActivityKeyTranslator, AutomatonState, BusinessProcessModelAndNotation,
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
     FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
     StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TreeMarking,
 };
 use rayon::iter::ParallelIterator;
 use std::{

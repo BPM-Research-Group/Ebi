@@ -11,9 +11,8 @@ use crate::{
 use ebi_objects::{
     anyhow::Result,
     ebi_arithmetic::{Fraction, One, Signed, Zero},
-    ebi_objects::process_tree::TreeMarking,
     Activity, AutomatonState, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TreeMarking,
 };
 use std::{
     collections::{hash_map::Entry, HashMap},

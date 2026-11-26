@@ -1227,7 +1227,7 @@ mod tests {
     use ebi_objects::{
         activity, con,
         ebi_arithmetic::{f, Fraction, One},
-        event_log, seq, trace, ActivityKey, EventLog, FiniteLanguage, FiniteStochasticLanguage,
+        event_log, seq, trace, FiniteLanguage, FiniteStochasticLanguage,
     };
 
     #[test]

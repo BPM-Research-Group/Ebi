@@ -4,10 +4,9 @@ use ebi_objects::{
     ebi_arithmetic::Fraction,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
-        process_tree::TreeMarking,
         stochastic_process_tree::{get_total_weight_of_enabled_transitions, get_transition_weight},
     },
-    StochasticProcessTree,
+    StochasticProcessTree, TreeMarking,
 };
 
 impl StochasticSemantics for StochasticProcessTree {

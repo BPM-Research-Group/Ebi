@@ -1,11 +1,11 @@
 use crate::{
+    ebi_commands::ebi_command_info::ebi_info,
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::EbiInputType,
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_info,
     ebi_traits::EbiTraitEventLogTraceAttributes,
     techniques::association::Associations,
 };

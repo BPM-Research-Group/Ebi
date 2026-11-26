@@ -1,22 +1,22 @@
 use crate::{
+    ebi_commands::ebi_command_info::ebi_info,
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
     },
-    ebi_info,
 };
 use clap::{value_parser, Arg, ArgAction};
 use ebi_objects::anyhow::{anyhow, Context, Ok};
 use std::path::PathBuf;
 
-#[macro_export]
 macro_rules! ebi_validate {
     () => {
         "validate"
     };
 }
+pub(crate) use ebi_validate;
 
 pub const EBI_VALIDATE: EbiCommand = EbiCommand::Command {
     name_short: "vali",

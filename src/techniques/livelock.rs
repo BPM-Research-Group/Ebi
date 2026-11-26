@@ -7,11 +7,10 @@ use crate::{
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},
-    ebi_objects::process_tree::TreeMarking,
     AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
     DirectlyFollowsModel, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TreeMarking,
 };
 use pastey::paste;
 use std::collections::{hash_map::Entry, HashMap, HashSet};

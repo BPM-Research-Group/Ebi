@@ -3,9 +3,9 @@ use ebi_objects::{
     anyhow::Result,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
-        process_tree::{
-            execute_transition, get_enabled_transitions, get_initial_state,
-            get_transition_activity, is_final_state, TreeMarking,
+        process_tree::semantics::{
+            execute_transition, execute_transition_unchecked, get_enabled_transitions,
+            get_initial_state, get_transition_activity, is_final_state, TreeMarking,
         },
     },
     Activity, ProcessTree,
@@ -23,7 +23,12 @@ impl Semantics for ProcessTree {
         state: &mut <Self as Semantics>::SemState,
         transition: TransitionIndex,
     ) -> Result<()> {
-        execute_transition(self, state, transition)
+        if cfg!(test) {
+            execute_transition(self, state, transition)
+        } else {
+            execute_transition_unchecked(self, state, transition);
+            Ok(())
+        }
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
