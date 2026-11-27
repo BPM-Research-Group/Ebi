@@ -211,8 +211,8 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EMPTY_TRACES: EbiCommand = EbiCommand::Comm
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[&EbiInputType::Object(EbiObjectType::ProcessTree)]],
-    input_names: &["FILE"],
-    input_helps: &["A file"],
+    input_names: &["TREE"],
+    input_helps: &["A process tree"],
     execute: |mut objects, _| {
         let model = objects.remove(0).to_type::<ProcessTree>()?;
 
@@ -466,7 +466,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
         &[&EbiInputType::Usize(Some(1), None, Some(1))],
     ],
-    input_names: &["FILE", "NUMBER_OF_TRACES"],
+    input_names: &["LANG", "NUMBER_OF_TRACES"],
     input_helps: &[
         "The finite stochastic language.",
         "The number of traces that should be extracted.",

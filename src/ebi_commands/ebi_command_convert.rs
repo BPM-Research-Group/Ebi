@@ -41,7 +41,7 @@ pub const EBI_CONVERT_BPMN: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::BusinessProcessModelAndNotation), //every object that can be imported as an LPN will be supported by the framework
     ]],
-    input_names: &["FILE"],
+    input_names: &["BPMN"],
     input_helps: &["Any file supported by Ebi that can be converted."],
     execute: |mut inputs, _| {
         let lpn = inputs
@@ -65,7 +65,7 @@ pub const EBI_CONVERT_LOG: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::EventLog), //every object that can be imported as an event log will be supported by the framework
     ]],
-    input_names: &["FILE"],
+    input_names: &["LOG"],
     input_helps: &["Any file supported by Ebi that can be converted."],
     execute: |mut inputs, _| {
         let lpn = inputs.remove(0).to_type::<EventLog>()?;
@@ -85,7 +85,7 @@ pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet), //every object that can be imported as an LPN will be supported by the framework
     ]],
-    input_names: &["FILE"],
+    input_names: &["LPN"],
     input_helps: &["Any file supported by Ebi that can be converted."],
     execute: |mut inputs, _| {
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
@@ -105,7 +105,7 @@ pub const EBI_CONVERT_LANG: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::FiniteLanguage), //every object that can be imported will be supported by the framework
     ]],
-    input_names: &["FILE"],
+    input_names: &["LANG"],
     input_helps: &["Any file supported by Ebi that can be converted."],
     execute: |mut inputs, _| {
         let slang = inputs.remove(0).to_type::<FiniteLanguage>()?;
@@ -125,7 +125,7 @@ pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage), //every object that can be imported as an FSL will be supported by the framework
     ]],
-    input_names: &["FILE"],
+    input_names: &["SLANG"],
     input_helps: &["Any file supported by Ebi that can be converted."],
     execute: |mut inputs, _| {
         let slang = inputs.remove(0).to_type::<FiniteStochasticLanguage>()?;
@@ -147,7 +147,7 @@ pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton), //every object that can be imported as an SDFA will be supported by the framework
     ]],
-    input_names: &["FILE"],
+    input_names: &["SDFA"],
     input_helps: &["Any file supported by Ebi that can be converted."],
     execute: |mut inputs, _| {
         let sdfa = inputs
@@ -171,7 +171,7 @@ pub const EBI_CONVERT_SLPN: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet), //every object that can be imported will be supported by the framework
     ]],
-    input_names: &["FILE"],
+    input_names: &["SLPN"],
     input_helps: &["Any file supported by Ebi that can be converted."],
     execute: |mut inputs, _| {
         let lpn = inputs.remove(0).to_type::<StochasticLabelledPetriNet>()?;
@@ -193,7 +193,7 @@ pub const EBI_CONVERT_SDFM: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::StochasticDirectlyFollowsModel), //every object that can be imported as an SDFM will be supported by the framework
     ]],
-    input_names: &["FILE"],
+    input_names: &["SDFM"],
     input_helps: &[
         "Any file supported by Ebi that can be converted. An SLPN must be livelock-free and bounded.",
     ],
@@ -220,7 +220,7 @@ pub const EBI_CONVERT_SNFA: EbiCommand = EbiCommand::Command {
         &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton), //every object that can be imported as an NDFA will be supported by the framework
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
     ]],
-    input_names: &["FILE"],
+    input_names: &["MODEL"],
     input_helps: &[
         "Any file supported by Ebi that can be converted. An SLPN must be livelock-free and bounded.",
     ],

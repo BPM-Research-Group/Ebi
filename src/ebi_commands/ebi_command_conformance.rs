@@ -118,7 +118,7 @@ pub const EBI_CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
         SAMPLED_OBJECT_INPUTS,
         &[&EbiInputType::Usize(Some(1), None, None)],
     ],
-    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
+    input_names: &["SLANG_1", "SLANG_2", "NUMBER_OF_TRACES"],
     input_helps: &[
         "A sampleable stochastic language to compare.",
         "A sampleable stochastic language to compare.",
@@ -264,7 +264,7 @@ pub const EBI_CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
         SAMPLED_OBJECT_INPUTS,
         &[&EbiInputType::Usize(Some(1), None, None)],
     ],
-    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
+    input_names: &["SLANG_1", "SLANG_2", "NUMBER_OF_TRACES"],
     input_helps: &[
         "A sampleable stochastic language to compare.",
         "A sampleable stochastic language to compare.",
@@ -409,7 +409,7 @@ pub const EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE: EbiCommand = EbiCommand::Command 
         SAMPLED_OBJECT_INPUTS,
         &[&EbiInputType::Usize(Some(1), None, None)],
     ],
-    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
+    input_names: &["SLANG_1", "SLANG_2", "NUMBER_OF_TRACES"],
     input_helps: &[
         "A stochastic language (log or model) to compare.",
         "A stochastic language (log or model) to compare.",
@@ -497,7 +497,7 @@ pub const EBI_CONFORMANCE_HELLINGER_SAMPLE: EbiCommand = EbiCommand::Command {
         SAMPLED_OBJECT_INPUTS,
         &[&EbiInputType::Usize(Some(1), None, None)],
     ],
-    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
+    input_names: &["SLANG_1", "SLANG_2", "NUMBER_OF_TRACES"],
     input_helps: &[
         "A sampleable stochastic language to compare.",
         "A sampleable stochastic language to compare.",
@@ -588,7 +588,7 @@ pub const EBI_CONFORMANCE_CHI_SQUARED_SAMPLE: EbiCommand = EbiCommand::Command {
         SAMPLED_OBJECT_INPUTS,
         &[&EbiInputType::Usize(Some(1), None, None)],
     ],
-    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
+    input_names: &["SLANG_1", "SLANG_2", "NUMBER_OF_TRACES"],
     input_helps: &[
         "A sampleable stochastic language to compare.",
         "A sampleable stochastic language to compare.",
@@ -642,7 +642,7 @@ pub const EBI_CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Usize(Some(1), None, None)],
         &[&EbiInputTypeEnum!(DistanceMeasure)],
     ],
-    input_names: &["FILE_1", "FILE_2", "K_ORDER", "MEASURE"],
+    input_names: &["SLANG_1", "SLANG_2", "K_ORDER", "MEASURE"],
     input_helps: &[
         "A finite stochastic language or a stochastic labelled Petri net (log) to compare. A model must be livelock-free and bounded.",
         "A finite stochastic language or a stochastic labelled Petri net (model) to compare. A model must be livelock-free and bounded.",

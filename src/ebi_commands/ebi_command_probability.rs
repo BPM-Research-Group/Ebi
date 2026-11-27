@@ -23,17 +23,17 @@ pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
     explanation_short: "Compute the probability of a trace or specification on the model.",
     explanation_long: None,
     children: &[
-        &EBI_PROBABILITY_LOG,
+        &EBI_PROBABILITY_LANG,
         &EBI_PROBABILITY_TRACE,
         &EBI_PROBABILITY_EXPLAIN_TRACE,
     ],
 };
 
-pub const EBI_PROBABILITY_LOG: EbiCommand = EbiCommand::Command {
-    name_short: "log",
+pub const EBI_PROBABILITY_LANG: EbiCommand = EbiCommand::Command {
+    name_short: "lang",
     name_long: None,
     explanation_short:
-        "Compute the probability that a stochastic model produces any trace of a log.",
+        "Compute the probability that a stochastic language produces any trace of a finite language.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:journals/is/LeemansMM24}"),
     cli_command: None,
@@ -42,7 +42,7 @@ pub const EBI_PROBABILITY_LOG: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "LANG"],
     input_helps: &[
         "The queriable stochastic language (model).",
         "The finite language (log).",
@@ -75,7 +75,7 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
         &[&EbiInputType::StringList],
     ],
-    input_names: &["FILE", "TRACE"],
+    input_names: &["SLANG", "TRACE"],
     input_helps: &[
         "The queriable stochastic language (model).",
         "The remaining multiple standard arguments after FILE are interpreted as the TRACE. Provide event labels in trace order, separated as normal command line arguments (e.g., a space).",
@@ -118,7 +118,7 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
         )],
         &[&EbiInputType::StringList],
     ],
-    input_names: &["FILE", "VALUE", "TRACE"],
+    input_names: &["MODEL", "VALUE", "TRACE"],
     input_helps: &[
         "The model.",
         "Balance between 0 (=only consider deviations) to 1 (=only consider weight in the model)",

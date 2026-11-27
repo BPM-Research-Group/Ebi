@@ -152,7 +152,7 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS: EbiCommand = EbiCommand
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
         &[&EbiInputType::Trait(EbiTrait::Semantics)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["LANG", "MODEL"],
     input_helps: &["The finite language.", "The model."],
     execute: |mut objects, _| {
         let log = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
