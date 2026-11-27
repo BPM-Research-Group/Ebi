@@ -4,7 +4,7 @@ use crate::{
 };
 use ebi_objects::{
     anyhow::{anyhow, Result},
-    DeterministicFiniteAutomaton, HasActivityKey, ProcessTree, TreeNode, TreeOperator,
+    tau, DeterministicFiniteAutomaton, HasActivityKey, ProcessTree, TreeNode, TreeOperator,
 };
 use std::collections::HashSet;
 
@@ -18,12 +18,22 @@ pub trait FlowerMinerDFA {
 
 impl FlowerMinerTree for dyn EbiTraitFiniteLanguage {
     fn mine_flower_tree(&self) -> ProcessTree {
+        if self.number_of_traces() == 0 {
+            //empty language
+            return ProcessTree::default();
+        }
+
         //gather activities
         let mut activities = HashSet::new();
         for trace in self.iter_traces() {
             for activity in trace {
                 activities.insert(activity);
             }
+        }
+
+        if activities.is_empty() {
+            // only empty traces
+            return tau!();
         }
 
         let mut tree = vec![
@@ -37,7 +47,7 @@ impl FlowerMinerTree for dyn EbiTraitFiniteLanguage {
                 .collect::<Vec<_>>(),
         );
 
-        (self.activity_key().clone(), tree).into()
+        ProcessTree::new_unchecked(self.activity_key().clone(), tree)
     }
 }
 
@@ -101,6 +111,10 @@ impl FlowerMinerTree for EbiTraitSemantics {
             .cloned()
             .collect::<Vec<_>>();
 
+        if activities.is_empty() {
+            return tau!();
+        }
+
         let mut tree = vec![
             TreeNode::Operator(TreeOperator::Loop, activities.len() + 1),
             TreeNode::Tau,
@@ -112,7 +126,7 @@ impl FlowerMinerTree for EbiTraitSemantics {
                 .collect::<Vec<_>>(),
         );
 
-        (activity_key, tree).into()
+        ProcessTree::new_unchecked(activity_key, tree)
     }
 }
 
@@ -151,6 +165,10 @@ impl FlowerMinerTree for dyn HasActivityKey {
             .cloned()
             .collect::<Vec<_>>();
 
+        if activities.is_empty() {
+            return tau!();
+        }
+
         let mut tree = vec![
             TreeNode::Operator(TreeOperator::Loop, activities.len() + 1),
             TreeNode::Tau,
@@ -162,6 +180,6 @@ impl FlowerMinerTree for dyn HasActivityKey {
                 .collect::<Vec<_>>(),
         );
 
-        (activity_key, tree).into()
+        ProcessTree::new_unchecked(activity_key, tree)
     }
 }

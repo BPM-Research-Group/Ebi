@@ -169,7 +169,7 @@ mod tree {
                         if tree[child].is_tau() {
                             //move tau to xor(tau) above or
 
-                            tree.edit(|tree| {
+                            tree.edit_unchecked(|tree| {
                                 //remove tau
                                 tree.remove(child);
                                 _ = tree[node].set_number_of_children(number_of_children - 1);
@@ -193,7 +193,7 @@ mod tree {
                             {
                                 //println!("\tgrandchild_tau {grandchild_tau}");
                                 let number_of_child_children = tree[child].number_of_children();
-                                tree.edit(|tree| {
+                                tree.edit_unchecked(|tree| {
                                     //remove the grandchild
                                     tree.remove(grandchild_tau);
                                     _ = tree[child]
@@ -256,7 +256,7 @@ mod tree {
                         //loop has a body tau; pull it up
                         //remove the body tau
                         let x = tree.get_child(node, 0);
-                        tree.edit(|tree| {
+                        tree.edit_unchecked(|tree| {
                             tree.remove(x);
                             //change the loop to an xor
                             tree[node] =
@@ -265,7 +265,7 @@ mod tree {
 
                         //insert redo-tau
                         let y = tree.traverse(node);
-                        tree.edit(|tree| {
+                        tree.edit_unchecked(|tree| {
                             tree.insert(y, TreeNode::Tau);
                             //insert loop
                             tree.insert(node, TreeNode::Operator(TreeOperator::Loop, 2));
@@ -303,7 +303,7 @@ mod tree {
                         .children(node)
                         .all(|child| max_trace_length(tree, child) <= 1)
                     {
-                        tree.set_operator(node, TreeOperator::Concurrent);
+                        tree.set_operator_unchecked(node, TreeOperator::Concurrent);
                         return true;
                     }
                     false
@@ -339,7 +339,7 @@ mod tree {
                         let end1 = tree.traverse(child1);
 
                         //remove child2
-                        tree.edit(|tree| {
+                        tree.edit_unchecked(|tree| {
                             let tchild2 = tree.drain(child2..end2).collect::<Vec<_>>();
                             //remove child1
                             let tchild1 = tree.drain(child1..end1).collect::<Vec<_>>();

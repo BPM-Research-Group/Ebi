@@ -29,7 +29,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     file_extension: "ptree",
     is_binary: false,
     format_specification: ProcessTree::FILE_FORMAT_SPECIFICATION_LATEX,
-    validator: Some(ProcessTree::validate),
+    validator: Some(<ProcessTree as Validate>::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
             ProcessTree::import_as_activities_trait,

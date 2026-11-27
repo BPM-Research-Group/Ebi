@@ -29,7 +29,7 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     file_extension: "sptree",
     is_binary: false,
     format_specification: StochasticProcessTree::FILE_FORMAT_SPECIFICATION_LATEX,
-    validator: Some(StochasticProcessTree::validate),
+    validator: Some(<StochasticProcessTree as Validate>::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
             StochasticProcessTree::import_as_activities_trait,

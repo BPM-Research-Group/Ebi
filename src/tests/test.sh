@@ -40,4 +40,6 @@ cargo test --features javascript --package ebi --lib -- tests::tests_autogen::te
 > src/python/python_module_autogen.rs
 > src/surfaces/java/java_autogen.rs
 
+cargo fmt
+
 echo "Ebi passed the tests."

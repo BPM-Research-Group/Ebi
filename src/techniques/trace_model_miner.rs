@@ -10,7 +10,7 @@ impl TraceModelMinerTree for dyn EbiTraitFiniteLanguage {
     fn mine_trace_model_tree(&self) -> ProcessTree {
         if self.number_of_traces().is_zero() {
             //empty language; empty tree
-            (self.activity_key().clone(), vec![]).into()
+            ProcessTree::default()
         } else {
             let mut tree = vec![TreeNode::Operator(
                 TreeOperator::Xor,
@@ -33,7 +33,7 @@ impl TraceModelMinerTree for dyn EbiTraitFiniteLanguage {
                 }
             }
 
-            (self.activity_key().clone(), tree).into()
+            ProcessTree::new_unchecked(self.activity_key().clone(), tree)
         }
     }
 }

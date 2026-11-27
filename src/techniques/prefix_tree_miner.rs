@@ -41,7 +41,7 @@ impl PrefixTreeMinerTree for dyn EbiTraitFiniteLanguage {
     fn mine_prefix_tree_tree(&self) -> ProcessTree {
         if self.number_of_traces().is_zero() {
             //empty language; return empty tree
-            return (self.activity_key().clone(), vec![]).into();
+            return ProcessTree::default();
         }
 
         //clone to be able to recurse
@@ -50,12 +50,11 @@ impl PrefixTreeMinerTree for dyn EbiTraitFiniteLanguage {
         let mut tree = vec![];
         node_2_tree(lang, &mut tree);
 
-        (self.activity_key().clone(), tree).into()
+        ProcessTree::new_unchecked(self.activity_key().clone(), tree)
     }
 }
 
 pub fn node_2_tree(lang: FiniteLanguage, tree: &mut Vec<TreeNode>) {
-    println!("node to tree {:?}", lang);
     //split traces
     let mut activity_2_lang = HashMap::<_, _, FnvBuildHasher>::default();
     let mut empty_traces = false;

@@ -91,7 +91,7 @@ fn inductive_miner(
     parameters: &InductiveMinerParameters,
 ) -> ProcessTree {
     let nodes = inductive_miner_recursion(log, parameters, 0);
-    let mut tree: ProcessTree = (log.activity_key().clone(), nodes).into();
+    let mut tree = ProcessTree::new_unchecked(log.activity_key().clone(), nodes);
     if parameters.reduce {
         tree.reduce_language_equivalently_for_petri_nets();
     }
