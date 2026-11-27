@@ -12,6 +12,9 @@ set -e
 > src/python/python_module_autogen.rs
 > src/surfaces/java/java_autogen.rs
 
+cargo fmt
+cargo clippy -- --A warnings
+
 # Generate Rust files
 cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs
 cargo run --features surface_generation -- itself surface javascript -o src/surfaces/javascript/javascript_autogen.rs
