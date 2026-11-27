@@ -39,7 +39,7 @@ pub const EBI_ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
             Some(DEFAULT_NUMBER_OF_SAMPLES),
         )],
     ],
-    input_names: &["FILE", "ATTRIBUTE", "SAMPLES"],
+    input_names: &["LOG", "ATTRIBUTE", "SAMPLES"],
     input_helps: &[
         "The event log for which association is to be computed.",
         concat!(
@@ -88,7 +88,7 @@ pub const EBI_ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
             Some(DEFAULT_NUMBER_OF_SAMPLES),
         )],
     ],
-    input_names: &["FILE", "SAMPLES"],
+    input_names: &["LOG", "SAMPLES"],
     input_helps: &[
         "The event log for which association is to be computed.",
         "The number of samples taken.",

@@ -60,7 +60,7 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
             Some(DEFAULT_P_VALUE),
         )],
     ],
-    input_names: &["FILE", "ATTRIBUTE", "SAMPLES", "P-VALUE"],
+    input_names: &["LOG", "ATTRIBUTE", "SAMPLES", "P-VALUE"],
     input_helps: &[
         "The event log for which the test is to be performed.",
         concat!(

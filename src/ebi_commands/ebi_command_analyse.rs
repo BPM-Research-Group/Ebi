@@ -58,7 +58,7 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
         &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
         &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics),
     ]],
-    input_names: &["FILE"],
+    input_names: &["MODEL"],
     input_helps: &["Any object with deterministic stochastic semantics."],
     execute: |mut objects, _| {
         let object = objects.remove(0);
@@ -102,7 +102,7 @@ pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
             Some(ConstFraction::of(1, 20)),
         )],
     ],
-    input_names: &["FILE", "RNDSPL", "MINSIZ"],
+    input_names: &["LOG", "RNDSPL", "MINSIZ"],
     input_helps: &[
         "An event log with trace attributes.",
         "The size of cohorts may have an influence on the measured distances. To correct for this, these measures can be scaled by randomly generated cohorts of the same size. This parameter sets the number of such random splits. Set this to 0 to not perform this correction.",
@@ -130,7 +130,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     latex_link: Some("~\\cite{DBLP:conf/icpm/KabierskiRW23}"),
     exact_arithmetic: true,
     input_types: &[&[&EbiInputType::Trait(EbiTrait::EventLog)]],
-    input_names: &["FILE"],
+    input_names: &["LOG"],
     input_helps: &["An event log."],
     execute: |mut objects, _| {
         let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
@@ -156,7 +156,7 @@ The computation may not terminate if the model has non-decreasing livelocks, or 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics) ],
         &[ &EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), None)]
     ],
-    input_names: &[ "FILE", "MINIMUM_COVERAGE"],
+    input_names: &[ "MODEL", "MINIMUM_COVERAGE"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
     execute: |mut objects, _| {
         let model = objects.remove(0);
@@ -282,7 +282,7 @@ The computation may not terminate if the model is unbounded and this unboundedne
         &[ &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics) ],
         &[ &EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), None)]
     ],
-    input_names: &[ "FILE", "MINIMUM_PROBABILITY"],
+    input_names: &[ "MODEL", "MINIMUM_PROBABILITY"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
     execute: |mut objects, _| {
         let semantics = objects.remove(0).to_type::<EbiTraitStochasticDeterministicSemantics>()?;
@@ -308,7 +308,7 @@ Computation is more efficient for an object with a finite stochastic language.")
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics)],
         &[ &EbiInputType::Usize(Some(1), None, None)]
     ],
-    input_names: &[ "FILE", "NUMBER_OF_TRACES"],
+    input_names: &[ "MODEL", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The number of traces that should be extracted."],
     execute: |mut objects, _| {
         let object = objects.remove(0);
@@ -340,7 +340,7 @@ If there are more than one such trace, an arbitrary one is returned."),
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[ &EbiInputType::Usize(Some(1), None, Some(1))],
     ],
-    input_names: &[ "FILE", "NUMBER_OF_TRACES"],
+    input_names: &[ "SLANG", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with a finite stochastic language.", "The number of traces that should be extracted."],
     execute: |mut objects, _| {
         let language = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
@@ -366,7 +366,7 @@ Computation is more efficient for a model with a finite stochastic language."),
     input_types: &[
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics)],
     ],
-    input_names: &[ "FILE" ],
+    input_names: &[ "MODEL" ],
     input_helps: &[ "Any object with deterministic stochastic semantics." ],
     execute: |mut objects, _| {
         let number_of_traces = 1;
@@ -393,7 +393,7 @@ pub const EBI_ANALYSE_VARIETY: EbiCommand = EbiCommand::Command {
     latex_link: None,
     exact_arithmetic: true,
     input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)]],
-    input_names: &["FILE"],
+    input_names: &["SLANG"],
     input_helps: &["An event log."],
     execute: |mut objects, _| {
         let log = objects

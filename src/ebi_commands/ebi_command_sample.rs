@@ -94,7 +94,7 @@ pub const EBI_SAMPLE_TRACES: EbiCommand = EbiCommand::Command {
         SAMPLED_OBJECT_INPUTS,
         &[&EbiInputType::Usize(Some(1), None, None)],
     ],
-    input_names: &["FILE", "NUMBER_OF_TRACES"],
+    input_names: &["MODEL", "NUMBER_OF_TRACES"],
     input_helps: &[
         "The stochastic semantics (model).",
         "The number of traces to be sampled.",
